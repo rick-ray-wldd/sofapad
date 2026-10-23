@@ -7,6 +7,7 @@ Control a Mac with your iPhone's own keyboard (any IME works: Zhuyin, Pinyin, ha
 - `sofapad.py`: the Mac helper. Python standard library only, nothing to install.
 - `web/index.html`: the phone client, served by the helper.
 - `start.command`: double-click in Finder to start the helper.
+- `macos/`: builds a signed SofaPad.app menu bar app (v0.3).
 - `tests/`: automated tests that emulate an iPhone with Playwright, plus their results.
 - `docs/research-report.html`: the research and design report (existing apps, papers, architecture, UI design).
 - `process/`: the development log (timeline, sources, decisions, tool use, issues, user prompts). It's written in Chinese.
@@ -89,6 +90,21 @@ The on-screen labels are in Traditional Chinese. The tables below give the label
 - A two-finger horizontal swipe scrolls sideways in Safari; it won't go back a page the way a real trackpad does. Use ⌘[ in the shortcut panel to go back.
 
 Switching desktops uses the macOS ⌃← / ⌃→ shortcuts. If it does nothing, go to System Settings > Keyboard > Keyboard Shortcuts > Mission Control and make sure "Move left a space" and "Move right a space" are turned on.
+
+## SofaPad.app (v0.3, signed menu bar app)
+
+`macos/` builds SofaPad as a small menu bar app, so you don't need Terminal or `start.command`. macOS gives the Accessibility permission to SofaPad itself, and with a Developer ID certificate the app opens without the malware warning.
+
+Build it on your Mac (needs only the Command Line Tools, not Xcode):
+```
+./macos/build-app.sh              # build and sign (ad-hoc if you have no Developer ID)
+./macos/build-app.sh --notarize   # also notarize and staple
+```
+For `--notarize`, store your notarization login once (it asks for an app-specific password from appleid.apple.com):
+```
+xcrun notarytool store-credentials sofapad-notary --apple-id YOUR_APPLE_ID --team-id YOUR_TEAM_ID
+```
+The result is `dist/SofaPad.app` and a zip. Open it, turn on SofaPad in System Settings > Privacy & Security > Accessibility, and reopen it. The ⌨︎ menu bar icon shows the address and PIN, copies the address, opens the log (`~/Library/Logs/SofaPad.log`), and quits.
 
 ## Commands
 

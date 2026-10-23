@@ -7,6 +7,7 @@
 - `sofapad.py`：Mac 端 helper（只用 Python 內建函式庫，不用裝套件）
 - `web/index.html`：手機端網頁，由 helper 直接提供
 - `start.command`：在 Finder 雙擊就能啟動
+- `macos/`：建置簽章過的 SofaPad.app 選單列 App（v0.3）
 - `tests/`：在雲端用 Playwright 模擬 iPhone 的自動測試與結果
 - `docs/research-report.html`：研究與設計報告（現有方案比較、文獻、架構、介面設計）
 - `process/`：開發過程紀錄（時間線、來源、決定、工具使用、問題、使用者指令）
@@ -81,6 +82,21 @@
 - 兩指左右滑在 Safari 裡是橫向捲動，不會像真觸控板那樣「上一頁」；要上一頁請用快捷鍵面板裡的 ⌘[。
 
 三指切換桌面用的是 macOS 的「⌃←／⌃→」快捷鍵。如果沒反應，請到「系統設定 > 鍵盤 > 鍵盤快速鍵 > Mission Control」，確認「移到左邊的空間」「移到右邊的空間」有勾選。
+
+## SofaPad.app（v0.3，簽章過的選單列 App）
+
+`macos/` 可以把 SofaPad 做成一個選單列小 App，不用再開終端機或 start.command。輔助使用權限會給 SofaPad 本身；有 Developer ID 憑證的話，打開時也不會跳惡意軟體警告。
+
+在你的 Mac 上建置（只要命令列工具，不用 Xcode）：
+```
+./macos/build-app.sh              # 建置並簽章（沒有 Developer ID 時用臨時簽章）
+./macos/build-app.sh --notarize   # 另外做公證並釘上票證
+```
+要用 `--notarize`，先存一次公證登入資訊（會要你輸入 appleid.apple.com 建立的 App 專用密碼）：
+```
+xcrun notarytool store-credentials sofapad-notary --apple-id 你的AppleID --team-id 你的TeamID
+```
+完成後會得到 `dist/SofaPad.app` 和一個 zip。打開它，到「系統設定 > 隱私權與安全性 > 輔助使用」打開 SofaPad，再重新打開 App。選單列的 ⌨︎ 圖示會顯示網址和 PIN，可以複製網址、開啟紀錄（`~/Library/Logs/SofaPad.log`）和結束。
 
 ## 常用指令
 

@@ -26,7 +26,7 @@ import subprocess
 import sys
 import time
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 HERE = os.path.dirname(os.path.abspath(__file__))
 WEB_DIR = os.path.join(HERE, "web")
@@ -635,6 +635,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="log events instead of posting them")
     ap.add_argument("--new-pin", action="store_true", help="generate a new pairing PIN")
     ap.add_argument("--pin", help="use this PIN for this run (testing)")
+    ap.add_argument("--app", action="store_true", help="started from SofaPad.app (prints status lines for its menu)")
     args = ap.parse_args()
 
     cfg = load_config(reset_pin=args.new_pin)
@@ -649,7 +650,7 @@ def main():
         trusted = check_accessibility()
         if trusted is False:
             log("!! Accessibility permission missing. Open System Settings > Privacy & Security >")
-            log("!! Accessibility and enable the app running this script (e.g. Terminal), then restart it.")
+            log("!! Accessibility and enable %s, then restart it." % ("SofaPad" if args.app else "the app running this script (e.g. Terminal)"))
 
     status = {"post": None, "selftest": None}
     if True:
@@ -661,10 +662,14 @@ def main():
         log("post-event access:", status["post"], "| pointer self-test:", status["selftest"])
         if status["post"] is False or status["selftest"] is False:
             print()
-            print("  !! macOS 沒有允許這個程式控制滑鼠和鍵盤，手機送來的動作都會被丟掉。")
-            print("  !! 請到「系統設定 > 隱私權與安全性 > 輔助使用」，打開「終端機」")
-            print("  !!（如果沒有這一列，按 + 加入 /System/Applications/Utilities/Terminal.app），")
-            print("  !! 然後在這個視窗按 Ctrl+C，再重新啟動 start.command。")
+            if args.app:
+                print("  !! macOS 沒有允許 SofaPad 控制滑鼠和鍵盤。請到「系統設定 > 隱私權與安全性 >")
+                print("  !! 輔助使用」打開 SofaPad，然後結束 SofaPad 再重新打開。")
+            else:
+                print("  !! macOS 沒有允許這個程式控制滑鼠和鍵盤，手機送來的動作都會被丟掉。")
+                print("  !! 請到「系統設定 > 隱私權與安全性 > 輔助使用」，打開「終端機」")
+                print("  !!（如果沒有這一列，按 + 加入 /System/Applications/Utilities/Terminal.app），")
+                print("  !! 然後在這個視窗按 Ctrl+C，再重新啟動 start.command。")
             print()
             if sys.platform == "darwin":
                 subprocess.call(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"])
@@ -680,6 +685,12 @@ def main():
             print("      http://%s:%d" % (a, args.port))
         print("  PIN: %s" % pin)
         print("  Ctrl+C to stop.\n", flush=True)
+        if args.app:
+            # SofaPad.app reads these lines from stdout to fill its menu bar menu.
+            blocked = status["post"] is False or status["selftest"] is False
+            print("@@url http://%s:%d" % (local_hostname(), args.port))
+            print("@@pin %s" % pin)
+            print("@@access %s" % ("blocked" if blocked else "ok"), flush=True)
         async with srv:
             await srv.serve_forever()
 
