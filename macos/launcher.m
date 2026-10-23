@@ -10,6 +10,7 @@
 @property (strong) NSMutableString *pending;
 @property (strong) NSMenuItem *stateItem, *urlItem, *pinItem, *accessItem;
 @property (copy) NSString *url;
+@property (copy) NSString *lastError;
 @end
 
 @implementation AppDelegate
@@ -71,7 +72,7 @@
     };
     task.terminationHandler = ^(NSTask *t) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.stateItem.title = [NSString stringWithFormat:@"SofaPad stopped (exit %d) – see log / 已停止", t.terminationStatus];
+            weakSelf.stateItem.title = weakSelf.lastError ?: [NSString stringWithFormat:@"SofaPad stopped (exit %d) – see log / 已停止", t.terminationStatus];
             weakSelf.item.button.title = @"⌨︎!";
             weakSelf.urlItem.hidden = YES;
             weakSelf.pinItem.hidden = YES;
@@ -109,6 +110,8 @@
     } else if ([line hasPrefix:@"@@pin "]) {
         self.pinItem.title = [NSString stringWithFormat:@"PIN: %@", [line substringFromIndex:6]];
         self.pinItem.hidden = NO;
+    } else if ([line hasPrefix:@"@@error "]) {
+        self.lastError = [line substringFromIndex:8];
     } else if ([line hasPrefix:@"@@access "]) {
         BOOL blocked = [[line substringFromIndex:9] isEqualToString:@"blocked"];
         self.accessItem.hidden = !blocked;

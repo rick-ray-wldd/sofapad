@@ -676,7 +676,14 @@ def main():
     server = Server(injector, pin, status)
 
     async def run():
-        srv = await asyncio.start_server(server.handle, args.host, args.port)
+        try:
+            srv = await asyncio.start_server(server.handle, args.host, args.port)
+        except OSError as e:
+            log("!! cannot listen on port %d: %s" % (args.port, e))
+            log("!! another app is probably using it; quit that app or use --port")
+            if args.app:
+                print("@@error Port %d is in use by another app / 連接埠被其他 App 佔用" % args.port, flush=True)
+            sys.exit(2)
         print()
         print("  SofaPad %s is running." % VERSION)
         print("  On your iPhone (same Wi-Fi), open:")
