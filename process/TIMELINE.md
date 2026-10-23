@@ -5,7 +5,7 @@
 | M0 收到指令 | 2026-10-23 11:38（補記） | 使用者訊息時間戳 03:38:18 UTC；thread 喚醒時間 03:38:26 UTC |
 | M1 開始研究 | 約 11:38（補記） | 第一個動作是發布進度清單，接著第一批 WebSearch ×4；無逐筆時間戳 |
 | M2 研究完成 | 約 11:41（補記） | 最後一批 WebFetch ×3 之後即開始寫報告；時間為推估 |
-| M3 設計定案 | 11:42（補記） | 報告 HTML 檔修改時間 11:42:12；Artifact v1 發布 docs/research-report.html ；thread 回覆約 11:42（協調者告知） |
+| M3 設計定案 | 11:42（補記） | 報告 HTML 檔修改時間 11:42:12；Artifact v1 發布 https://claude.ai/artifact/33YXCQQBzsqqqHAK2xckuN ；thread 回覆約 11:42（協調者告知） |
 | M4 手機打字 Mac 出字 | 未達成（實機，16:30 第一次實測失敗：權限未生效）；模擬通過 12:07 | 在雲端用 --dry-run 模式＋Chromium 模擬 iPhone 13，英文、注音組字（只送「你好」）、刪除、Return、emoji、⌘C 都通過（sofapad/tests/e2e-result.txt）。沒有真的 Mac，所以 Mac 上出字尚未驗證 |
 | M5 滑鼠能用（移動/點擊/右鍵/捲動） | 未達成（實機，16:30 同上）；模擬通過 12:07 | 同一組測試：移動、輕點左鍵、長按右鍵、兩指右鍵、兩指捲動、捲動帶、雙擊拖曳都產生正確事件；Mac 上的 CGEvent 呼叫未驗證 |
 | M6 使用者在 Vision Pro 沙發情境用過（使用者確認） | 未達成 | — |
@@ -62,3 +62,4 @@
 - 18:07 push 被拒（non-fast-forward）：遠端有使用者建立的 Initial commit（MIT LICENSE）；rebase 到其上後 push 成功
 - 18:08 使用者要求以英文為主、附中文版（P-15）
 - 約 18:11 README.md 改寫為英文，中文版移到 README.zh-TW.md；push
+- 18:13 回覆下載新版的方法（P-16）；README 英文版完成並通知

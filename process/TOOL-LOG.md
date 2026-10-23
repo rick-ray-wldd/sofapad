@@ -98,3 +98,6 @@
 ### 18:08–18:12 英文 README
 - post_message：1（確認理解）
 - Bash：4；Write：1（README.md 英文版）
+
+### 18:13 回覆下載方法
+- Bash：1；post_message：1（附件 sofapad-v0.2.zip）
