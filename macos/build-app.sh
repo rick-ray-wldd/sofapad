@@ -38,8 +38,9 @@ BUILT=""
 if compile ""; then
   BUILT="default SDK"
 else
+  echo "   default SDK failed (it may be newer than this linker)"
   for sdk in $SDKS; do
-    echo "   default SDK failed; trying $(basename "$sdk")"
+    echo "   trying $(basename "$sdk")"
     if compile "$sdk"; then BUILT="$(basename "$sdk")"; break; fi
   done
 fi
