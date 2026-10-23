@@ -58,3 +58,5 @@
 - 17:04 看橫向與快捷鍵面板截圖，修正按鈕文字換行
 - 17:05 打包 sofapad-v0.2.zip
 - 17:06 GitHub 已連結（sofapad，公開）；加入 repo（push），同步 v0.2 與紀錄、去識別化掃描後嘗試 push
+- 18:06 使用者回報已安裝 GitHub App（P-14）
+- 18:07 push 被拒（non-fast-forward）：遠端有使用者建立的 Initial commit（MIT LICENSE）；rebase 到其上後 push 成功

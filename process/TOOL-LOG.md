@@ -91,3 +91,6 @@
 ### 17:06 GitHub push（補上 v0.2 與紀錄）
 - add_repo：1（回應 push_check=refused，提示需安裝 Claude GitHub App）
 - Bash：同步紀錄、去識別化、掃描、commit、push
+
+### 18:07 GitHub push（第二次）
+- Bash：push（被拒 non-fast-forward）、fetch、rebase、push 成功、補紀錄再 push

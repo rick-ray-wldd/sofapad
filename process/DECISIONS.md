@@ -164,3 +164,6 @@
 - 理由：協調者轉達「推送前要先問」
 - 誰決定：照規則
 - 之後好不好改：好改
+
+## D-20 保留使用者建立的 LICENSE（18:07）
+- 遠端 main 已有使用者自己建立的 Initial commit（MIT LICENSE）。選擇把本機 commit rebase 上去，不覆蓋（不 force push），所以 repo 現在是 MIT 授權，這是使用者自己加的。

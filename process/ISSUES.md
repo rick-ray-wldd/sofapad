@@ -92,3 +92,8 @@
 - 開啟啟動台：macOS 26 改名為「App」，用 `open -a Apps`，失敗再試 `open -a Launchpad`，未實測。
 - 捏合靈敏度（每 18% 一級）、慣性衰減參數都是猜的。
 - 舊測試「三指輕點不做事」在 v0.2 改為查詢，是預期的行為變更，不是 bug。
+
+## I-23 push 被拒（17:07）
+- 現象：repo 已加入，但 git push 回 403，訊息為 Claude 對 sofapad 沒有寫入權限，需要在 GitHub 安裝 Claude GitHub App。
+- 處理：已在本機 commit 好（含最新紀錄），備份 bundle 更新；等使用者安裝 App 後重推。
+- 狀態：已解決（18:07）。使用者安裝 App 後重推成功，中間需要先 rebase 到遠端的 Initial commit。
