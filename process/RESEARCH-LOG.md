@@ -31,3 +31,12 @@
 ## 統計
 - 實際打開（皆僅摘要）：8（論文 1、GitHub 2、官方文件 1、開發者論壇 1、程式碼審查 1、App 頁 2）
 - 全文閱讀或試跑：0
+
+## 18:13–18:19 游標為何進不了 visionOS App（P-17）
+- 已讀：Apple〈Use Mac Virtual Display on Apple Vision Pro〉https://support.apple.com/guide/apple-vision-pro/tan357ede966/visionos（「you can use your trackpad or mouse with your Mac as you normally would, as well as for visionOS apps」；分享游標要開 Handoff；沒寫支援哪些裝置）
+- 已讀：Eclectic Light〈Inside Universal Control〉https://eclecticlight.co/2022/06/06/inside-universal-control/（輸入在控制端擷取後以 EVNT 事件轉送；沒寫軟體注入的事件會不會轉）
+- 已讀：Synergy 論壇 https://forums.symless.com/topic/6696-synergy-and-universal-control-on-mac/（用 Synergy 時游標移不到 iPad，實體滑鼠可以）
+- 已讀：Apple Community https://discussions.apple.com/thread/255460248（游標分享不穩；有人說只有觸控板可以，屬個人說法）
+- 已讀：Apple〈visionOS 26 連接藍牙配件〉https://support.apple.com/ur-in/guide/apple-vision-pro/connect-bluetooth-accessories-tanaa651a58d/26/visionos/26（列出鍵盤、觸控板、滑鼠）
+- 搜尋但沒開：Karabiner 與通用控制相容性（結果不相關）
+- 結論：「軟體注入事件不會被轉給 Vision Pro」是推論，Apple 沒寫明；依據是使用者實測（真滑鼠可以、SofaPad 不行）和 Synergy 的類似回報。

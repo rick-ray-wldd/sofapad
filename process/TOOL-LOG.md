@@ -101,3 +101,9 @@
 
 ### 18:13 回覆下載方法
 - Bash：1；post_message：1（附件 sofapad-v0.2.zip）
+
+### 18:12–18:20 visionOS 游標問題
+- post_message：2；WebSearch：6；WebFetch：5；request_decision：2（1 次標籤過長失敗）
+
+### 18:16–18:18 Gatekeeper
+- post_message：2；Bash：1

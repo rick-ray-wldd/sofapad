@@ -15,7 +15,7 @@
 
 1. **把整個 `sofapad` 資料夾放到 Mac 上**（例如「文件」裡）。
 2. **確認有 python3**：打開「終端機」，輸入 `python3 --version`。如果跳出「安裝命令列開發者工具」，按安裝，等它裝完。
-3. **啟動**：在 Finder 雙擊 `start.command`。第一次 macOS 可能會說「無法打開」，這時改成按右鍵選「打開」。或在終端機裡執行：
+3. **啟動**：在 Finder 雙擊 `start.command`。如果 macOS 說「無法確認 start.command 沒有惡意軟體」，先按「完成」，再到「系統設定 > 隱私權與安全性」，在 start.command 那段按「強制打開」（新版 macOS 用右鍵「打開」已經繞不過去）。或直接在終端機裡執行，就不會經過這個檢查：
    ```
    cd ~/Documents/sofapad
    python3 sofapad.py

@@ -21,7 +21,7 @@ Text is sent only after the iPhone IME finishes composing, so you pick character
 
 1. **Put the whole `sofapad` folder on your Mac**, for example in Documents.
 2. **Check that python3 is available.** Open Terminal and run `python3 --version`. If macOS offers to install the command line developer tools, accept and wait for it to finish.
-3. **Start the helper.** Double-click `start.command` in Finder. If macOS says it can't be opened, right-click it and choose Open. You can also run it from Terminal:
+3. **Start the helper.** Double-click `start.command` in Finder. If macOS says it "could not verify start.command is free of malware", press Done, then go to System Settings > Privacy & Security and click Open Anyway next to start.command (right-click > Open no longer works on recent macOS). Or skip that check by running it from Terminal:
    ```
    cd ~/Documents/sofapad
    python3 sofapad.py

@@ -97,3 +97,13 @@
 - 現象：repo 已加入，但 git push 回 403，訊息為 Claude 對 sofapad 沒有寫入權限，需要在 GitHub 安裝 Claude GitHub App。
 - 處理：已在本機 commit 好（含最新紀錄），備份 bundle 更新；等使用者安裝 App 後重推。
 - 狀態：已解決（18:07）。使用者安裝 App 後重推成功，中間需要先 rebase 到遠端的 Initial commit。
+
+## I-24 研究報告連結漏遮（18:14）
+- 現象：18:13 那次同步紀錄時，去識別化指令少了 artifact 連結的替換，SUMMARY.md 和 TIMELINE.md 帶著報告的 claude.ai 連結推上 GitHub（commit b86bb89）。
+- 處理：下一個 commit 立刻換回 docs/research-report.html，掃描結果乾淨。該連結是私人 Artifact，未登入的人打不開；舊 commit 裡仍看得到，沒有改寫歷史。
+- 狀態：已修正。
+
+## I-25 Gatekeeper 擋 start.command（18:16）
+- 現象：macOS 顯示「Apple could not verify start.command is free of malware」，只有「丟到垃圾桶」和「完成」。新版 macOS 右鍵「打開」已不能繞過。
+- 處理：請使用者改從終端機執行 python3 sofapad.py，或到隱私權與安全性按「強制打開」；兩份 README 同步更新。
+- 狀態：等使用者確認。
