@@ -125,10 +125,10 @@ check('three-finger tap does nothing', ev.length===0, ev.join(' | '));
 // 8. buttons
 n = logLines().length;
 await page.tap('#leftBtn'); await page.tap('#rightBtn');
-await page.tap('[data-combo="cmd+tab"]'); await page.tap('[data-combo="ctrl+left"]'); await page.tap('[data-combo="ctrl+right"]');
+await page.tap('[data-combo="cmd+tab"]'); await page.tap('[data-combo="ctrl+left"]'); await page.tap('[data-combo="ctrl+right"]'); await page.tap('[data-combo="ctrl+cmd+shift+4"]');
 await sleep(150);
 ev = since(n);
-check('buttons: left, right, ⌘Tab, ◀桌面, 桌面▶', ev.some(l=>l.includes('click left')) && ev.some(l=>l.includes('click right')) && ev.some(l=>l.includes('key cmd+tab')) && ev.some(l=>l.includes('key ctrl+left')) && ev.some(l=>l.includes('key ctrl+right')), ev.map(l=>l.split('[dry-run] ')[1]).join(' | '));
+check('buttons: left, right, ⌘Tab, ◀桌面, 桌面▶, 截圖', ev.some(l=>l.includes('click left')) && ev.some(l=>l.includes('click right')) && ev.some(l=>l.includes('key cmd+tab')) && ev.some(l=>l.includes('key ctrl+left')) && ev.some(l=>l.includes('key ctrl+right')) && ev.some(l=>l.includes('key ctrl+cmd+shift+4')), ev.map(l=>l.split('[dry-run] ')[1]).join(' | '));
 
 // 9. typing ascii
 await page.tap('#kbBtn');
