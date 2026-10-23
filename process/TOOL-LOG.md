@@ -87,3 +87,7 @@
 - read_thread：1
 - update_progress_checklist：6（含最後一次）
 - post_message：4（1 次失敗；含本次交付回覆）
+
+### 17:06 GitHub push（補上 v0.2 與紀錄）
+- add_repo：1（回應 push_check=refused，提示需安裝 Claude GitHub App）
+- Bash：同步紀錄、去識別化、掃描、commit、push
