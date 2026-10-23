@@ -56,6 +56,16 @@
 | 16:33 | Read | 看警告截圖 | 成功 |
 | 16:33 | Bash ×2 | README、重跑測試、打包 v0.1.1；確認伺服器停止 | 成功（exit 144 同 I-13） |
 | 16:34 | Bash | 更新 process/ 記錄 | 成功 |
+| 16:35 | Bash、update_progress_checklist、post_message | 記錄 P-07，請使用者逐項確認 | 成功 |
+| 16:39 | ToolSearch、Bash | 載入 repo 工具；記錄 P-08 | 成功 |
+| 16:39 | list_repos | 查可用的 GitHub repo | 失敗：沒有連結 GitHub 帳號 |
+| 16:39 | ToolSearch、Bash、read_documentation | 掃描檔案中的 PIN／IP；讀 GitHub 存取說明 | 成功 |
+| 16:40 | Bash ×3 | 組 repo、遮蔽 IP 與電腦名稱、git commit、存 bundle、記錄 | 成功 |
+| 16:40 | update_progress_checklist、post_message | 請使用者連結 GitHub 並給 repo | 成功 |
+| 16:43 | Bash、update_progress_checklist | 記錄 P-09 | 成功 |
+| 16:43 | Bash | 記錄 P-10；實作三指滑動與方向鍵旗標 | 成功 |
+| 16:44 | Bash ×2 | 加測試並跑完整測試；存結果、README、打包 v0.1.2 | 31/31＋3/3 |
+| 16:45 | Bash ×2 | 更新 process/ 記錄；更新本機 repo 並 commit | 成功 |
 
 ## 次數統計（截至 12:11，本 thread；之後的呼叫見上方各列）
 - WebSearch：11

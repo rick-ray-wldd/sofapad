@@ -26,7 +26,7 @@ import subprocess
 import sys
 import time
 
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 HERE = os.path.dirname(os.path.abspath(__file__))
 WEB_DIR = os.path.join(HERE, "web")
@@ -46,6 +46,13 @@ KEYCODES = {
 }
 MOD_FLAGS = {"shift": 1 << 17, "ctrl": 1 << 18, "alt": 1 << 19, "cmd": 1 << 20}
 MOD_KEYCODES = {"cmd": 55, "shift": 56, "alt": 58, "ctrl": 59}
+# Real arrow/navigation keys carry these flags; without them macOS ignores
+# synthetic ctrl+arrow for Mission Control and switching Spaces.
+FLAG_NUMPAD, FLAG_FN = 1 << 21, 1 << 23
+NAV_FLAGS = {"left": FLAG_NUMPAD | FLAG_FN, "right": FLAG_NUMPAD | FLAG_FN,
+             "up": FLAG_NUMPAD | FLAG_FN, "down": FLAG_NUMPAD | FLAG_FN,
+             "home": FLAG_FN, "end": FLAG_FN, "pageup": FLAG_FN, "pagedown": FLAG_FN,
+             "forwarddelete": FLAG_FN}
 
 
 def log(*args):
@@ -222,7 +229,7 @@ class MacInjector:
         code = KEYCODES.get(name)
         if code is None:
             raise ValueError("unknown key %r" % name)
-        flags = 0
+        flags = NAV_FLAGS.get(name, 0)
         for m in mods:
             flags |= MOD_FLAGS.get(m, 0)
         for down in (True, False):

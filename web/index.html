@@ -44,6 +44,9 @@ body.typing #pad .hint{display:none}
 #strip{position:absolute;top:10px;bottom:10px;right:8px;width:34px;border-radius:17px;border:1px dashed var(--pad-line);
   display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;font-size:16px;touch-action:none}
 body.lefty #strip{right:auto;left:8px}
+#swipeToast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(14,138,149,.92);color:#fff;
+  border-radius:12px;padding:8px 14px;font-size:14px;pointer-events:none;white-space:nowrap}
+#swipeToast[hidden]{display:none}
 #strip.active{background:rgba(79,193,201,.12);border-color:var(--accent);color:var(--accent)}
 #dragbadge{position:absolute;top:10px;left:12px;font-size:12px;color:#fff;background:var(--key-on);border-radius:8px;padding:2px 8px}
 body.lefty #dragbadge{left:auto;right:12px}
@@ -98,9 +101,10 @@ body.draft #sendDraft{display:block}
   <div id="axWarn" role="alert" hidden><div><b>Mac 尚未允許控制，動作都會被擋掉。</b><br>請在 Mac 的「系統設定 &gt; 隱私權與安全性 &gt; 輔助使用」打開「終端機」，再把終端機 ⌘Q 結束、重新雙擊 start.command。</div><button id="axRetry" type="button">重新檢查</button></div>
 
   <div id="pad" aria-label="觸控板">
-    <div class="hint">單指滑動移動游標<br>輕點＝左鍵　長按＝右鍵<br>點兩下後按住滑動＝拖曳<br>兩指滑動＝捲動</div>
+    <div class="hint">單指滑動移動游標<br>輕點＝左鍵　長按＝右鍵<br>點兩下後按住滑動＝拖曳<br>兩指滑動＝捲動<br>三指左右滑＝切換桌面／全螢幕視窗<br>三指上滑＝Mission Control，下滑＝App Exposé</div>
     <div id="strip" aria-label="捲動帶">⇅</div>
     <div id="dragbadge" hidden>拖曳中</div>
+    <div id="swipeToast" hidden></div>
   </div>
 
   <div id="last" class="typing-only"></div>
@@ -132,10 +136,10 @@ body.draft #sendDraft{display:block}
     <button id="rightBtn" class="big" type="button">右鍵</button>
   </div>
   <div class="row mirror pad-only">
-    <button data-combo="cmd+tab" type="button">⌘Tab</button>
+    <button data-combo="ctrl+left" type="button" aria-label="切到左邊的桌面">◀ 桌面</button>
     <button data-combo="ctrl+up" type="button">Mission</button>
-    <button data-combo="cmd+w" type="button">⌘W</button>
-    <button data-combo="cmd+z" type="button">⌘Z</button>
+    <button data-combo="ctrl+right" type="button" aria-label="切到右邊的桌面">桌面 ▶</button>
+    <button data-combo="cmd+tab" type="button">⌘Tab</button>
     <button id="kbBtn" class="primary" type="button" aria-label="打開鍵盤">打字</button>
   </div>
 </div>
@@ -346,7 +350,12 @@ body.draft #sendDraft{display:block}
     pend.sx += dx * s; pend.sy += dy * s; schedule();
   }
 
-  var TAP_MS = 250, TAP_SLOP = 9, LONG_MS = 450, DEAD = 3;
+  var TAP_MS = 250, TAP_SLOP = 9, LONG_MS = 450, DEAD = 3, SWIPE_PX = 45;
+  var SWIPE_LABEL = { left: "◀ 左邊的桌面", right: "右邊的桌面 ▶", up: "Mission Control", down: "App Exposé" };
+  function flashSwipe(key) {
+    var el = $("swipeToast"); el.textContent = SWIPE_LABEL[key]; el.hidden = false;
+    clearTimeout(flashSwipe.t); flashSwipe.t = setTimeout(function () { el.hidden = true; }, 700);
+  }
   var g = null;          // current gesture
   var lastTapEnd = 0, lastTapX = 0, lastTapY = 0;
   var touchDragging = false;
@@ -377,6 +386,7 @@ body.draft #sendDraft{display:block}
     } else {
       g.maxF = Math.max(g.maxF, e.touches.length);
       g.lx = c.x; g.ly = c.y; g.lt = now;
+      if (e.touches.length >= 3 && !g.x3) { g.x3 = c.x; g.y3 = c.y; }
       clearTimeout(g.longTimer);
     }
   }, { passive: false });
@@ -393,7 +403,18 @@ body.draft #sendDraft{display:block}
       g.pastDead = true;
     }
     if (g.moved > TAP_SLOP) clearTimeout(g.longTimer);
-    if (e.touches.length >= 2) {
+    if (g.maxF >= 3) {
+      // Three-finger swipe, like a laptop trackpad: fire once per gesture.
+      if (!g.swiped && g.x3 !== undefined && e.touches.length >= 3) {
+        var sx = c.x - g.x3, sy = c.y - g.y3;
+        if (Math.max(Math.abs(sx), Math.abs(sy)) > SWIPE_PX) {
+          g.swiped = true;
+          var key = Math.abs(sx) > Math.abs(sy) ? (sx < 0 ? "right" : "left") : (sy < 0 ? "up" : "down");
+          send({ t: "k", k: key, mods: ["ctrl"] }); buzz();
+          flashSwipe(key);
+        }
+      }
+    } else if (e.touches.length >= 2) {
       addScroll(dx, dy);
     } else if (e.touches.length === 1 && g.maxF === 1) {
       if (g.dragArm && !touchDragging && !dragLocked) {
@@ -411,6 +432,8 @@ body.draft #sendDraft{display:block}
     var now = performance.now(), dur = now - g.start;
     if (touchDragging) {
       touchDragging = false; send({ t: "b", down: false }); $("dragbadge").hidden = !dragLocked;
+    } else if (g.maxF >= 3) {
+      // three-finger gestures never click
     } else if (!g.consumed && dur < TAP_MS + (g.dragArm ? 150 : 0) && g.moved < TAP_SLOP) {
       if (g.maxF >= 2) { click("r"); buzz(); }
       else {

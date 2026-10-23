@@ -101,13 +101,34 @@ ev = since(n);
 sc = ev.filter(l=>l.includes(' scroll '));
 check('thumb scroll strip scrolls with inertia', sc.length>8 && !ev.some(l=>l.includes(' move ')||l.includes('click')), `${sc.length} scroll events`);
 
+// 7b. three-finger swipes
+for (const [name, dx, dy, expect] of [['left', -12, 0, 'key ctrl+right'], ['right', 12, 0, 'key ctrl+left'], ['up', 0, -12, 'key ctrl+up'], ['down', 0, 12, 'key ctrl+down']]) {
+  await sleep(400);
+  n = logLines().length;
+  const pts = [[cx-40,cy],[cx,cy],[cx+40,cy]];
+  await touch('touchStart', pts);
+  for (let i=1;i<=8;i++){ await touch('touchMove', pts.map(p=>[p[0]+dx*i, p[1]+dy*i])); await sleep(16); }
+  await touch('touchEnd', []);
+  await sleep(120);
+  ev = since(n);
+  const keys = ev.filter(l=>l.includes(' key '));
+  check(`three-finger swipe ${name} => ${expect.slice(4)} (once, no click/scroll)`, keys.length===1 && keys[0].includes(expect) && !ev.some(l=>/ click | scroll /.test(l+' ')), ev.map(l=>l.split('[dry-run] ')[1]).join(' | '));
+}
+// short three-finger touch should do nothing
+await sleep(400);
+n = logLines().length;
+await touch('touchStart', [[cx-40,cy],[cx,cy],[cx+40,cy]]); await sleep(60); await touch('touchEnd', []);
+await sleep(120);
+ev = since(n);
+check('three-finger tap does nothing', ev.length===0, ev.join(' | '));
+
 // 8. buttons
 n = logLines().length;
 await page.tap('#leftBtn'); await page.tap('#rightBtn');
-await page.tap('[data-combo="cmd+tab"]');
+await page.tap('[data-combo="cmd+tab"]'); await page.tap('[data-combo="ctrl+left"]'); await page.tap('[data-combo="ctrl+right"]');
 await sleep(150);
 ev = since(n);
-check('buttons: left, right, ⌘Tab', ev.some(l=>l.includes('click left')) && ev.some(l=>l.includes('click right')) && ev.some(l=>l.includes('key cmd+tab')), ev.map(l=>l.split('[dry-run] ')[1]).join(' | '));
+check('buttons: left, right, ⌘Tab, ◀桌面, 桌面▶', ev.some(l=>l.includes('click left')) && ev.some(l=>l.includes('click right')) && ev.some(l=>l.includes('key cmd+tab')) && ev.some(l=>l.includes('key ctrl+left')) && ev.some(l=>l.includes('key ctrl+right')), ev.map(l=>l.split('[dry-run] ')[1]).join(' | '));
 
 // 9. typing ascii
 await page.tap('#kbBtn');
