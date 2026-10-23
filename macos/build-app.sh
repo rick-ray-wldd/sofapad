@@ -20,14 +20,37 @@ VERSION=$(sed -n 's/^VERSION = "\(.*\)"/\1/p' sofapad.py)
 echo "== SofaPad $VERSION"
 
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+mkdir -p "$OUT" "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp macos/Info.plist "$APP/Contents/Info.plist"
 cp sofapad.py "$APP/Contents/Resources/"
 cp -R web "$APP/Contents/Resources/web"
 
 echo "== compiling launcher"
-clang -fobjc-arc -O2 -arch arm64 -arch x86_64 -mmacosx-version-min=12.0 \
-  -framework Cocoa -o "$APP/Contents/MacOS/SofaPad" macos/launcher.m
+# The Command Line Tools can ship an SDK that is newer than their own linker
+# (for example a macOS 27 SDK with a 26.x linker: "tapi error: unknown architecture").
+# Try the default SDK first, then each installed SDK from newest to oldest.
+compile() {
+  clang -fobjc-arc -O2 -arch arm64 -arch x86_64 -mmacosx-version-min=12.0 \
+    ${1:+-isysroot "$1"} -framework Cocoa -o "$APP/Contents/MacOS/SofaPad" macos/launcher.m 2>"$OUT/clang.log"
+}
+SDKS=$(ls -d "$(xcode-select -p)"/SDKs/MacOSX[0-9]*.sdk 2>/dev/null | sort -r || true)
+BUILT=""
+if compile ""; then
+  BUILT="default SDK"
+else
+  for sdk in $SDKS; do
+    echo "   default SDK failed; trying $(basename "$sdk")"
+    if compile "$sdk"; then BUILT="$(basename "$sdk")"; break; fi
+  done
+fi
+if [ -z "$BUILT" ]; then
+  cat "$OUT/clang.log"
+  echo "!! Could not compile with any installed SDK. Installed: $(echo $SDKS | xargs -n1 basename 2>/dev/null | tr '\n' ' ')"
+  echo "!! Try updating the Command Line Tools: softwareupdate --list, then install the newest 'Command Line Tools' item."
+  exit 1
+fi
+rm -f "$OUT/clang.log"
+echo "   built with $BUILT"
 
 LINE=$(security find-identity -v -p codesigning | grep '"Developer ID Application: ' | head -1 || true)
 IDENTITY=$(echo "$LINE" | sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p')
