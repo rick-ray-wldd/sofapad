@@ -1,101 +1,115 @@
-# SofaPad 原型 v0.2
+# SofaPad prototype v0.2
 
-用 iPhone 的系統鍵盤（注音、拼音、手寫、聽寫都可以）和單手觸控板控制 Mac。適合戴 Vision Pro 用「Mac 虛擬顯示器」時，坐在沙發上工作。
+**English** | [繁體中文](README.zh-TW.md)
 
-- `sofapad.py`：Mac 端 helper（只用 Python 內建函式庫，不用裝套件）
-- `web/index.html`：手機端網頁，由 helper 直接提供
-- `start.command`：在 Finder 雙擊就能啟動
-- `tests/`：在雲端用 Playwright 模擬 iPhone 的自動測試與結果
-- `docs/research-report.html`：研究與設計報告（現有方案比較、文獻、架構、介面設計）
-- `process/`：開發過程紀錄（時間線、來源、決定、工具使用、問題、使用者指令）
+Control a Mac with your iPhone's own keyboard (any IME works: Zhuyin, Pinyin, handwriting, dictation) and a one-handed trackpad. It's built for working from the sofa with Apple Vision Pro and Mac Virtual Display, when there's no good place to put a real keyboard.
 
-## 第一次設定（約 5 分鐘）
+- `sofapad.py`: the Mac helper. Python standard library only, nothing to install.
+- `web/index.html`: the phone client, served by the helper.
+- `start.command`: double-click in Finder to start the helper.
+- `tests/`: automated tests that emulate an iPhone with Playwright, plus their results.
+- `docs/research-report.html`: the research and design report (existing apps, papers, architecture, UI design).
+- `process/`: the development log (timeline, sources, decisions, tool use, issues, user prompts). It's written in Chinese.
 
-1. **把整個 `sofapad` 資料夾放到 Mac 上**（例如「文件」裡）。
-2. **確認有 python3**：打開「終端機」，輸入 `python3 --version`。如果跳出「安裝命令列開發者工具」，按安裝，等它裝完。
-3. **啟動**：在 Finder 雙擊 `start.command`。第一次 macOS 可能會說「無法打開」，這時改成按右鍵選「打開」。或在終端機裡執行：
+## How it works
+
+iOS doesn't let apps act as a Bluetooth keyboard, so SofaPad uses a small helper on the Mac instead. The phone opens a web page served by the helper and talks to it over a WebSocket on your home Wi-Fi. The helper turns those messages into real mouse and keyboard events with macOS CoreGraphics.
+
+Text is sent only after the iPhone IME finishes composing, so you pick characters on the phone and the Mac receives the final text.
+
+## First-time setup (about 5 minutes)
+
+1. **Put the whole `sofapad` folder on your Mac**, for example in Documents.
+2. **Check that python3 is available.** Open Terminal and run `python3 --version`. If macOS offers to install the command line developer tools, accept and wait for it to finish.
+3. **Start the helper.** Double-click `start.command` in Finder. If macOS says it can't be opened, right-click it and choose Open. You can also run it from Terminal:
    ```
    cd ~/Documents/sofapad
    python3 sofapad.py
    ```
-4. **給「輔助使用」權限**：到「系統設定 > 隱私權與安全性 > 輔助使用」，打開「終端機」（如果你用 iTerm 就打開 iTerm）。打開後要把 helper 關掉（Ctrl+C）再重新啟動。沒有給這個權限的話，滑鼠和鍵盤都不會動。
-5. 如果 macOS 問「是否允許 Python 接受連入連線」，請選允許。
-6. **手機連線**：iPhone 和 Mac 要連同一個 Wi-Fi。用 Safari 打開終端機上印出來的網址（例如 `http://你的Mac名稱.local:8765`），輸入終端機上顯示的 6 位數 PIN。
-7. **加到主畫面**（建議）：在 Safari 點分享按鈕，選「加入主畫面」，之後就能像 App 一樣全螢幕使用。
+4. **Grant Accessibility permission.** Go to System Settings > Privacy & Security > Accessibility and turn on Terminal (or iTerm, if that's what you use). Then quit the helper (Ctrl+C) and start it again. Without this permission, the mouse and keyboard won't move.
+5. If macOS asks whether Python may accept incoming connections, choose Allow.
+6. **Connect the phone.** Put the iPhone and the Mac on the same Wi-Fi. In Safari, open the URL the helper prints (for example `http://your-mac-name.local:8765`) and enter the 6-digit PIN it shows.
+7. **Add it to the Home Screen** (recommended). In Safari, tap Share, then Add to Home Screen, so it opens full screen like an app.
 
-## 如果手機有反應但 Mac 沒動
+## If the phone responds but the Mac doesn't move
 
-這幾乎都是權限問題。v0.1.1 啟動時會把游標推 1 點再移回來，用來檢查 macOS 有沒有擋掉動作。如果被擋，終端機會印出中文警告，手機上方也會出現紅色提示。修正方式：
+This is almost always the Accessibility permission. At startup, the helper nudges the pointer by 1 point and back to check whether macOS is blocking events. If it's blocked, the helper prints a warning and the phone shows a red banner. To fix it:
 
-1. 到「系統設定 > 隱私權與安全性 > 輔助使用」，打開「終端機」。如果清單裡沒有這一列，按「+」加入「應用程式 > 工具程式 > 終端機」。
-2. 在終端機按 ⌘Q 整個結束，再雙擊 `start.command`。權限要重新啟動才會生效。
-3. 手機上按紅色提示裡的「重新檢查」，或直接重新整理頁面。
+1. Go to System Settings > Privacy & Security > Accessibility and turn on Terminal. If Terminal isn't listed, click + and add Applications > Utilities > Terminal.
+2. Quit Terminal completely with ⌘Q, then double-click `start.command` again. The permission only takes effect after a restart.
+3. On the phone, tap the recheck button in the red banner (重新檢查), or reload the page.
 
-終端機每 3 秒會印一行 `received: ...`，顯示收到了哪些動作，方便判斷問題出在手機、網路還是 Mac。
+Every 3 seconds the helper prints a `received: ...` line that counts the events it got. That tells you whether a problem is on the phone, the network, or the Mac.
 
-## 打中文前
+## Before typing Chinese (or any IME language)
 
-**把 Mac 的輸入法切到英文（ABC）。** 選字在手機上完成，Mac 只會收到選好的字。如果 Mac 還開著注音，送過去的字可能會被 Mac 再組一次。
+**Switch the Mac's input source to English (ABC).** Composition happens on the phone, and the Mac only receives finished text. If a Chinese input method is still active on the Mac, it may try to compose the text a second time.
 
-## 操作方式
+## Using it
 
-### 觸控板手勢（比照 Mac 觸控板）
+The on-screen labels are in Traditional Chinese. The tables below give the label in parentheses where it helps.
 
-| 手勢 | 效果 |
+### Trackpad gestures (modeled on the Mac trackpad)
+
+| Gesture | What it does |
 |---|---|
-| 單指滑動 | 移動游標（滑得越快，游標走得越遠） |
-| 單指輕點 | 左鍵 |
-| 長按約 0.5 秒 | 右鍵 |
-| 點兩下後按住滑動 | 拖曳（選取文字、移動視窗） |
-| 兩指輕點 | 右鍵 |
-| 兩指滑動 | 捲動，放開後會像 Mac 一樣繼續滑一段 |
-| 兩指捏合／張開 | 縮小／放大（送 ⌘− ／⌘+） |
-| 三指左右滑 | 切換桌面／全螢幕視窗（往左滑到右邊那個） |
-| 三指上滑／下滑 | Mission Control／App Exposé |
-| 三指輕點 | 查詢（⌃⌘D，等於 Mac 的「查詢與資料偵測器」） |
-| 四指左右滑 | 同三指，切換桌面 |
-| 四指張開 | 顯示桌面（F11） |
-| 四指捏合 | 啟動台（macOS 26 叫「App」） |
-| 右側 ⇅ 捲動帶 | 單手捲動 |
+| One-finger slide | Move the pointer (faster swipes travel farther) |
+| One-finger tap | Left click |
+| Long press, about 0.5 s | Right click |
+| Tap twice, then hold and slide | Drag (select text, move windows) |
+| Two-finger tap | Right click |
+| Two-finger slide | Scroll, with momentum after you lift, like a Mac |
+| Two-finger pinch / spread | Zoom out / in (sends ⌘− / ⌘+) |
+| Three-finger swipe left/right | Switch desktop or full-screen app |
+| Three-finger swipe up/down | Mission Control / App Exposé |
+| Three-finger tap | Look Up (⌃⌘D) |
+| Four-finger swipe left/right | Same as three fingers: switch desktop |
+| Four-finger spread | Show Desktop (F11) |
+| Four-finger pinch | Launchpad (called Apps in macOS 26) |
+| ⇅ strip on the right edge | One-handed scrolling |
 
-### 按鈕與模式
+### Buttons and modes
 
-| 按鈕 | 效果 |
+| Button | What it does |
 |---|---|
-| ⌘ ⌥ ⌃ ⇧ | 點一下只用一次（亮青色），快速點兩下會鎖住（白框），再點一次取消 |
-| 拖曳鎖 | 鎖住左鍵，可以分好幾次滑完一段長距離拖曳 |
-| ◀ Mission ▶ | 切換左邊桌面、Mission Control、切換右邊桌面 |
-| 截圖 | ⌃⌘⇧4：選取範圍截圖並複製到剪貼簿 |
-| ⌘ 快捷 | 打開快捷鍵面板：複製、貼上、復原、重做、分頁、上一頁、視窗、Spotlight、表情符號、鎖定螢幕、各種截圖等 40 多個 |
-| ⤢ | 全螢幕觸控板：整個螢幕都是觸控板，左上角 ✕ 離開 |
-| 橫著拿 | 自動變成「左邊大觸控板、右邊按鈕」的版面，像 MacBook 一樣；再按 ⤢ 就是整面橫向觸控板（記得關掉 iPhone 的直向鎖定） |
-| 打字 | 叫出 iPhone 鍵盤，打的字會即時送到 Mac |
-| 即時／草稿 | 草稿模式下先在手機上打完、看過，再按「送出」 |
-| 設定 | 游標速度、捲動速度、自然捲動（Mac 預設，可關掉改傳統方向）、左手模式、觸覺回饋 |
+| ⌘ ⌥ ⌃ ⇧ | Tap once to apply to the next key (cyan). Double-tap to lock (white outline). Tap again to release. |
+| Drag lock (拖曳鎖) | Holds the left button down so you can drag across several strokes |
+| ◀ Mission ▶ | Desktop to the left, Mission Control, desktop to the right |
+| Screenshot (截圖) | ⌃⌘⇧4: capture a selection to the clipboard |
+| ⌘ Shortcuts (⌘ 快捷) | Opens a panel of 40+ shortcuts: copy, paste, undo, redo, tabs, back, windows, Spotlight, emoji, lock screen, screenshots, and more |
+| ⤢ | Full-screen trackpad: the whole screen becomes a trackpad. Tap ✕ in the top-left corner to leave. |
+| Turn the phone sideways | Switches to a MacBook-like layout: a large trackpad on the left, buttons on the right. Tap ⤢ for an edge-to-edge landscape trackpad. Turn off the iPhone's portrait lock first. |
+| Type (打字) | Brings up the iPhone keyboard; text goes to the Mac as you type |
+| Live / Draft (即時 / 草稿) | In draft mode you finish and review the text on the phone, then tap Send |
+| Settings (設定) | Pointer speed, scroll speed, natural scrolling (on by default like macOS; turn it off for classic direction), left-handed layout, haptics |
 
-### 做不到的部分
+### What it can't do
 
-- 網頁沒辦法產生 Mac 真正的觸控板手勢事件，所以捏合縮放是用 ⌘+／⌘− 代替，「智慧型縮放」（兩指點兩下）、「從右邊緣滑入通知中心」、Force Touch 壓力感應做不到。
-- 兩指左右滑在 Safari 裡是橫向捲動，不會像真觸控板那樣「上一頁」；要上一頁請用快捷鍵面板裡的 ⌘[。
+- A web page can't generate real Mac trackpad gesture events. Pinch zoom is sent as ⌘+ / ⌘− instead, and Smart Zoom (two-finger double-tap), swiping in from the right edge for Notification Center, and Force Touch aren't possible.
+- A two-finger horizontal swipe scrolls sideways in Safari; it won't go back a page the way a real trackpad does. Use ⌘[ in the shortcut panel to go back.
 
-三指切換桌面用的是 macOS 的「⌃←／⌃→」快捷鍵。如果沒反應，請到「系統設定 > 鍵盤 > 鍵盤快速鍵 > Mission Control」，確認「移到左邊的空間」「移到右邊的空間」有勾選。
+Switching desktops uses the macOS ⌃← / ⌃→ shortcuts. If it does nothing, go to System Settings > Keyboard > Keyboard Shortcuts > Mission Control and make sure "Move left a space" and "Move right a space" are turned on.
 
-## 常用指令
+## Commands
 
 ```
-python3 sofapad.py              # 啟動
-python3 sofapad.py --new-pin    # 換一組新的 PIN（舊手機要重新配對）
-python3 sofapad.py --port 9000  # 換連接埠
-python3 sofapad.py --dry-run    # 只印出事件，不真的控制 Mac（除錯用）
+python3 sofapad.py              # start
+python3 sofapad.py --new-pin    # generate a new PIN (phones must pair again)
+python3 sofapad.py --port 9000  # use a different port
+python3 sofapad.py --dry-run    # print events without controlling the Mac (for debugging)
 ```
 
-PIN 存在 `~/.sofapad.json`。
+The PIN is stored in `~/.sofapad.json`.
 
-## 已知限制
+## Known limitations
 
-- **還沒在真的 Mac 上測過。** 這版是在雲端 Linux 上用模擬模式測試的（網頁、手勢、中文輸入、連線協定），但呼叫 macOS 的部分只能在 Mac 上驗證。第一次跑如果有錯誤訊息，請把終端機的內容貼給我。
-- 連線沒有加密（只在家裡 Wi-Fi 內使用，靠 PIN 擋住別人）。不要把 8765 埠開到網際網路上。
-- 網址是 http，所以 iOS 不能讓螢幕保持亮著；需要的話，請到「設定 > 螢幕顯示與亮度 > 自動鎖定」把時間調長一點。
-- 游標只能在 Mac 的畫面裡移動，不能移到 Vision Pro 旁邊的 visionOS App。
-- 打字時游標會被固定在最後面。iOS 空白鍵拖曳移動游標的功能在這裡不能用，請改用方向鍵。
-- 觸覺回饋用的是 iOS 18 Safari 的開關技巧，有沒有震動要看系統版本。
+- **The v0.2 gestures haven't been verified on a real Mac yet.** Typing and the mouse from v0.1 have been tested on a real Mac. The v0.2 desktop switching (⌃← / ⌃→), Show Desktop (F11), Launchpad, and the pinch-zoom step have only been tested in dry-run mode on Linux. If you see errors, please open an issue with the Terminal output.
+- The connection isn't encrypted. It's meant for your home Wi-Fi, with the PIN keeping others out. Don't expose port 8765 to the internet.
+- The page is served over plain http, so iOS won't keep the screen awake. If that bothers you, raise Settings > Display & Brightness > Auto-Lock.
+- The pointer can only move within the Mac's screen. It can't reach visionOS apps next to the Mac Virtual Display.
+- While typing, the text cursor stays at the end. The iOS space-bar cursor drag doesn't work here; use the arrow keys instead.
+- Haptics rely on an iOS 18 Safari switch trick, so whether you feel them depends on your iOS version.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

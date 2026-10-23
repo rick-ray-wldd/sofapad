@@ -94,3 +94,7 @@
 
 ### 18:07 GitHub push（第二次）
 - Bash：push（被拒 non-fast-forward）、fetch、rebase、push 成功、補紀錄再 push
+
+### 18:08–18:12 英文 README
+- post_message：1（確認理解）
+- Bash：4；Write：1（README.md 英文版）

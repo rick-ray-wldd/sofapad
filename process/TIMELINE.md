@@ -60,3 +60,5 @@
 - 17:06 GitHub 已連結（sofapad，公開）；加入 repo（push），同步 v0.2 與紀錄、去識別化掃描後嘗試 push
 - 18:06 使用者回報已安裝 GitHub App（P-14）
 - 18:07 push 被拒（non-fast-forward）：遠端有使用者建立的 Initial commit（MIT LICENSE）；rebase 到其上後 push 成功
+- 18:08 使用者要求以英文為主、附中文版（P-15）
+- 約 18:11 README.md 改寫為英文，中文版移到 README.zh-TW.md；push

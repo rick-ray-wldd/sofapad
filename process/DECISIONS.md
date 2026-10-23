@@ -167,3 +167,8 @@
 
 ## D-20 保留使用者建立的 LICENSE（18:07）
 - 遠端 main 已有使用者自己建立的 Initial commit（MIT LICENSE）。選擇把本機 commit rebase 上去，不覆蓋（不 force push），所以 repo 現在是 MIT 授權，這是使用者自己加的。
+
+## D-21 英文為主的 README（18:10）
+- 「英文版為主，附中文版本」判讀為 GitHub 上的說明文件。README.md 改為英文（GitHub 預設顯示），中文完整版放 README.zh-TW.md，頂端互相連結。
+- 手機介面文字和 process/ 紀錄這次維持中文；英文 README 在按鈕表格裡用括號附上畫面上的中文標籤。
+- 順便修正兩份 README 的「還沒在真的 Mac 上測過」：v0.1 已實機成功，改成只有 v0.2 手勢未驗證。
