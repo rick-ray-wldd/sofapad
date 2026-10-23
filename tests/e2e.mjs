@@ -120,7 +120,7 @@ n = logLines().length;
 await touch('touchStart', [[cx-40,cy],[cx,cy],[cx+40,cy]]); await sleep(60); await touch('touchEnd', []);
 await sleep(120);
 ev = since(n);
-check('three-finger tap does nothing', ev.length===0, ev.join(' | '));
+check('three-finger tap => look up only (v0.2)', ev.length===1 && ev[0].includes('key ctrl+cmd+d'), ev.join(' | '));
 
 // 8. buttons
 n = logLines().length;

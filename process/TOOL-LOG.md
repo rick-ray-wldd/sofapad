@@ -69,6 +69,12 @@
 | 16:46 | Bash ×2 | 記錄 P-11、加截圖按鈕、跑測試、截圖；確認 | 31/31（pkill 又回傳 144，同 I-13） |
 | 16:46 | Read | 看 v0.1.2 畫面截圖 | 發現按鈕文字換行 |
 | 16:47 | Bash ×3 | 改按鈕文字、重測、重打包；更新記錄；更新 repo 並 commit | 31/31 |
+| 16:54 | Bash ×2、ToolSearch、list_repos | 記錄 P-12、掃描個人資訊、再查 GitHub | list_repos 仍失敗：未連結 |
+| 16:55 | Bash ×2、update_progress_checklist、post_message | 公開版遮蔽、commit、回覆取名與步驟 | 成功 |
+| 17:01 | Bash、update_progress_checklist | 記錄 P-13、確認檔案未變 | 成功 |
+| 17:02–17:03 | Bash ×3 | 改寫手勢引擎；版面、快捷鍵面板、helper | 語法檢查通過 |
+| 17:04 | Bash ×3、Read ×3 | 新測試、回歸測試、看截圖、修換行 | 16/16、31/31、3/3 |
+| 17:05 | Bash ×2 | README、存測試結果、打包 v0.2；記錄 | 成功 |
 
 ## 次數統計（截至 12:11，本 thread；之後的呼叫見上方各列）
 - WebSearch：11

@@ -26,7 +26,7 @@ import subprocess
 import sys
 import time
 
-VERSION = "0.1.2"
+VERSION = "0.2.0"
 WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 HERE = os.path.dirname(os.path.abspath(__file__))
 WEB_DIR = os.path.join(HERE, "web")
@@ -43,6 +43,8 @@ KEYCODES = {
     "return": 36, "tab": 48, "space": 49, "backspace": 51, "escape": 53,
     "forwarddelete": 117, "home": 115, "end": 119, "pageup": 116, "pagedown": 121,
     "left": 123, "right": 124, "down": 125, "up": 126,
+    "f1": 122, "f2": 120, "f3": 99, "f4": 118, "f5": 96, "f6": 97, "f7": 98, "f8": 100,
+    "f9": 101, "f10": 109, "f11": 103, "f12": 111,
 }
 MOD_FLAGS = {"shift": 1 << 17, "ctrl": 1 << 18, "alt": 1 << 19, "cmd": 1 << 20}
 MOD_KEYCODES = {"cmd": 55, "shift": 56, "alt": 58, "ctrl": 59}
@@ -53,6 +55,9 @@ NAV_FLAGS = {"left": FLAG_NUMPAD | FLAG_FN, "right": FLAG_NUMPAD | FLAG_FN,
              "up": FLAG_NUMPAD | FLAG_FN, "down": FLAG_NUMPAD | FLAG_FN,
              "home": FLAG_FN, "end": FLAG_FN, "pageup": FLAG_FN, "pagedown": FLAG_FN,
              "forwarddelete": FLAG_FN}
+NAV_FLAGS.update({"f%d" % i: FLAG_FN for i in range(1, 13)})
+# Apps the phone may open by name (allowlist). macOS 26 replaced Launchpad with "Apps".
+APPS = {"launchpad": [["open", "-a", "Apps"], ["open", "-a", "Launchpad"]]}
 
 
 def log(*args):
@@ -568,6 +573,16 @@ class Server:
             s = str(msg.get("s", ""))
             if s:
                 inj.text(s[:2000])
+        elif t == "app":
+            name = str(msg.get("name", ""))
+            if name not in APPS:
+                raise ValueError("unknown app %r" % name)
+            if isinstance(self.inj, DryRunInjector):
+                self.inj._rec("app", name)
+            else:
+                for cmd in APPS[name]:
+                    if subprocess.call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+                        break
         elif t == "selftest":
             ok = self.inj.self_test()
             self.status["selftest"] = ok

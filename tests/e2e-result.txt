@@ -1,19 +1,19 @@
-# 測試時間 2026-10-23 16:46:17 台北，v0.1.2，雲端 Linux + Chromium（iPhone 13 模擬），helper 以 --dry-run 執行
+# 測試時間 2026-10-23 17:05:39 台北，v0.2，雲端 Linux + Chromium（iPhone 13 模擬），helper 以 --dry-run 執行
 PASS wrong PIN rejected
 PASS paired with correct PIN — vm
 PASS RTT shown — vm · 1 ms
 PASS one-finger drag moves cursor — 10 move events, total dx 74.8 for 60px finger
-PASS tap = left click — 08:46:04 [dry-run] click left
-PASS long press = right click — 08:46:05 [dry-run] click right
-PASS two-finger tap = right click — 08:46:06 [dry-run] click right
-PASS two-finger drag scrolls (finger down => positive) — 10 scroll events, total dy 176
-PASS double-tap + hold + drag = drag — click left | button down | move 7.71 0.0 | move 5.93 0.0 | move 5.92 0.0 | move 5.92 0.0 | move 5.93 0.0 | move 5.93 0.0 | move 5.92 0.0 | move 5.92 0.0 | button up
+PASS tap = left click — 09:05:03 [dry-run] click left
+PASS long press = right click — 09:05:04 [dry-run] click right
+PASS two-finger tap = right click — 09:05:05 [dry-run] click right
+PASS two-finger drag scrolls (finger down => positive) — 15 scroll events, total dy 198
+PASS double-tap + hold + drag = drag — click left | button down | move 7.89 0.0 | move 5.92 0.0 | move 5.92 0.0 | move 5.92 0.0 | move 5.93 0.0 | move 5.92 0.0 | move 5.93 0.0 | move 5.92 0.0 | button up
 PASS thumb scroll strip scrolls with inertia — 36 scroll events
 PASS three-finger swipe left => ctrl+right (once, no click/scroll) — key ctrl+right
 PASS three-finger swipe right => ctrl+left (once, no click/scroll) — key ctrl+left
 PASS three-finger swipe up => ctrl+up (once, no click/scroll) — key ctrl+up
 PASS three-finger swipe down => ctrl+down (once, no click/scroll) — key ctrl+down
-PASS three-finger tap does nothing
+PASS three-finger tap => look up only (v0.2) — 09:05:13 [dry-run] key ctrl+cmd+d
 PASS buttons: left, right, ⌘Tab, ◀桌面, 桌面▶, 截圖 — click left | click right | key cmd+tab | key ctrl+left | key ctrl+right | key ctrl+cmd+shift+4
 PASS keyboard mode opens and textarea focused
 PASS type "hi" then backspace — text h | text i | key backspace
@@ -32,6 +32,26 @@ PASS draft mode: nothing sent until 送出 — text 明天下午開會
 PASS remembered PIN after reload
 
 31/31 passed
+
+# v0.2 新手勢與版面
+PASS two-finger pinch out => ⌘+ (zoom in), no scroll — key cmd+= | key cmd+= | key cmd+= | key cmd+= | key cmd+=
+PASS two-finger pinch in => ⌘− (zoom out) — key cmd+- | key cmd+- | key cmd+- | key cmd+-
+PASS two-finger flick keeps scrolling after lift (momentum) — 8 scroll events while touching, 39 total
+PASS traditional direction flips scroll sign — total dy -61 (natural gives positive)
+PASS three-finger tap => ⌃⌘D look up — key ctrl+cmd+d
+PASS four-finger spread => F11 show desktop (once) — key f11
+PASS four-finger pinch => Launchpad/Apps — app launchpad
+PASS four-finger swipe left => next Space (like 3 fingers) — key ctrl+right
+PASS shortcut sheet opens
+PASS sheet shortcuts send correct keys — key cmd+c | key shift+cmd+z | key ctrl+cmd+space | app launchpad | key f11
+PASS shortcut sheet closes
+PASS full-screen mode: only the trackpad — {"bar":"none","side":"none","padH":656,"vh":664}
+PASS tap still clicks in full-screen mode — click left
+PASS exit full-screen restores controls
+PASS landscape: wide trackpad left, controls column right, no overflow — {"padW":484.40625,"padH":332,"sideX":504.40625,"padRight":494.40625,"overflowX":false}
+PASS landscape full-screen pad fills width — pad width 836
+
+16/16 passed
 
 # 權限被擋時的警告（SOFAPAD_DRY_BLOCKED=1）
 PASS port 8766: warning shown (expected shown)
