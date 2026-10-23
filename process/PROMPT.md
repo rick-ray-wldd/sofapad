@@ -1,7 +1,7 @@
 # PROMPT
 
 ## 原始指令（逐字）
-- 發送者：Rick Ray
+- 發送者：使用者
 - 收到時間：2026-10-23 11:38（台北時間，訊息時間戳 03:38:18 UTC；本 thread 於 11:38:26 收到）（補記）
 
 > 我現在的問題是帶著visionpro工作的時候常常找不到適合的地方放鍵盤 手常常會酸 因為visionpro可以讓我很好的在沙發上工作 但是我沒有合適高度的桌子放我的電腦鍵盤 所以我想要如果我可以用手機的鍵盤連接到我的 Macbook neo 這樣我就可以很舒服的坐姿透過按手機的鍵盤以及某種方式操控滑鼠 讓我可以自由的透過visionpro連我的macbook neo 進行工作。 所以目標是設計手機app或是website 讓我可以以平時最方便的輸入的手機鍵盤在手機上使用但是文字輸入到我連上的macbook neo 以及設計一個使用者介面方便的滑鼠功能讓我能在一隻手機上順暢的操控我的macmini 幫我深度學習與搜尋有沒有相關的文獻或github project 並且設計一款符合我需求的手幾鍵盤滑鼠
@@ -11,7 +11,7 @@
 
 ## 流程記錄指令
 - 收到時間：2026-10-23 11:46（台北，訊息時間戳 03:46:38 UTC）
-- 內容：要求維持 process/ 下 7 個檔案（本資料夾）。原文見協調者轉傳訊息 cmsg_018ChBTqFsUQPjn9FbyxYQhyRXdrFLaALQvqxeiNCMfv2f。
+- 內容：要求維持 process/ 下 7 個檔案（本資料夾）。原文見 USER-PROMPTS.md 的 P-02。
 
 ## 執行環境
 - App：claude.ai 專案（project「phone mouse」）中的 thread，由 Claude Code 遠端執行環境驅動（雲端容器，非使用者電腦）
