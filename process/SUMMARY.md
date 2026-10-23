@@ -14,7 +14,7 @@
 | 決定數 | 13（D-01～D-13；D-09 由使用者決定，D-07 仍待使用者） |
 | 工具呼叫數 | WebSearch 11、WebFetch 8、Artifact 3、Write 3、Read 2、Bash 17、ToolSearch 1、讀 thread 1、清單 6、回覆 4（含 1 次附檔超量失敗） |
 | 費用或用量 | 看不到計費；未記錄 token 數 |
-| 成品 | 研究＋設計報告（Artifact v2）https://claude.ai/artifact/33YXCQQBzsqqqHAK2xckuN ；原型 v0.1：專案檔案 sofapad/（sofapad.py、web/index.html、start.command、README.md、tests/）、sofapad-v0.1.zip 、sofapad-v0.1.1.zip（加上權限偵測與手機提示）、sofapad-v0.1.2.zip（三指切換桌面、截圖按鈕）、sofapad-v0.2.zip（比照 Mac 觸控板手勢、橫向與全螢幕模式、快捷鍵面板）。功能：觸控板（移動、點擊、長按右鍵、兩指右鍵/捲動、捲動帶含慣性、雙擊拖曳、拖曳鎖）、黏滯修飾鍵、常用快捷鍵、即時與草稿兩種打字模式（手機端選字）、PIN 配對、左手模式、設定 |
+| 成品 | 研究＋設計報告（Artifact v2）docs/research-report.html ；原型 v0.1：專案檔案 sofapad/（sofapad.py、web/index.html、start.command、README.md、tests/）、sofapad-v0.1.zip 、sofapad-v0.1.1.zip（加上權限偵測與手機提示）、sofapad-v0.1.2.zip（三指切換桌面、截圖按鈕）、sofapad-v0.2.zip（比照 Mac 觸控板手勢、橫向與全螢幕模式、快捷鍵面板）。功能：觸控板（移動、點擊、長按右鍵、兩指右鍵/捲動、捲動帶含慣性、雙擊拖曳、拖曳鎖）、黏滯修飾鍵、常用快捷鍵、即時與草稿兩種打字模式（手機端選字）、PIN 配對、左手模式、設定 |
 | 啟動方式 | Mac 上雙擊 start.command 或執行 python3 sofapad.py，給終端機「輔助使用」權限，iPhone Safari 打開印出的網址並輸入 PIN |
 | 自測結果 | 雲端模擬：v0.2 31/31＋新手勢與版面 16/16＋權限警告 3/3 通過（17:04）。實機：16:30 第一次實測失敗（Mac 沒反應），原因是終端機權限沒生效（I-15）；16:34 使用者回報「成功了」，16:42 回報表示已實際使用（缺三指切換）；逐項確認尚未回覆 |
 | 最大的三個問題 | 1. Mac 與 iPhone 實機完全沒測，ctypes 呼叫可能有錯；2. 研究階段曾引用未讀論文，且所有閱讀只有摘要；3. 偏離報告的 Swift 計畫改用 Python |
