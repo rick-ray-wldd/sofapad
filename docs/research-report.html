@@ -1,0 +1,305 @@
+<title>沙發觸控板 SofaPad</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column (~720px) with wide breakout blocks for the comparison table, architecture strip and phone mockup */
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --ink:#17202b; --muted:#5b6876; --line:#d9dfe6;
+  --accent:#0e7c86; --accent-soft:#dff1f2; --warn:#b5651d; --warn-soft:#fbeedd; --bad:#b33a3a; --good:#2e7d4f;
+  --pad:#1d2733; --pad-ink:#e8eef4; --pad-line:#33414f;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Heiti TC",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10161d; --surface:#172029; --ink:#e6ebf0; --muted:#97a4b2; --line:#2a3642;
+  --accent:#4fc1c9; --accent-soft:#163338; --warn:#e2a35f; --warn-soft:#3a2b1a; --bad:#e07777; --good:#6cc28f;
+  --pad:#0b1016; --pad-ink:#e8eef4; --pad-line:#2b3845; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161d; --surface:#172029; --ink:#e6ebf0; --muted:#97a4b2; --line:#2a3642;
+  --accent:#4fc1c9; --accent-soft:#163338; --warn:#e2a35f; --warn-soft:#3a2b1a; --bad:#e07777; --good:#6cc28f;
+  --pad:#0b1016; --pad-ink:#e8eef4; --pad-line:#2b3845; color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+.wide{max-width:1040px;margin:0 auto;width:100%}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:.01em}
+h2{font-size:1.6rem;font-weight:900}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.1rem;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:18px}
+.stack{display:flex;flex-direction:column;gap:12px}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 6px;border-radius:4px}
+ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.verdict{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.verdict strong{color:var(--accent)}
+.note{font-size:.9rem;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.fact .tag{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+.tag.bad{color:var(--bad)} .tag.good{color:var(--good)} .tag.warn{color:var(--warn)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:880px;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{font-weight:700;font-size:.78rem;color:var(--muted);letter-spacing:.04em;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.name{font-weight:700;white-space:nowrap}
+.pill{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:999px;white-space:nowrap;font-weight:500}
+.pill.good{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+tr.ours td{background:var(--accent-soft)}
+/* architecture */
+.arch{display:flex;flex-wrap:wrap;align-items:stretch;gap:0}
+.node{flex:1 1 200px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.node .who{font-family:var(--f-mono);font-size:.72rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.node ul{font-size:.88rem}
+.link{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:8px 10px;font-family:var(--f-mono);font-size:.72rem;color:var(--muted);text-align:center;min-width:90px}
+.link .arrow{font-size:1.3rem;color:var(--accent);line-height:1}
+@media (max-width:760px){.arch{flex-direction:column}.link{min-width:0;flex-direction:row;gap:8px;padding:6px}.link .arrow{transform:rotate(90deg)}}
+/* phone mockups */
+.phones{display:flex;flex-wrap:wrap;gap:36px;justify-content:center;align-items:flex-start}
+.phonecol{display:flex;flex-direction:column;gap:12px;align-items:center;max-width:300px}
+.phone{width:270px;max-width:100%;aspect-ratio:9/19.5;background:var(--pad);border-radius:38px;padding:12px;box-shadow:0 0 0 2px var(--pad-line),0 18px 40px -20px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:8px;color:var(--pad-ink);font-size:11px;position:relative;overflow:hidden}
+.p-status{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 0;font-family:var(--f-mono);font-size:10px;opacity:.8}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#43c78a;margin-right:5px}
+.p-pad{flex:1;border:1px solid var(--pad-line);border-radius:22px;position:relative;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));display:flex;align-items:center;justify-content:center}
+.p-pad .hint{opacity:.45;text-align:center;line-height:1.5}
+.p-scroll{position:absolute;right:6px;top:14px;bottom:14px;width:20px;border-radius:10px;border:1px dashed var(--pad-line);display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font-size:9px;opacity:.7}
+.p-row{display:flex;gap:6px}
+.k{flex:1;border:1px solid var(--pad-line);border-radius:10px;padding:8px 0;text-align:center;font-family:var(--f-mono);font-size:11px;background:rgba(255,255,255,.04)}
+.k.on{background:#0e7c86;border-color:#0e7c86;color:#fff}
+.k.big{flex:2}
+.p-kbd{height:38%;background:#2b333d;border-radius:14px;padding:6px;display:grid;grid-template-columns:repeat(10,1fr);gap:4px;align-content:start}
+.p-kbd span{background:#4a5462;border-radius:4px;height:22px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#e8eef4}
+.p-cand{grid-column:1/-1;display:flex;gap:10px;font-size:11px;padding:2px 4px 4px;border-bottom:1px solid #3a434e;margin-bottom:2px;color:#e8eef4}
+.p-mini{height:64px;flex:none}
+.p-draft{border:1px solid var(--pad-line);border-radius:10px;padding:6px 8px;font-size:11px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+.p-draft b{font-weight:500;color:#7fd6dc}
+.cap{font-size:.9rem;color:var(--muted);text-align:center}
+.gest{display:grid;grid-template-columns:minmax(120px,auto) 1fr;gap:0;border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
+.gest div{padding:10px 14px;border-bottom:1px solid var(--line);font-size:.92rem;min-width:0}
+.gest div:nth-child(odd){font-weight:700;background:var(--bg)}
+.gest div:nth-last-child(-n+2){border-bottom:0}
+.budget{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:150px 1fr 90px;gap:10px;align-items:center;font-size:.88rem}
+.bar .track{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:6px}
+.bar .fill.warn{background:var(--warn)}
+.bar .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;color:var(--muted)}
+@media (max-width:520px){.bar{grid-template-columns:1fr 70px}.bar .track{grid-column:1/-1;grid-row:2}}
+.phase{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.src{font-size:.85rem;color:var(--muted)}
+.src ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:4px}
+@media (prefers-reduced-motion:no-preference){.p-cursor{animation:drift 6s ease-in-out infinite}}
+@keyframes drift{0%,100%{transform:translate(0,0)}40%{transform:translate(40px,-30px)}70%{transform:translate(-20px,20px)}}
+.p-cursor{position:absolute;left:46%;top:44%;width:14px;height:14px;border-radius:50%;background:rgba(127,214,220,.35);border:1.5px solid #7fd6dc}
+</style>
+
+<div class="wrap">
+
+<header class="stack">
+  <span class="eyebrow">研究 + 設計報告 · 2026 年 10 月</span>
+  <h1>沙發觸控板 SofaPad</h1>
+  <p class="lede">讓 iPhone 變成你 Mac 的鍵盤和觸控板，戴著 Vision Pro 用 Mac 虛擬顯示器在沙發上工作時，不用再找地方擺鍵盤。打字用的是你平常最順手的 iPhone 系統鍵盤（含注音、拼音、手寫、聽寫），選字在手機上完成，只把最後的文字送到 Mac。</p>
+</header>
+
+<section>
+  <h2>結論先講</h2>
+  <div class="verdict">
+    <p><strong>建議架構：</strong>Mac 上跑一個小小的選單列 helper（Swift），用 Wi-Fi 上的 WebSocket 接收手機傳來的指令，再用 macOS 的 CGEvent 產生滑鼠與鍵盤事件。手機端第一版做成網頁（加到主畫面的 PWA），不用上架、不用裝 App；之後若想要更好的震動回饋和自動重連，再包成原生 iOS App。</p>
+    <p><strong>為什麼不用藍牙當鍵盤：</strong>iOS 不允許一般 App 假裝成藍牙鍵盤（HID 服務 UUID 0x1812 被系統擋掉），所以幾乎所有成熟方案都需要 Mac 端 helper。</p>
+    <p><strong>中文輸入的關鍵：</strong>在 iPhone 上用注音選完字，只送「確認後的文字」到 Mac，Mac 端直接插入 Unicode 字串。Mac 的輸入法保持在 ABC（英文）即可，不會發生二次選字。</p>
+    <p><strong>今天就能試的：</strong>開源的 <a href="https://github.com/joonlab/MacPilot/wiki">MacPilot</a> 架構和我建議的幾乎一樣，可以先拿來體驗；商業 App 裡 Remote Mouse 和 BT Keys 也值得試。但它們都沒有針對「單手拇指 + 中文長段輸入」做設計，這是自己做的價值所在。</p>
+  </div>
+</section>
+
+<section>
+  <h2>你的情境有三個硬限制</h2>
+  <div class="facts">
+    <div class="fact"><span class="tag good">可行</span><h3>Mac 虛擬顯示器吃的是 Mac 自己的輸入</h3><p>Vision Pro 只是把 Mac 畫面串流過來，鍵盤滑鼠事件仍由 Mac 處理。所以只要 Mac 上能產生事件，畫面裡就會動。Apple 官方說 Mac 的觸控板或滑鼠「照平常一樣使用」。</p></div>
+    <div class="fact"><span class="tag bad">不可行</span><h3>iPhone 不能直接當藍牙鍵盤</h3><p>CoreBluetooth 拒絕註冊 HID 服務（錯誤碼 8「UUID not allowed」）。少數 App 宣稱做到了，但走的是非公開行為，穩定度和上架風險都不確定。</p></div>
+    <div class="fact"><span class="tag warn">注意</span><h3>指標無法跨到 visionOS App</h3><p>實體觸控板可以把指標從 Mac 畫面移到旁邊的 visionOS 視窗（需開 Handoff）。軟體模擬的指標只會留在 Mac 畫面內。另外，使用虛擬顯示器時不能用 iPhone 鏡像輸出。</p></div>
+    <div class="fact"><span class="tag warn">注意</span><h3>通用控制不支援 iPhone</h3><p>Universal Control 只在 Mac 與 iPad 之間運作，iPhone 沒有官方的「借鍵盤給 Mac」功能，所以需要第三方方案。（依既有知識，這次沒有另外查證）</p></div>
+  </div>
+</section>
+
+<section class="wide">
+  <div class="stack" style="max-width:760px;margin:0 auto 18px;width:100%">
+    <h2>現有方案比較</h2>
+    <p class="note">延遲欄位是依連線方式推估的量級，不是實測。「中文輸入」指能否用 iPhone 系統鍵盤選好字再送出。</p>
+  </div>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>方案</th><th>類型</th><th>連線</th><th>Mac 端</th><th>iPhone 系統鍵盤 / 中文</th><th>延遲（推估）</th><th>費用</th><th>適合你嗎</th></tr></thead>
+    <tbody>
+      <tr><td class="name">Remote Mouse</td><td>商業 App</td><td>Wi-Fi / 藍牙</td><td>需裝 server</td><td>標榜「任何語言」打字，IME 細節未說明</td><td>Wi-Fi 約 10–40 ms</td><td>免費，進階內購</td><td><span class="pill warn">可試用</span> 功能多但介面雜，有 iOS 18 連線失敗的評論</td></tr>
+      <tr><td class="name">Mobile Mouse Pro</td><td>商業 App</td><td>Wi-Fi</td><td>Mobile Mouse Server</td><td>支援系統鍵盤</td><td>Wi-Fi 約 10–40 ms</td><td>付費</td><td><span class="pill warn">可試用</span> 老牌、穩，設計偏舊</td></tr>
+      <tr><td class="name">Unified Remote</td><td>商業 App</td><td>Wi-Fi / 藍牙</td><td>需裝 server</td><td>Basic Input 支援系統鍵盤</td><td>Wi-Fi 約 10–40 ms</td><td>免費 / 完整版付費</td><td><span class="pill warn">普通</span> 強在遙控各種 App，觸控板手感普通</td></tr>
+      <tr><td class="name">BT Keys</td><td>商業 App</td><td>藍牙（宣稱免 helper）</td><td>對同 Apple 帳號裝置免安裝；不行時裝接收端</td><td>可用系統鍵盤，但中文是送拼音按鍵，由 Mac 輸入法選字</td><td>BLE 約 15–30 ms</td><td>每天免費 10 分鐘，買斷解鎖</td><td><span class="pill warn">可試用</span> 選字發生在 Mac 上，戴頭顯看畫面選字較累</td></tr>
+      <tr><td class="name">MacPilot</td><td>開源（Swift + 網頁）</td><td>Wi-Fi WebSocket</td><td>選單列 helper，CGEvent</td><td>送 Unicode 文字（含韓文、emoji）</td><td>Wi-Fi 約 10–30 ms</td><td>免費</td><td><span class="pill good">最接近</span> 架構正確，可當起點或參考</td></tr>
+      <tr><td class="name">webbymouse</td><td>開源（Node + 網頁）</td><td>socket.io</td><td>NW.js + RobotJS</td><td>未說明鍵盤處理</td><td>Wi-Fi 約 15–40 ms</td><td>免費</td><td><span class="pill bad">過時</span> 依賴老舊，僅供參考手勢設計</td></tr>
+      <tr><td class="name">KDE Connect</td><td>開源</td><td>Wi-Fi</td><td>KDE Connect for macOS</td><td>遠端輸入，macOS 端已修正 Unicode 注入</td><td>Wi-Fi 約 20–50 ms</td><td>免費</td><td><span class="pill warn">普通</span> 功能廣但 macOS 版較粗糙</td></tr>
+      <tr class="ours"><td class="name">SofaPad（本設計）</td><td>自建</td><td>Wi-Fi WebSocket（可加 Tailscale）</td><td>Swift 選單列 helper</td><td>在 iPhone 上選字，只送確認文字</td><td>目標 &lt; 20 ms</td><td>自用免費</td><td><span class="pill good">針對你</span> 單手、中文長段、Vision Pro 情境</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>文獻告訴我們的事</h2>
+  <p>Siddhpuria 等人在 CHI 2018 的研究〈Pointing at a Distance with Everyday Smart Devices〉比較了手機和手錶的七種遠距指向方式，結論可以直接用在設計上：</p>
+  <ul>
+    <li><b>用相對移動（像觸控板），不要絕對座標。</b>相對模式明顯更快，精準度一樣。</li>
+    <li><b>單手拇指觸控板是最好的單手選項。</b>中位完成時間約 2.17 秒、錯誤率 4–7%；雙手橫拿約 1.89 秒。陀螺儀空中滑鼠最快（約 1.72 秒）但錯誤率約 23%，不適合工作。</li>
+    <li><b>速度相關的加速度曲線。</b>他們用 S 形（logistic）增益：慢慢滑很精準，快速甩能跨越整個畫面。參數要依螢幕距離重新調。</li>
+    <li><b>點擊防抖。</b>按下 250 ms 內、沒有移動的輕點算點擊，並把點擊位置回推到前 250 ms 內速度最低的時刻，避免手指離開時游標偏掉。</li>
+  </ul>
+  <p class="note">延伸閱讀（尚未讀）：PointerPhone（INTERACT 2013）研究手機直接指向遠端螢幕，搜尋時找到，但內容還沒打開，所以這裡不引用它的結論。</p>
+</section>
+
+<section class="wide">
+  <div class="stack" style="max-width:760px;margin:0 auto 18px;width:100%">
+    <h2>系統架構</h2>
+    <p>三段路徑：手機產生事件，Mac helper 注入事件，Vision Pro 只負責顯示。</p>
+  </div>
+  <div class="arch">
+    <div class="node"><span class="who">iPhone · PWA</span><h3>觸控板與鍵盤介面</h3>
+      <ul><li>隱藏的 <code>&lt;textarea&gt;</code> 叫出系統鍵盤</li><li>監聽 <code>compositionend</code> 與 <code>beforeinput</code>，只送確認後的文字</li><li>觸控點以 60–120 Hz 合併成相對位移</li><li>Wake Lock 讓螢幕不關</li></ul></div>
+    <div class="link"><span class="arrow">→</span><span>WebSocket<br>區網 Wi-Fi<br>PIN 配對</span></div>
+    <div class="node"><span class="who">Mac · 選單列 helper</span><h3>SofaPad Helper（Swift）</h3>
+      <ul><li>Network.framework 提供 HTTP + WebSocket，並用 Bonjour 廣播 <code>sofapad.local</code></li><li>CGEvent 產生移動、點擊、捲動、修飾鍵</li><li><code>CGEventKeyboardSetUnicodeString</code> 插入中文</li><li>需要「輔助使用」權限</li></ul></div>
+    <div class="link"><span class="arrow">→</span><span>macOS<br>視窗系統</span></div>
+    <div class="node"><span class="who">Vision Pro</span><h3>Mac 虛擬顯示器</h3>
+      <ul><li>只負責串流畫面</li><li>不需要裝任何東西</li><li>透過透視畫面可以看到手上的 iPhone</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>網頁版還是原生 App？</h2>
+  <div class="phase">
+    <div class="fact"><span class="tag good">第一版</span><h3>PWA（加到主畫面）</h3><p>Mac helper 直接提供網頁，手機掃 QR code 就能用。改介面不必重新安裝。缺點：Safari 沒有 Vibration API，震動回饋有限；切到別的 App 回來要重連。</p></div>
+    <div class="fact"><span class="tag warn">第二版</span><h3>原生 iOS App（SwiftUI）</h3><p>完整的觸覺回饋（UIFeedbackGenerator）、背景重連、Bonjour 自動找到 Mac、更低的觸控延遲。自己用可以透過 Xcode 免上架安裝。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>中文輸入怎麼處理</h2>
+  <p>這是現有 App 最弱的地方。設計原則：<b>選字在手機上完成，Mac 只收到最終文字。</b></p>
+  <ul>
+    <li><b>即時模式（預設）：</b>每次 <code>compositionend</code> 或一般字元輸入，就把那段文字送到 Mac 插入。注音組字中的過程不送。刪除鍵送 Mac 的 Delete，換行送 Return。</li>
+    <li><b>草稿模式：</b>在手機上先打完一整段、看過一遍，再按「送出」一次貼上。適合寫長訊息或文件，也能避免中途誤觸游標。</li>
+    <li><b>Mac 輸入法保持 ABC：</b>helper 可在連線時提醒或自動切換，否則 Mac 的注音輸入法會把送來的英文再組一次字。</li>
+    <li><b>快捷鍵另外處理：</b>⌘C、⌘V、⌘Tab 這類組合鍵用虛擬按鍵碼送，不走文字通道，才不會受輸入法影響。</li>
+    <li><b>聽寫與手寫也能用：</b>因為用的是 iOS 系統鍵盤，iPhone 上能用的輸入方式全部可用。</li>
+  </ul>
+</section>
+
+<section class="wide">
+  <div class="stack" style="max-width:760px;margin:0 auto 18px;width:100%">
+    <h2>單手介面設計</h2>
+    <p>直拿、單手、拇指操作。所有常用按鈕都放在拇指自然弧線內（螢幕下半部），右側留一條捲動帶，因為單手很難兩指捲動。支援左手鏡像。</p>
+  </div>
+  <div class="phones">
+    <div class="phonecol">
+      <div class="phone" aria-label="觸控板模式示意">
+        <div class="p-status"><span><span class="dot"></span>MacBook · 12 ms</span><span>⌨︎ 鍵盤</span></div>
+        <div class="p-pad"><div class="p-cursor"></div><div class="hint">單指滑動移動游標<br>輕點＝點擊<br>長按＝右鍵</div><div class="p-scroll">捲動帶</div></div>
+        <div class="p-row"><div class="k">⌘</div><div class="k">⌥</div><div class="k">⌃</div><div class="k">⇧</div><div class="k">esc</div></div>
+        <div class="p-row"><div class="k big">左鍵</div><div class="k">拖曳鎖</div><div class="k big">右鍵</div></div>
+        <div class="p-row"><div class="k">⌘Tab</div><div class="k">Mission</div><div class="k">⌘W</div><div class="k">⌘Z</div></div>
+      </div>
+      <p class="cap"><b>觸控板模式</b>：大面積觸控區，底部三排按鈕放在拇指範圍內。修飾鍵是黏滯鍵，點一下亮起、下一個動作後自動放開。</p>
+    </div>
+    <div class="phonecol">
+      <div class="phone" aria-label="打字模式示意">
+        <div class="p-status"><span><span class="dot"></span>即時模式</span><span>草稿 ⇄</span></div>
+        <div class="p-pad p-mini"><div class="hint">迷你觸控板：微調游標</div></div>
+        <div class="p-row"><div class="k on">⌘</div><div class="k">tab</div><div class="k">←</div><div class="k">→</div><div class="k">↑</div><div class="k">↓</div></div>
+        <div class="p-draft"><span>剛送出：<b>明天下午開會</b></span><span class="mono">↶ 撤回</span></div>
+        <div style="flex:1"></div>
+        <div class="p-kbd">
+          <div class="p-cand"><span>會</span><span>回</span><span>匯</span><span>繪</span><span>惠</span></div>
+          <span>ㄅ</span><span>ㄉ</span><span>ˇ</span><span>ˋ</span><span>ㄓ</span><span>ˊ</span><span>˙</span><span>ㄚ</span><span>ㄞ</span><span>ㄢ</span>
+          <span>ㄆ</span><span>ㄊ</span><span>ㄍ</span><span>ㄐ</span><span>ㄔ</span><span>ㄗ</span><span>ㄧ</span><span>ㄛ</span><span>ㄟ</span><span>ㄣ</span>
+          <span>ㄇ</span><span>ㄋ</span><span>ㄎ</span><span>ㄑ</span><span>ㄕ</span><span>ㄘ</span><span>ㄨ</span><span>ㄜ</span><span>ㄠ</span><span>ㄤ</span>
+        </div>
+      </div>
+      <p class="cap"><b>打字模式</b>：下方是 iPhone 原生注音鍵盤，上方保留迷你觸控板、方向鍵和「撤回上一次送出」，打字中不必切換畫面就能移動游標。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h3>手勢對照</h3>
+  <div class="gest">
+    <div>單指滑動</div><div>移動游標，S 形加速曲線，可調靈敏度</div>
+    <div>單指輕點</div><div>左鍵點擊（250 ms 內、移動 &lt; 8 pt）</div>
+    <div>雙擊後按住滑動</div><div>拖曳（選取文字、移動視窗），放開即放下</div>
+    <div>長按 0.4 秒</div><div>右鍵（單手時取代兩指輕點），伴隨震動</div>
+    <div>右側捲動帶</div><div>拇指上下滑＝捲動，帶慣性；按住左右滑＝橫向捲動</div>
+    <div>兩指輕點 / 兩指滑</div><div>雙手時可用：右鍵 / 捲動</div>
+    <div>三指左右滑</div><div>切換桌面（也有按鈕替代）</div>
+    <div>按住「拖曳鎖」</div><div>鎖住左鍵，可以分多次滑動完成長距離拖曳</div>
+  </div>
+</section>
+
+<section>
+  <h2>延遲預算</h2>
+  <p>目標是手指動到游標動的時間低於 20 ms（不含 Vision Pro 串流本身）。以下是各段的推估值：</p>
+  <div class="budget">
+    <div class="bar"><span>iOS 觸控取樣</span><div class="track"><div class="fill" style="width:17%"></div></div><span class="v">4–8 ms</span></div>
+    <div class="bar"><span>Wi-Fi WebSocket</span><div class="track"><div class="fill" style="width:30%"></div></div><span class="v">3–15 ms</span></div>
+    <div class="bar"><span>Wi-Fi 省電突波</span><div class="track"><div class="fill warn" style="width:100%"></div></div><span class="v">偶發 50+ ms</span></div>
+    <div class="bar"><span>CGEvent 注入</span><div class="track"><div class="fill" style="width:3%"></div></div><span class="v">&lt; 1 ms</span></div>
+    <div class="bar"><span>Mac 虛擬顯示器</span><div class="track"><div class="fill warn" style="width:40%"></div></div><span class="v">未測，需實測</span></div>
+  </div>
+  <p class="note">降低突波的做法：每 100 ms 送心跳封包讓 Wi-Fi 不進省電、觸控位移在手機端累加後以固定頻率送出、Mac 與 iPhone 連同一個 5 GHz / 6 GHz 頻段。</p>
+</section>
+
+<section>
+  <h2>風險與需要你確認的事</h2>
+  <ul>
+    <li><b>CGEvent 在虛擬顯示器下是否正常：</b>理論上沒問題（MacPilot、Remote Mouse 都是這樣做），但我沒有實機驗證，第一個原型要先測。</li>
+    <li><b>安全性：</b>helper 只在區網開放，連線需要 6 位數 PIN，配對後記住手機。不建議開放到網際網路；外出時可以用 Tailscale。</li>
+    <li><b>「MacBook Neo」和 Mac mini：</b>兩台都適用，helper 裝在你用虛擬顯示器連的那台即可。如果兩台都會用，手機端可以做切換。</li>
+    <li><b>先試現成的：</b>如果 MacPilot 或 BT Keys 已經夠用，你可能不需要自己做。我建議先花 10 分鐘試 MacPilot，再決定要不要做 SofaPad。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>建議的下一步</h2>
+  <div class="phase">
+    <div class="fact"><span class="tag good">步驟一 · 約半天</span><h3>最小原型</h3><p>Swift helper + 單頁網頁：移動、點擊、捲動、即時中文輸入。用來在 Vision Pro 上實測手感和延遲。</p></div>
+    <div class="fact"><span class="tag warn">步驟二</span><h3>單手介面打磨</h3><p>捲動帶、長按右鍵、黏滯修飾鍵、草稿模式、加速曲線調整、左手鏡像。</p></div>
+    <div class="fact"><span class="tag warn">步驟三（選做）</span><h3>原生 iOS App</h3><p>震動回饋、自動找 Mac、背景重連。</p></div>
+  </div>
+</section>
+
+<footer class="src">
+  <h3 style="margin-bottom:8px">資料來源</h3>
+  <ol>
+    <li><a href="https://support.apple.com/guide/apple-vision-pro/tan357ede966/visionos">Apple Vision Pro 使用手冊：Mac 虛擬顯示器</a></li>
+    <li><a href="https://developer.apple.com/forums/thread/725238">Apple Developer Forums：iOS 能否當藍牙 HID 裝置</a></li>
+    <li><a href="https://www.cs.virginia.edu/~bjc8c/class/cs6501-f18/papers/siddhpuria18pointing.pdf">Siddhpuria et al., Pointing at a Distance with Everyday Smart Devices, CHI 2018</a></li>
+    <li><a href="https://dl.ifip.org/hal-01504904v1">PointerPhone, INTERACT 2013（未讀）</a></li>
+    <li><a href="https://github.com/joonlab/MacPilot/wiki">MacPilot（GitHub）</a></li>
+    <li><a href="https://github.com/gasolin/webbymouse">webbymouse（GitHub）</a></li>
+    <li><a href="https://invent.kde.org/network/kdeconnect-kde/-/merge_requests/467">KDE Connect：macOS Unicode 輸入修正</a></li>
+    <li><a href="https://chromium.googlesource.com/chromium/src/+/510e13d15/remoting/host/input_injector_mac.cc">Chromium Remote Desktop：Mac 輸入注入程式碼</a></li>
+    <li><a href="https://apps.apple.com/app/remote-mouse/id403195710">Remote Mouse（App Store）</a></li>
+    <li><a href="https://apps.apple.com/us/app/mobile-mouse-server/id412814284?mt=12">Mobile Mouse Server（Mac App Store）</a></li>
+    <li><a href="https://www.unifiedremote.com/remotes/basic-input">Unified Remote：Basic Input</a></li>
+    <li><a href="https://mwm.ai/apps/bt-keys-keyboard-trackpad/6778806487">BT Keys: Keyboard &amp; Trackpad</a></li>
+  </ol>
+</footer>
+
+</div>

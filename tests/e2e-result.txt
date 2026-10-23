@@ -1,0 +1,35 @@
+# 測試時間 2026-10-23 16:33:14 台北，v0.1.1，雲端 Linux + Chromium（iPhone 13 模擬），helper 以 --dry-run 執行
+PASS wrong PIN rejected
+PASS paired with correct PIN — vm
+PASS RTT shown — vm · 1 ms
+PASS one-finger drag moves cursor — 10 move events, total dx 74.8 for 60px finger
+PASS tap = left click — 08:33:04 [dry-run] click left
+PASS long press = right click — 08:33:05 [dry-run] click right
+PASS two-finger tap = right click — 08:33:05 [dry-run] click right
+PASS two-finger drag scrolls (finger down => positive) — 10 scroll events, total dy 176
+PASS double-tap + hold + drag = drag — click left | button down | move 7.64 0.0 | move 5.93 0.0 | move 5.92 0.0 | move 5.93 0.0 | move 5.92 0.0 | move 5.92 0.0 | move 5.92 0.0 | move 5.93 0.0 | button up
+PASS thumb scroll strip scrolls with inertia — 36 scroll events
+PASS buttons: left, right, ⌘Tab — click left | click right | key cmd+tab
+PASS keyboard mode opens and textarea focused
+PASS type "hi" then backspace — text h | text i | key backspace
+PASS IME: nothing sent while composing — 0 events during composition
+PASS IME: committed text sent once — text 你好
+PASS backspace keeps working past start of field — 3 backspaces for 3 presses
+PASS Enter sends Return key — text o | text k | key return
+PASS replacement "teh"→"the" ends as "the" on Mac — events: text t | text e | text h | key backspace | key backspace | text he => "the"
+PASS sticky ⌘ + c => cmd+c (not text) — key cmd+c
+PASS shortcut letter removed from field — "​the"
+PASS backspace after shortcut deletes real text only — key backspace
+PASS preview mirrors Mac text — 已送出：ok⏎th
+PASS ⌘ released after use
+PASS emoji sent, one backspace deletes it — text 👍 | key backspace
+PASS draft mode: nothing sent until 送出 — text 明天下午開會
+PASS remembered PIN after reload
+
+26/26 passed
+
+# 權限被擋時的警告（SOFAPAD_DRY_BLOCKED=1）
+PASS port 8766: warning shown (expected shown)
+PASS retry keeps warning while still blocked
+PASS port 8765: warning hidden (expected hidden)
+blocked-banner tests passed

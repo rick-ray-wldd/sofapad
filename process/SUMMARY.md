@@ -1,0 +1,21 @@
+# SUMMARY（進行中，截至 2026-10-23 16:34）
+
+| 項目 | 內容 |
+|---|---|
+| 執行環境 | claude.ai 專案 thread／Claude Code 雲端容器（Linux），模型 Claude Opus 5.5（1M context）；無使用者裝置存取 |
+| M0→M2 | 約 3 分鐘（11:38 → 約 11:41） |
+| M0→M4 | 實機未達成；模擬模式約 29 分鐘（11:38 → 12:07） |
+| M0→M7 | 未達成 |
+| 使用者介入次數 / 時間 | 3 次（11:46 記錄規則、11:56 規則 v1.1、12:02 授權開始原型），撰寫時間未知 |
+| prompt 總數 | 全部 8／不算實驗管理 6；任務指令 3、回答問題 0、授權核准 1、回報測試結果 2、實驗管理 2（見 USER-PROMPTS.md） |
+| 查過的來源數 | 搜尋 11 次；實際打開 8：論文 1、GitHub 2、官方文件 1、App 頁 2、論壇/程式碼審查 2；另有約 10 筆只看到搜尋結果 |
+| 讀過全文或試跑 | 0（全為 WebFetch 轉述） |
+| 自己發現的錯誤或捏造 | 4（I-01 引用未讀論文；I-02 無來源內容；I-09、I-10 原型 bug，測試前自己抓到）＋1 次測試寫錯（I-08） |
+| 決定數 | 13（D-01～D-13；D-09 由使用者決定，D-07 仍待使用者） |
+| 工具呼叫數 | WebSearch 11、WebFetch 8、Artifact 3、Write 3、Read 2、Bash 17、ToolSearch 1、讀 thread 1、清單 6、回覆 4（含 1 次附檔超量失敗） |
+| 費用或用量 | 看不到計費；未記錄 token 數 |
+| 成品 | 研究＋設計報告（Artifact v2）https://claude.ai/artifact/33YXCQQBzsqqqHAK2xckuN ；原型 v0.1：專案檔案 sofapad/（sofapad.py、web/index.html、start.command、README.md、tests/）、sofapad-v0.1.zip 與 sofapad-v0.1.1.zip（加上權限偵測與手機提示）。功能：觸控板（移動、點擊、長按右鍵、兩指右鍵/捲動、捲動帶含慣性、雙擊拖曳、拖曳鎖）、黏滯修飾鍵、常用快捷鍵、即時與草稿兩種打字模式（手機端選字）、PIN 配對、左手模式、設定 |
+| 啟動方式 | Mac 上雙擊 start.command 或執行 python3 sofapad.py，給終端機「輔助使用」權限，iPhone Safari 打開印出的網址並輸入 PIN |
+| 自測結果 | 雲端模擬：v0.1.1 26/26＋權限警告 3/3 通過（16:33）。實機：16:30 第一次實測失敗（Mac 沒反應），原因是終端機權限沒生效（I-15）；修正後尚未重測 |
+| 最大的三個問題 | 1. Mac 與 iPhone 實機完全沒測，ctypes 呼叫可能有錯；2. 研究階段曾引用未讀論文，且所有閱讀只有摘要；3. 偏離報告的 Swift 計畫改用 Python |
+| 重來會改什麼 | 從一開始就逐筆記時間；只寫有打開過的來源；把 MacPilot 原始碼 clone 下來讀 EventInjector 與文字處理，而不是只看 wiki |
