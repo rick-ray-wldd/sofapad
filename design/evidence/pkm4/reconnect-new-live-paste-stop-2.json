@@ -1,0 +1,313 @@
+{
+ "scenario": "reconnect",
+ "build": "new",
+ "mode": "live",
+ "textMode": "paste",
+ "kind": "stop",
+ "tag": "reconnect-new-live-paste-stop-2",
+ "startedAt": "2026-10-27T19:08:45.333Z",
+ "rounds": [
+  {
+   "k": 1,
+   "label": "d01",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6884,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 2,
+   "label": "d02",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6794,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 3,
+   "label": "d03",
+   "reconnected": true,
+   "reconnectMs": 20,
+   "outageMs": 6858,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 4,
+   "label": "d04",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6694,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 5,
+   "label": "d05",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 7187,
+   "inA": 1,
+   "inB": 0
+  }
+ ],
+ "notes": [],
+ "textA": "d01 ok d02 ok d03 ok d04 ok d05 ok ",
+ "textB": "x\nx\nx\nx\nx\n",
+ "guardTripped": false,
+ "closed": {
+  "ok": true,
+  "windowsLeft": 0
+ },
+ "timing": [
+  {
+   "at": 1793128135451,
+   "done": 1793128135524.73,
+   "id": 1,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128135452.223,
+   "via": "paste"
+  },
+  {
+   "at": 1793128135459,
+   "done": 1793128136234.936,
+   "id": 2,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793128136194.17,
+   "via": "paste"
+  },
+  {
+   "at": 1793128144188,
+   "done": 1793128144223.828,
+   "id": 4,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128144189.362,
+   "via": "paste"
+  },
+  {
+   "at": 1793128145952,
+   "done": 1793128145955.4429,
+   "id": 5,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793128145953.304
+  },
+  {
+   "at": 1793128148801,
+   "done": 1793128148832.71,
+   "id": 6,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128148801.564,
+   "via": "paste"
+  },
+  {
+   "at": 1793128148802,
+   "done": 1793128149609.1763,
+   "id": 7,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793128149573.782,
+   "via": "paste"
+  },
+  {
+   "at": 1793128157434,
+   "done": 1793128157467.69,
+   "id": 9,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128157435.175,
+   "via": "paste"
+  },
+  {
+   "at": 1793128159188,
+   "done": 1793128159191.149,
+   "id": 10,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793128159188.3909
+  },
+  {
+   "at": 1793128162907,
+   "done": 1793128162942.385,
+   "id": 11,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128162907.9631,
+   "via": "paste"
+  },
+  {
+   "at": 1793128162909,
+   "done": 1793128163699.0308,
+   "id": 12,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793128163657.805,
+   "via": "paste"
+  },
+  {
+   "at": 1793128171715,
+   "done": 1793128171752.275,
+   "id": 14,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128171716.144,
+   "via": "paste"
+  },
+  {
+   "at": 1793128173479,
+   "done": 1793128173482.2239,
+   "id": 15,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793128173479.916
+  },
+  {
+   "at": 1793128177226,
+   "done": 1793128177263.822,
+   "id": 16,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128177226.628,
+   "via": "paste"
+  },
+  {
+   "at": 1793128177227,
+   "done": 1793128178024.202,
+   "id": 17,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793128177990.658,
+   "via": "paste"
+  },
+  {
+   "at": 1793128186087,
+   "done": 1793128186124.734,
+   "id": 19,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128186087.727,
+   "via": "paste"
+  },
+  {
+   "at": 1793128187838,
+   "done": 1793128187842.5952,
+   "id": 20,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793128187839.311
+  },
+  {
+   "at": 1793128191556,
+   "done": 1793128191591.7393,
+   "id": 21,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128191557.002,
+   "via": "paste"
+  },
+  {
+   "at": 1793128191558,
+   "done": 1793128192366.5981,
+   "id": 22,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793128192324.791,
+   "via": "paste"
+  },
+  {
+   "at": 1793128200695,
+   "done": 1793128200732.596,
+   "id": 24,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793128200696.408,
+   "via": "paste"
+  },
+  {
+   "at": 1793128202441,
+   "done": 1793128202444.276,
+   "id": 25,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793128202442.177
+  }
+ ],
+ "late": [
+  "[03:09:03] late by 5937 ms: id 3 not typed",
+  "[03:09:16] late by 5883 ms: id 8 not typed",
+  "[03:09:30] late by 5927 ms: id 13 not typed",
+  "[03:09:45] late by 5765 ms: id 18 not typed",
+  "[03:09:59] late by 6553 ms: id 23 not typed"
+ ],
+ "lostInA": 0,
+ "lostInB": 0,
+ "okTwice": 0,
+ "reconnects": 5,
+ "reconnectMeanMs": 21,
+ "reconnectMaxMs": 21,
+ "latency": {
+  "n": 20,
+  "p50": 37,
+  "p95": 809,
+  "max": 809
+ },
+ "switches": [],
+ "serverLog": [
+  "[03:08:45] 端對端測試模式：只有前景 App 是 pid 89619、前景視窗是 [16986, 16988]、而且點擊／捲動落在它的視窗上時才送事件",
+  "[03:08:45] 版本 4.0.0（建置 dev）",
+  "[03:08:45] 網路介面：en1 192.168.x.x；utun5 100.x.x.x：不使用，不是區網位址（KeyMouse 只接受區網裡的手機）",
+  "",
+  "========== SofaPad 4.0.0 ==========",
+  "手機和這台 Mac 連同一個 Wi-Fi，用 iPhone 相機掃下面的 QR code，或用 Safari 打開：",
+  "  http://127.0.0.1:31237/",
+  "配對碼：******（15 分鐘內有效；之後手機可以按「要求配對」，Mac 螢幕會跳出新碼）",
+  "網頁資料夾：phone-keymouse/web",
+  "已配對手機：0 支",
+  "人在 Mac 前面時，也可以用手機相機掃這個 QR code（內含配對碼）：",
+  "\u001b[30;47m                                 \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█ ▄█ ██▄▀  █ ▄▀ █▀▀▀▀▀█  \u001b[0m",
+  "\u001b[30;47m  █ ███ █  █▀▀▄▄ ▀▄▄█ ▄ █ ███ █  \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ ▀▄▀▀ ▀▄▄█▀    █ ▀▀▀ █  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ ▀ ▀ ▀ ▀▄▀▄▀▄▀ ▀▀▀▀▀▀▀  \u001b[0m",
+  "\u001b[30;47m  ▀▄▀▄█▄▀▄  ▄  ▄ ▄█ ▄█▀▄▄▄▀▄ ▀▄  \u001b[0m",
+  "\u001b[30;47m    █▀█▄▀███▄█▀▄█▀█  █ █▄  ▄▀█▀  \u001b[0m",
+  "\u001b[30;47m  █▄ ▀▀▄▀▀ ███▀ ██  ▀▄▀█ ▀ ▄ ▀█  \u001b[0m",
+  "\u001b[30;47m  █▀█ ▀█▀▀▀██▄▀▀ ▄ █▄▄▄▀██▀▄██▀  \u001b[0m",
+  "\u001b[30;47m  ▀█▄  ▄▀█ ▄██▀▄ ▄█▄ ▀▀█▄█▄▀█▀█  \u001b[0m",
+  "\u001b[30;47m  ▀▄ ▄▀█▀▀▄ █ ▄▄█▀█▄ ▀█▀▄▀ ▀▄█▀  \u001b[0m",
+  "\u001b[30;47m  ▀ ▀▀▀▀▀ ▄▄▄█▀ ██▀▄▀██▀▀▀█  ▄▄  \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█   ▀▀▄▀ ▄▀▀ ▄█ ▀ █▀▄█▀  \u001b[0m",
+  "\u001b[30;47m  █ ███ █ ▀ ▀▀▀▄ ▄▄███▀▀██▀█ █▀  \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ ▀▄▄█▀█ ▀▄▀▀ ▄▄▀  ▄ ▄▀  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ ▀   ▀ ▀▀  ▀▀▀▀▀ ▀ ▀▀▀  \u001b[0m",
+  "\u001b[30;47m                                 \u001b[0m",
+  "",
+  "在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。",
+  "",
+  "[03:08:49] 手機已配對。要再配對另一支手機：在這裡按 Enter，或用選單列的「配對新手機」。",
+  "[03:08:49] authenticated iPhone from 127.0.0.1 (new pairing)",
+  "[03:09:03] late by 5937 ms: id 3 not typed",
+  "[03:09:03] controller disconnected: iPhone",
+  "[03:09:03] authenticated iPhone from 127.0.0.1",
+  "[03:09:16] late by 5883 ms: id 8 not typed",
+  "[03:09:16] controller disconnected: iPhone",
+  "[03:09:16] authenticated iPhone from 127.0.0.1",
+  "[03:09:30] late by 5927 ms: id 13 not typed",
+  "[03:09:30] controller disconnected: iPhone",
+  "[03:09:30] authenticated iPhone from 127.0.0.1",
+  "[03:09:45] late by 5765 ms: id 18 not typed",
+  "[03:09:45] controller disconnected: iPhone",
+  "[03:09:45] authenticated iPhone from 127.0.0.1",
+  "[03:09:59] controller disconnected: iPhone",
+  "[03:09:59] late by 6553 ms: id 23 not typed",
+  "[03:09:59] authenticated iPhone from 127.0.0.1",
+  "[03:10:03] 結束中…",
+  ""
+ ]
+}

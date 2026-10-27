@@ -1,0 +1,58 @@
+[
+ {
+  "name": "pkm31-input-log",
+  "note": "PKM-3-1 ①：⚙︎ 設定裡的輸入紀錄（只在手機，不上傳），重播 P-19 的聽寫樣式"
+ },
+ {
+  "name": "pkm32-scan-window",
+  "note": "PKM-3-2：選單列「用 iPhone 掃描」，這台 Mac mini 的 IP 網址（螢幕外繪製）"
+ },
+ {
+  "name": "pkm32-scan-window-two-networks",
+  "note": "PKM-3-2：兩個區網介面時可以選（模擬介面；100.96.x 不列）"
+ },
+ {
+  "name": "pkm32-scan-window-no-lan-ip",
+  "note": "PKM-3-2：沒有區網 IP 時只剩 .local，寫出每個介面不能用的原因（模擬 x.x.x.x）"
+ },
+ {
+  "name": "pkm3-voice-http-keyboard",
+  "note": "PKM-3：現在的 iPhone（http）：🎤 → 預覽框＋鍵盤聽寫，原因和第一次設定連結"
+ },
+ {
+  "name": "pkm3-voice-listening",
+  "note": "PKM-3：https＋Safari：按一下就開始聽（假的辨識器），字即時出現"
+ },
+ {
+  "name": "pkm3-voice-preview",
+  "note": "PKM-3：說完停下來，預覽框可改字，再按送出"
+ },
+ {
+  "name": "pkm3-voice-error-mic",
+  "note": "PKM-3：麥克風被拒時的原因和去哪裡設定"
+ },
+ {
+  "name": "pkm3-voice-landscape-pad",
+  "note": "PKM-3：橫拿全螢幕，左側浮動列的 🎤"
+ },
+ {
+  "name": "pkm3-voice-landscape-listening",
+  "note": "PKM-3：橫拿按 🎤，預覽框貼在上方"
+ },
+ {
+  "name": "pkm31-keyrow-editor-portrait",
+  "note": "PKM-3-1 ②：按鍵列編輯畫面（直拿，從列尾 ✎ 打開）"
+ },
+ {
+  "name": "pkm31-keyrow-editor-edited",
+  "note": "PKM-3-1 ②：從清單加了 ⌘C、⇧⌘4，新增自訂 ⌥⌘K（已選的標藍框）"
+ },
+ {
+  "name": "pkm31-keyrow-row-edited",
+  "note": "PKM-3-1 ②：編輯後的按鍵列（⌘C 在最前、esc 拿掉、最後 ⌥⌘K 和 ✎）"
+ },
+ {
+  "name": "pkm31-keyrow-editor-landscape",
+  "note": "PKM-3-1 ②：橫拿的編輯畫面（寬版）"
+ }
+]

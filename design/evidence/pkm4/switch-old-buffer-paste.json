@@ -1,0 +1,145 @@
+{
+ "scenario": "switch",
+ "build": "old",
+ "mode": "buffer",
+ "textMode": "paste",
+ "kind": "stop",
+ "tag": "switch-old-buffer-paste",
+ "startedAt": "2026-10-27T18:48:59.646Z",
+ "rounds": [
+  {
+   "k": 1,
+   "label": "r01",
+   "sentToSwitchMs": 2470,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 2,
+   "label": "r02",
+   "sentToSwitchMs": 2552,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 3,
+   "label": "r03",
+   "sentToSwitchMs": 2470,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 4,
+   "label": "r04",
+   "sentToSwitchMs": 2489,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 5,
+   "label": "r05",
+   "sentToSwitchMs": 2497,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 6,
+   "label": "r06",
+   "sentToSwitchMs": 2484,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 7,
+   "label": "r07",
+   "sentToSwitchMs": 2486,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 8,
+   "label": "r08",
+   "sentToSwitchMs": 2478,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 9,
+   "label": "r09",
+   "sentToSwitchMs": 2508,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 10,
+   "label": "r10",
+   "sentToSwitchMs": 2517,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  }
+ ],
+ "notes": [
+  "stopped after 10 rounds: 2-minute limit"
+ ],
+ "textA": "r01 orca line 1r02 orca line 2r03 orca line 3r04 orca line 4r05 orca line 5r06 orca line 6r07 orca line 7r08 orca line 8r09 orca line 9r10 orca line 10",
+ "textB": "xxxxxxxxxx",
+ "guardTripped": false,
+ "closed": {
+  "ok": true,
+  "windowsLeft": 0
+ },
+ "timing": [],
+ "late": [],
+ "leakedChars": 0,
+ "leaks": 0,
+ "dupes": 0,
+ "missing": 0,
+ "bOnlyX": true,
+ "switches": [],
+ "serverLog": [
+  "[02:49:00] 端對端測試模式：只有前景 App 是 pid 41246、而且點擊／捲動落在它的視窗上時才送事件",
+  "[02:49:00] 網路介面：en1 192.168.x.x；utun5 100.x.x.x：不使用，不是區網位址（KeyMouse 只接受區網裡的手機）",
+  "",
+  "========== Phone KeyMouse ==========",
+  "手機和這台 Mac 連同一個 Wi-Fi，用 Safari 打開：",
+  "  http://127.0.0.1:33752/",
+  "配對碼：******（15 分鐘內有效；之後手機可以按「要求配對」，Mac 螢幕會跳出新碼）",
+  "網頁資料夾：<scratch>/v3src/web",
+  "已配對手機：0 支",
+  "人在 Mac 前面時，也可以用手機相機掃這個 QR code（內含配對碼）：",
+  "\u001b[30;47m                                 \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█ █▀█▄▄ ▄█▀█  ▄ █▀▀▀▀▀█  \u001b[0m",
+  "\u001b[30;47m  █ ███ █ ▄▄▀ ▀▀▀▀▄  ██ █ ███ █  \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █  ▀█  ▀▄  ▄▀   █ ▀▀▀ █  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ █ ▀▄▀▄█ ▀▄▀ █ ▀▀▀▀▀▀▀  \u001b[0m",
+  "\u001b[30;47m  ▀ ██▄█▀█▄▄▄▄▄▀▀▄█▄▀  ▄█ ▄▀ ▀█  \u001b[0m",
+  "\u001b[30;47m  ███  ▄▀██ ▄▄█▄██ █▀█ ▀▀█▀▄▀▀▄  \u001b[0m",
+  "\u001b[30;47m  ▀▄▀▀ ▄▀ ▄█▄▄▄▄  ▀ ▀ ▄ ▀▀  █▄▄  \u001b[0m",
+  "\u001b[30;47m  ███▀▄█▀▄▀  ▄█▄▀▄ ▀▀▀█▀█▀▄▀▄█▀  \u001b[0m",
+  "\u001b[30;47m  ▀██  ▄▀▄█▄▄▄ ▄   ▀▀▀▀▀▀ █▀██   \u001b[0m",
+  "\u001b[30;47m  ▀ ▀ ▀▄▀▀ ▄ ▄▄  ▄▄▄ ██▄█▀ █▀    \u001b[0m",
+  "\u001b[30;47m   ▀ ▀  ▀▀█  ▀ █▄█▀ ▄▀█▀▀▀██▀▄▄  \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█ █▄█  ▀  ▄▄▀▀█ ▀ █▀▄▀▄  \u001b[0m",
+  "\u001b[30;47m  █ ███ █ ▄▄▀▀▀▄█▀▄ ▄▀████▀▀█    \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ ▀▀ █▀▄▄ ▄▀▀█▄ ▀▄█▀▀▄▀  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ ▀     ▀ ▀  ▀▀  ▀  ▀▀   \u001b[0m",
+  "\u001b[30;47m                                 \u001b[0m",
+  "",
+  "在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。",
+  "",
+  "[02:49:03] 手機已配對。要再配對另一支手機：在這裡按 Enter，或用選單列的「配對新手機」。",
+  "[02:49:03] authenticated iPhone from 127.0.0.1 (new pairing)",
+  "[02:50:48] 結束中…",
+  ""
+ ]
+}

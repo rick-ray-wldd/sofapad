@@ -1,0 +1,274 @@
+[
+ {
+  "name": "portrait-no-keyboard",
+  "note": "直拿、鍵盤收起（基準）",
+  "viewport": {
+   "w": 390,
+   "h": 844,
+   "visualH": 844,
+   "keyboard": 0
+  },
+  "app": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 844
+  },
+  "bar": {
+   "h": 48
+  },
+  "pad": {
+   "x": 10,
+   "y": 95,
+   "w": 370,
+   "h": 463
+  },
+  "strip": {
+   "x": 328,
+   "y": 103,
+   "w": 44,
+   "h": 447
+  },
+  "controls": {
+   "x": 10,
+   "y": 566,
+   "w": 370,
+   "h": 236
+  },
+  "buttons": 58,
+  "input": {
+   "x": 10,
+   "y": 704,
+   "w": 370,
+   "h": 46
+  },
+  "keys": {
+   "x": 10,
+   "y": 758,
+   "w": 370,
+   "h": 44
+  },
+  "shortcuts": null,
+  "padUsableArea": 151642,
+  "padShareOfVisible": 46.1,
+  "clipped": []
+ },
+ {
+  "name": "portrait-keyboard-homescreen",
+  "note": "直拿、點文字框、注音鍵盤彈出（主畫面 App：鍵盤＋選字列 336 px）",
+  "viewport": {
+   "w": 390,
+   "h": 844,
+   "visualH": 508,
+   "keyboard": 336
+  },
+  "app": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 508
+  },
+  "bar": {
+   "h": 48
+  },
+  "pad": {
+   "x": 10,
+   "y": 95,
+   "w": 370,
+   "h": 199
+  },
+  "strip": {
+   "x": 328,
+   "y": 103,
+   "w": 44,
+   "h": 183
+  },
+  "controls": {
+   "x": 10,
+   "y": 302,
+   "w": 370,
+   "h": 164
+  },
+  "buttons": 58,
+  "input": {
+   "x": 10,
+   "y": 368,
+   "w": 370,
+   "h": 46
+  },
+  "keys": {
+   "x": 10,
+   "y": 422,
+   "w": 370,
+   "h": 44
+  },
+  "shortcuts": null,
+  "padUsableArea": 65578,
+  "padShareOfVisible": 33.1,
+  "clipped": []
+ },
+ {
+  "name": "portrait-keyboard-safari",
+  "note": "同上，但在 Safari 分頁（再多表單輔助列 44 px）",
+  "viewport": {
+   "w": 390,
+   "h": 844,
+   "visualH": 464,
+   "keyboard": 380
+  },
+  "app": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 464
+  },
+  "bar": {
+   "h": 48
+  },
+  "pad": {
+   "x": 10,
+   "y": 95,
+   "w": 370,
+   "h": 155
+  },
+  "strip": {
+   "x": 328,
+   "y": 103,
+   "w": 44,
+   "h": 139
+  },
+  "controls": {
+   "x": 10,
+   "y": 258,
+   "w": 370,
+   "h": 164
+  },
+  "buttons": 58,
+  "input": {
+   "x": 10,
+   "y": 324,
+   "w": 370,
+   "h": 46
+  },
+  "keys": {
+   "x": 10,
+   "y": 378,
+   "w": 370,
+   "h": 44
+  },
+  "shortcuts": null,
+  "padUsableArea": 51234,
+  "padShareOfVisible": 28.3,
+  "clipped": []
+ },
+ {
+  "name": "portrait-keyboard-shortcuts",
+  "note": "鍵盤彈出（Safari）＋打開快捷鍵面板",
+  "viewport": {
+   "w": 390,
+   "h": 844,
+   "visualH": 464,
+   "keyboard": 380
+  },
+  "app": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 464
+  },
+  "bar": {
+   "h": 48
+  },
+  "pad": {
+   "x": 10,
+   "y": 95,
+   "w": 370,
+   "h": 120
+  },
+  "strip": {
+   "x": 328,
+   "y": 103,
+   "w": 44,
+   "h": 104
+  },
+  "controls": {
+   "x": 10,
+   "y": 223,
+   "w": 370,
+   "h": 442
+  },
+  "buttons": 58,
+  "input": {
+   "x": 10,
+   "y": 289,
+   "w": 370,
+   "h": 46
+  },
+  "keys": {
+   "x": 10,
+   "y": 343,
+   "w": 370,
+   "h": 44
+  },
+  "shortcuts": null,
+  "padUsableArea": 39824,
+  "padShareOfVisible": 22,
+  "clipped": [
+   "shortcuts"
+  ]
+ },
+ {
+  "name": "portrait-keyboard-multiline",
+  "note": "鍵盤彈出（Safari）＋整段模式打了三行字",
+  "viewport": {
+   "w": 390,
+   "h": 844,
+   "visualH": 464,
+   "keyboard": 380
+  },
+  "app": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 464
+  },
+  "bar": {
+   "h": 48
+  },
+  "pad": {
+   "x": 10,
+   "y": 95,
+   "w": 370,
+   "h": 120
+  },
+  "strip": {
+   "x": 328,
+   "y": 103,
+   "w": 44,
+   "h": 104
+  },
+  "controls": {
+   "x": 10,
+   "y": 223,
+   "w": 370,
+   "h": 205
+  },
+  "buttons": 58,
+  "input": {
+   "x": 10,
+   "y": 289,
+   "w": 299,
+   "h": 87
+  },
+  "keys": {
+   "x": 10,
+   "y": 384,
+   "w": 370,
+   "h": 44
+  },
+  "shortcuts": null,
+  "padUsableArea": 39824,
+  "padShareOfVisible": 22,
+  "clipped": []
+ }
+]

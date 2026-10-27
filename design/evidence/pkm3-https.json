@@ -1,0 +1,42 @@
+[
+ {
+  "name": "https://<desktop>.local:39074/ 用本機 CA 驗證通過（curl，不加 --insecure）",
+  "ok": true,
+  "detail": "200"
+ },
+ {
+  "name": "沒有裝本機 CA 時，https 不被信任（證明不是隨便放行）",
+  "ok": true,
+  "detail": "ERR curl: (60) SSL certificate problem: unable to get local issuer certificate\nMore details here: https://curl.se/docs/s"
+ },
+ {
+  "name": "http 網頁提供描述檔 /pkm-ca.mobileconfig（application/x-apple-aspen-config）",
+  "ok": true,
+  "detail": "HTTP/1.1 200 OK\r\nContent-Type: application/x-apple-aspen-config\r\nCache-Control: no-store\r\nContent-Length: 2860\r\nConnection: close\r\n\r\n"
+ },
+ {
+  "name": "http 網頁也提供 /pkm-ca.cer（application/x-x509-ca-cert）",
+  "ok": true,
+  "detail": "HTTP/1.1 200 OK\r\nContent-Type: application/x-x509-ca-cert\r\nCache-Control: no-store\r\nContent-Length: 931\r\nConnection: close\r\n\r\n"
+ },
+ {
+  "name": "私鑰不會被當成網頁送出（/ca.key → 404）",
+  "ok": true,
+  "detail": "404"
+ },
+ {
+  "name": "https 頁面：安全來源、經 wss 配對連上 Mac",
+  "ok": true,
+  "detail": "{\"secure\":true,\"ready\":true,\"speech\":true}"
+ },
+ {
+  "name": "https 頁面：🎤 用語音辨識（不用開鍵盤）",
+  "ok": true,
+  "detail": "speech"
+ },
+ {
+  "name": "https 頁面：打字經 wss 送到 Mac（dry-run 記錄）",
+  "ok": true,
+  "detail": "[01:19:30] [dry-run] type \"s\""
+ }
+]

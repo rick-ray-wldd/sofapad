@@ -1,0 +1,135 @@
+{
+  "checks": {
+    "probe 成為前景、事件只進 probe": true,
+    "迷你地圖跳到螢幕中央（游標進入 probe 視窗）": true,
+    "單指滑動 → 游標往右移": true,
+    "點一下 → 左鍵（clickCount 1）": true,
+    "點兩下 → 雙擊（clickCount 2）": true,
+    "雙指點 → 右鍵": true,
+    "雙指往下滑 → 捲動（dy>0、精確捲動）": true,
+    "長按再拖 → 左鍵拖曳": true,
+    "注音組字中沒有送出任何東西": true,
+    "整段模式：按送出前不送": true,
+    "Mac 文字框內容 = '你好， Hello\\n整段送出測試 OK'": true,
+    "所有 ack ok": true,
+    "前景檢查沒有擋到任何事件（全部在 probe 上）": true,
+    "游標與前景 App 已恢復": true,
+    "原本的前景 App 有記下來（不是 probe 自己）": true,
+    "結束後前景回到原本的 App": true
+  },
+  "final_text": "你好， Hello\n整段送出測試 OK",
+  "acks": [
+    {
+      "id": 1,
+      "ok": true,
+      "via": "type",
+      "us": 6901,
+      "latency": 7.599999964237213
+    },
+    {
+      "id": 2,
+      "ok": true,
+      "via": "type",
+      "us": 5144,
+      "latency": 5.699999988079071
+    },
+    {
+      "id": 3,
+      "ok": true,
+      "via": "type",
+      "us": 4564,
+      "latency": 6.399999976158142
+    },
+    {
+      "id": 4,
+      "ok": true,
+      "via": "type",
+      "us": 1743,
+      "latency": 20.30000001192093
+    },
+    {
+      "id": 5,
+      "ok": true,
+      "via": "type",
+      "us": 1382,
+      "latency": 17.69999998807907
+    },
+    {
+      "id": 6,
+      "ok": true,
+      "via": "type",
+      "us": 892,
+      "latency": 16.600000023841858
+    },
+    {
+      "id": 7,
+      "ok": true,
+      "via": "type",
+      "us": 1025,
+      "latency": 15.5
+    },
+    {
+      "id": 8,
+      "ok": true,
+      "via": "type",
+      "us": 896,
+      "latency": 14.400000035762787
+    },
+    {
+      "id": 9,
+      "ok": true,
+      "via": "type",
+      "us": 776,
+      "latency": 13.299999952316284
+    },
+    {
+      "id": 10,
+      "ok": true,
+      "via": "type",
+      "us": 753,
+      "latency": 10.899999976158142
+    },
+    {
+      "id": 11,
+      "ok": true,
+      "us": 2838,
+      "latency": 17.69999998807907
+    },
+    {
+      "id": 12,
+      "ok": true,
+      "us": 4197,
+      "latency": 6.699999988079071
+    },
+    {
+      "id": 13,
+      "ok": true,
+      "via": "type",
+      "us": 13720,
+      "latency": 14.399999976158142
+    }
+  ],
+  "driver_ms": 7303,
+  "times": "start 14:59:19\nfront before 81665\nfront after 81665\nend 14:59:30\nport 33371 closed\n",
+  "events": 51,
+  "ready": {
+    "cursor": {
+      "x": 2177,
+      "y": 0
+    },
+    "front": true,
+    "pid": 45880,
+    "previous": "com.stablyai.orca",
+    "ready": true,
+    "screen": {
+      "h": 1080,
+      "w": 2560
+    },
+    "window": {
+      "h": 628,
+      "w": 900,
+      "x": 830,
+      "y": 212
+    }
+  }
+}

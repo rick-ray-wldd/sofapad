@@ -1,0 +1,138 @@
+Building for debugging...
+[1 / 11]
+Build complete! (0.35 sec)
+Test Suite 'All tests' started at 2026-10-24 19:12:00.915.
+Test Suite 'PKMCoreTests.xctest' started at 2026-10-24 19:12:00.915.
+Test Suite 'ArrowKeyFlagTests' started at 2026-10-24 19:12:00.915.
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testArrowKeysCarryFnAndNumericPadLikeAPhysicalKeyboard]' started.
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testArrowKeysCarryFnAndNumericPadLikeAPhysicalKeyboard]' passed (0.001 seconds).
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testE2EGuardStillBlocksArrowShortcutsWithTheNewFlags]' started.
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testE2EGuardStillBlocksArrowShortcutsWithTheNewFlags]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testHotkeyNameIsExactlyControlArrow]' started.
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testHotkeyNameIsExactlyControlArrow]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testNavigationAndFunctionKeysCarryFn]' started.
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testNavigationAndFunctionKeysCarryFn]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testOrdinaryKeysGetNoExtraFlags]' started.
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testOrdinaryKeysGetNoExtraFlags]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testSpaceCountFromDockPreferences]' started.
+Test Case '-[PKMCoreTests.ArrowKeyFlagTests testSpaceCountFromDockPreferences]' passed (0.000 seconds).
+Test Suite 'ArrowKeyFlagTests' passed at 2026-10-24 19:12:00.917.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'E2EGuardPolicyTests' started at 2026-10-24 19:12:00.917.
+Test Case '-[PKMCoreTests.E2EGuardPolicyTests testClicksNeedBothFrontAndHitWindow]' started.
+Test Case '-[PKMCoreTests.E2EGuardPolicyTests testClicksNeedBothFrontAndHitWindow]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.E2EGuardPolicyTests testKeysAndMovesNeedTheProbeInFront]' started.
+Test Case '-[PKMCoreTests.E2EGuardPolicyTests testKeysAndMovesNeedTheProbeInFront]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.E2EGuardPolicyTests testUnknownWindowOrOwnerIsBlocked]' started.
+Test Case '-[PKMCoreTests.E2EGuardPolicyTests testUnknownWindowOrOwnerIsBlocked]' passed (0.000 seconds).
+Test Suite 'E2EGuardPolicyTests' passed at 2026-10-24 19:12:00.917.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'HTTPTests' started at 2026-10-24 19:12:00.917.
+Test Case '-[PKMCoreTests.HTTPTests testHostPolicyBlocksRebinding]' started.
+Test Case '-[PKMCoreTests.HTTPTests testHostPolicyBlocksRebinding]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.HTTPTests testIncompleteAndMalformed]' started.
+Test Case '-[PKMCoreTests.HTTPTests testIncompleteAndMalformed]' passed (0.002 seconds).
+Test Case '-[PKMCoreTests.HTTPTests testLocalNetworkFilter]' started.
+Test Case '-[PKMCoreTests.HTTPTests testLocalNetworkFilter]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.HTTPTests testParsesUpgradeRequest]' started.
+Test Case '-[PKMCoreTests.HTTPTests testParsesUpgradeRequest]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.HTTPTests testQuerySplit]' started.
+Test Case '-[PKMCoreTests.HTTPTests testQuerySplit]' passed (0.000 seconds).
+Test Suite 'HTTPTests' passed at 2026-10-24 19:12:00.920.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'KeyAndTextTests' started at 2026-10-24 19:12:00.920.
+Test Case '-[PKMCoreTests.KeyAndTextTests testDecodeMessages]' started.
+Test Case '-[PKMCoreTests.KeyAndTextTests testDecodeMessages]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.KeyAndTextTests testKeyMap]' started.
+Test Case '-[PKMCoreTests.KeyAndTextTests testKeyMap]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.KeyAndTextTests testTextPlanChunks]' started.
+Test Case '-[PKMCoreTests.KeyAndTextTests testTextPlanChunks]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.KeyAndTextTests testTextPlanSplitsGraphemesAndNewlines]' started.
+Test Case '-[PKMCoreTests.KeyAndTextTests testTextPlanSplitsGraphemesAndNewlines]' passed (0.000 seconds).
+Test Suite 'KeyAndTextTests' passed at 2026-10-24 19:12:00.920.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PairingTests' started at 2026-10-24 19:12:00.920.
+Test Case '-[PKMCoreTests.PairingTests testBurstOfFailuresRotatesCodeAndClosesPairing]' started.
+Test Case '-[PKMCoreTests.PairingTests testBurstOfFailuresRotatesCodeAndClosesPairing]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.PairingTests testCodeShape]' started.
+Test Case '-[PKMCoreTests.PairingTests testCodeShape]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.PairingTests testCorrectCodePairsOnceThenCloses]' started.
+Test Case '-[PKMCoreTests.PairingTests testCorrectCodePairsOnceThenCloses]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.PairingTests testCrossLanguageProofVector]' started.
+Test Case '-[PKMCoreTests.PairingTests testCrossLanguageProofVector]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.PairingTests testDevicesPersistHashedWithPrivatePermissions]' started.
+Test Case '-[PKMCoreTests.PairingTests testDevicesPersistHashedWithPrivatePermissions]' passed (0.002 seconds).
+Test Case '-[PKMCoreTests.PairingTests testPhoneRequestOpensShortWindowAndIsRateLimited]' started.
+Test Case '-[PKMCoreTests.PairingTests testPhoneRequestOpensShortWindowAndIsRateLimited]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.PairingTests testProofWithWrongNonceOrTokenFails]' started.
+Test Case '-[PKMCoreTests.PairingTests testProofWithWrongNonceOrTokenFails]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.PairingTests testWindowExpires]' started.
+Test Case '-[PKMCoreTests.PairingTests testWindowExpires]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.PairingTests testWrongCodeRejectedAndLocksOutAfterFive]' started.
+Test Case '-[PKMCoreTests.PairingTests testWrongCodeRejectedAndLocksOutAfterFive]' passed (0.000 seconds).
+Test Suite 'PairingTests' passed at 2026-10-24 19:12:00.924.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'ServerTests' started at 2026-10-24 19:12:00.924.
+Test Case '-[PKMCoreTests.ServerTests testEndToEndOverSocket]' started.
+Test Case '-[PKMCoreTests.ServerTests testEndToEndOverSocket]' passed (0.017 seconds).
+Test Case '-[PKMCoreTests.ServerTests testServesPageWithSecurityHeaders]' started.
+Test Case '-[PKMCoreTests.ServerTests testServesPageWithSecurityHeaders]' passed (0.003 seconds).
+Test Case '-[PKMCoreTests.ServerTests testTraversalAndMissingFiles]' started.
+Test Case '-[PKMCoreTests.ServerTests testTraversalAndMissingFiles]' passed (0.003 seconds).
+Test Case '-[PKMCoreTests.ServerTests testWebSocketNeedsMatchingOrigin]' started.
+Test Case '-[PKMCoreTests.ServerTests testWebSocketNeedsMatchingOrigin]' passed (0.002 seconds).
+Test Suite 'ServerTests' passed at 2026-10-24 19:12:00.948.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.024 (0.024) seconds
+Test Suite 'SessionTests' started at 2026-10-24 19:12:00.948.
+Test Case '-[PKMCoreTests.SessionTests testControlArrowAckCarriesHotkeyStatus]' started.
+Test Case '-[PKMCoreTests.SessionTests testControlArrowAckCarriesHotkeyStatus]' passed (0.001 seconds).
+Test Case '-[PKMCoreTests.SessionTests testHelloCarriesNonce]' started.
+Test Case '-[PKMCoreTests.SessionTests testHelloCarriesNonce]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SessionTests testInputBeforeAuthIsRefusedAndClosed]' started.
+Test Case '-[PKMCoreTests.SessionTests testInputBeforeAuthIsRefusedAndClosed]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SessionTests testMouseCommandsAndReleaseOnDisconnect]' started.
+Test Case '-[PKMCoreTests.SessionTests testMouseCommandsAndReleaseOnDisconnect]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SessionTests testNothingIsInjectedWhileScreenLocked]' started.
+Test Case '-[PKMCoreTests.SessionTests testNothingIsInjectedWhileScreenLocked]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SessionTests testPairTypeAndDedup]' started.
+Test Case '-[PKMCoreTests.SessionTests testPairTypeAndDedup]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SessionTests testPermissionAndSecureInputReported]' started.
+Test Case '-[PKMCoreTests.SessionTests testPermissionAndSecureInputReported]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SessionTests testTokenProofLogin]' started.
+Test Case '-[PKMCoreTests.SessionTests testTokenProofLogin]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SessionTests testWrongPairingCodeIsRejected]' started.
+Test Case '-[PKMCoreTests.SessionTests testWrongPairingCodeIsRejected]' passed (0.000 seconds).
+Test Suite 'SessionTests' passed at 2026-10-24 19:12:00.951.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'SystemShortcutTests' started at 2026-10-24 19:12:00.951.
+Test Case '-[PKMCoreTests.SystemShortcutTests testDisabledSpaceShortcutsAreReported]' started.
+Test Case '-[PKMCoreTests.SystemShortcutTests testDisabledSpaceShortcutsAreReported]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SystemShortcutTests testOrdinaryShortcutsStillReachTheProbe]' started.
+Test Case '-[PKMCoreTests.SystemShortcutTests testOrdinaryShortcutsStillReachTheProbe]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.SystemShortcutTests testSystemWideShortcutsAreRecognised]' started.
+Test Case '-[PKMCoreTests.SystemShortcutTests testSystemWideShortcutsAreRecognised]' passed (0.000 seconds).
+Test Suite 'SystemShortcutTests' passed at 2026-10-24 19:12:00.951.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'WebSocketTests' started at 2026-10-24 19:12:00.951.
+Test Case '-[PKMCoreTests.WebSocketTests testFragmentedTextWithInterleavedPing]' started.
+Test Case '-[PKMCoreTests.WebSocketTests testFragmentedTextWithInterleavedPing]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.WebSocketTests testInvalidUTF8Rejected]' started.
+Test Case '-[PKMCoreTests.WebSocketTests testInvalidUTF8Rejected]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.WebSocketTests testMaskedRoundTripAllLengths]' started.
+Test Case '-[PKMCoreTests.WebSocketTests testMaskedRoundTripAllLengths]' passed (0.053 seconds).
+Test Case '-[PKMCoreTests.WebSocketTests testRejectsHugeFrames]' started.
+Test Case '-[PKMCoreTests.WebSocketTests testRejectsHugeFrames]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.WebSocketTests testRejectsUnmaskedClientFrames]' started.
+Test Case '-[PKMCoreTests.WebSocketTests testRejectsUnmaskedClientFrames]' passed (0.000 seconds).
+Test Case '-[PKMCoreTests.WebSocketTests testRFCAcceptKey]' started.
+Test Case '-[PKMCoreTests.WebSocketTests testRFCAcceptKey]' passed (0.000 seconds).
+Test Suite 'WebSocketTests' passed at 2026-10-24 19:12:01.005.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.054 (0.054) seconds
+Test Suite 'PKMCoreTests.xctest' passed at 2026-10-24 19:12:01.005.
+	 Executed 49 tests, with 0 failures (0 unexpected) in 0.087 (0.090) seconds
+Test Suite 'All tests' passed at 2026-10-24 19:12:01.005.
+	 Executed 49 tests, with 0 failures (0 unexpected) in 0.087 (0.091) seconds
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

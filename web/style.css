@@ -1,0 +1,469 @@
+:root {
+  --bg: #0e1013;
+  --panel: #171a1f;
+  --pad: #1c2027;
+  --pad-line: #262b34;
+  --key: #252a32;
+  --key-active: #3a4352;
+  --text: #e9ecf1;
+  --muted: #9aa3b2;
+  --accent: #4f8cff;
+  --accent-soft: rgba(79, 140, 255, 0.18);
+  --ok: #3ecf8e;
+  --warn: #f5b942;
+  --bad: #ff5d5d;
+  --radius: 14px;
+  --gap: 8px;
+  --vvh: 100dvh;
+  --vvtop: 0px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.35 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Segoe UI", sans-serif;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: var(--key);
+  border-radius: 10px;
+  touch-action: manipulation;
+}
+button:active, button.active { background: var(--key-active); }
+[hidden] { display: none !important; }
+
+#app {
+  position: fixed;
+  left: 0;
+  top: var(--vvtop);
+  width: 100%;
+  height: var(--vvh);
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+/* Keyboard up: it covers the home-indicator strip, so the bottom safe area is wasted space (I-13, S-101). */
+#app.kbd { padding-bottom: 0; }
+
+/* ---------- top bar ---------- */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  padding: 6px 10px;
+  min-height: 44px;
+}
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  padding: 6px 4px;
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+}
+.status #host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bad); flex: none; display: inline-block; }
+.dot.connecting { background: var(--warn); }
+.dot.ready { background: var(--ok); }
+.rtt { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+.chip { padding: 6px 12px; border-radius: 999px; font-size: 13px; background: var(--accent-soft); color: #cfe0ff; }
+.icon-btn { width: 40px; height: 36px; font-size: 18px; background: transparent; }
+
+.banner {
+  margin: 0 10px 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(245, 185, 66, 0.14);
+  color: #ffe2a6;
+  font-size: 13px;
+}
+.banner.bad { background: rgba(255, 93, 93, 0.14); color: #ffc4c4; }
+
+/* ---------- workspace: portrait = pad on top, controls below ---------- */
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 0 10px 8px;
+}
+#app.kbd .workspace { padding-bottom: 6px; }
+
+.pad {
+  position: relative;
+  flex: 1;
+  min-height: 120px;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(var(--pad-line) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, var(--pad-line) 1px, transparent 1px) 0 0 / 28px 28px,
+    var(--pad);
+  touch-action: none;
+  overflow: hidden;
+}
+.pad.touching { box-shadow: inset 0 0 0 2px var(--accent-soft); }
+.pad.dragging { box-shadow: inset 0 0 0 3px var(--accent); }
+.pad-hint {
+  position: absolute;
+  inset: 0;
+  right: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.4s;
+}
+.pad-hint p { margin: 3px 0; }
+.pad-hint.faded { opacity: 0; }
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  pointer-events: none;
+}
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(14, 16, 19, 0.88);
+  color: var(--text);
+  font-size: 15px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 4;
+}
+
+.strip {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: 8px;
+  width: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  touch-action: none;
+}
+.strip.active { background: var(--accent-soft); }
+
+/* ---------- floating buttons on the pad ---------- */
+.fab { position: absolute; display: none; gap: 8px; z-index: 3; }
+.fab button {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(37, 42, 50, 0.88);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+.fab button[aria-pressed="true"] { background: var(--accent); color: white; }
+.fab .fab-status { background: rgba(37, 42, 50, 0.6); }
+.fab .fab-landscape { display: none; }
+
+.controls { display: flex; flex-direction: column; gap: var(--gap); flex: none; }
+
+.buttons { display: grid; grid-template-columns: 1fr 0.8fr 1fr; gap: var(--gap); }
+.mbtn { height: 58px; font-size: 16px; font-weight: 600; touch-action: none; }
+.mbtn.lock { font-size: 14px; font-weight: 500; color: var(--muted); }
+.mbtn.lock[aria-pressed="true"] { background: var(--accent); color: white; }
+
+.typing { display: flex; gap: var(--gap); }
+#input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  max-height: 110px;
+  resize: none;
+  border: 1px solid #2f3540;
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: #11141a;
+  color: var(--text);
+  font: inherit;
+  font-size: 16px; /* 16px keeps iOS from zooming on focus */
+  -webkit-user-select: text;
+  user-select: text;
+}
+#input:focus { outline: none; border-color: var(--accent); }
+.send { padding: 0 16px; background: var(--accent); color: white; font-weight: 600; }
+
+.keys {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  touch-action: pan-x;
+}
+.keys::-webkit-scrollbar { display: none; }
+.keys button { flex: none; min-width: 46px; height: 42px; padding: 0 10px; font-size: 15px; }
+.keys .mod.armed { background: var(--accent); color: white; }
+.keys .more { background: var(--accent-soft); color: #cfe0ff; }
+.keys .mode { border-radius: 10px; }
+/* The row scrolls sideways (swipes on a button scroll it; a key goes on release). ‹ › fades show more (I-19). */
+.keys-wrap { position: relative; min-width: 0; }
+.keys-wrap::before, .keys-wrap::after {
+  position: absolute;
+  top: 0;
+  bottom: 2px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.keys-wrap::before { content: "‹"; left: 0; padding-left: 2px; justify-content: flex-start; background: linear-gradient(to right, var(--bg) 40%, transparent); }
+.keys-wrap::after { content: "›"; right: 0; padding-right: 2px; justify-content: flex-end; background: linear-gradient(to left, var(--bg) 40%, transparent); }
+.keys-wrap.more-left::before, .keys-wrap.more-right::after { opacity: 1; }
+.mac-status { white-space: pre-line; }
+.mac-status.bad { color: var(--warn); }
+
+/* ---------- portrait while typing: give the pad back the space (D-14, I-13) ---------- */
+@media (orientation: portrait) {
+  #app.typing .bar, #app.typing .buttons, #app.typing .pad-hint { display: none; }
+  #app.typing #input { max-height: 66px; }
+  #app.typing .fab { display: flex; flex-direction: row; top: 8px; left: 8px; }
+  #app.typing.lefty .fab { left: auto; right: 8px; }
+  #app.typing .fab #fabKeyboard::before { content: "⌄"; }
+  #app.typing .fab #fabKeyboard { font-size: 0; }
+  #app.typing .fab #fabKeyboard::before { font-size: 20px; }
+  #app.typing .badge { top: 60px; }
+}
+
+/* ---------- landscape: full-screen trackpad (D-16) ---------- */
+@media (orientation: landscape) {
+  #app { padding: 0; }
+  .bar { display: none; }
+  .workspace { padding: 0; gap: 0; }
+  .pad { border-radius: 0; }
+  .pad-hint { left: 64px; right: 64px; }
+  .strip { right: max(8px, env(safe-area-inset-right)); top: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  .lefty .strip { right: auto; left: max(8px, env(safe-area-inset-left)); }
+  .fab { display: flex; flex-direction: column; left: max(8px, env(safe-area-inset-left)); top: 50%; transform: translateY(-50%); }
+  .fab .fab-landscape { display: flex; }
+  .lefty .fab { left: auto; right: max(8px, env(safe-area-inset-right)); }
+  .lefty .pad-hint { left: 64px; right: 64px; }
+  .badge { left: 50%; transform: translateX(-50%); }
+  .banner {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 70%;
+    margin: 0;
+    z-index: 6;
+    pointer-events: none;
+  }
+  /* controls only come back while typing: one row of text box + keys under the pad */
+  .controls { display: none; }
+  #app.typing .controls {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: var(--gap);
+    padding: 6px max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left));
+  }
+  #app.typing .buttons { display: none; }
+  #app.typing .typing { flex: 1 1 45%; min-width: 0; }
+  #app.typing .keys-wrap { flex: 1 1 55%; min-width: 0; }
+  #app.typing #input { max-height: 44px; }
+  #app.typing .pad-hint { display: none; }
+  /* the pad is short now: buttons go in one row at the top instead of a centred column */
+  #app.typing .fab { flex-direction: row; top: 8px; transform: none; }
+  #app.typing .fab .fab-landscape { display: none; }
+  #app.typing .fab #fabKeyboard { background: var(--accent); color: white; }
+}
+#fabKeyboard { font-size: 15px; font-weight: 600; }
+.lefty .strip { right: auto; left: 8px; }
+.lefty .pad-hint { right: 0; left: 56px; }
+
+/* ---------- shortcut panel (covers the pad) ---------- */
+.panel {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: rgba(17, 20, 25, 0.97);
+  display: flex;
+  flex-direction: column;
+  border-radius: inherit;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px 4px 12px;
+}
+.spacer { flex: 1; }
+.panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 10px 12px;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+.sc-group h3 { font-size: 12px; color: var(--muted); margin: 10px 2px 6px; font-weight: 500; }
+.sc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.sc-grid button {
+  min-height: 52px;
+  padding: 4px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.sc-grid .combo { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sc-grid .name { font-size: 11px; color: var(--muted); line-height: 1.2; text-align: center; }
+.sc-empty { color: var(--muted); font-size: 13px; margin: 4px 2px; }
+@media (orientation: landscape) {
+  .panel { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  .sc-grid { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); }
+}
+
+/* ---------- sheets ---------- */
+.sheet {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10;
+}
+.sheet-card {
+  width: min(420px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  background: var(--panel);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.sheet-card h2 { margin: 0; font-size: 20px; }
+.muted { color: var(--muted); margin: 0; }
+.small { font-size: 12px; }
+#codeInput {
+  font-size: 34px;
+  letter-spacing: 10px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #2f3540;
+  background: #11141a;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.primary, .secondary { height: 48px; font-size: 16px; }
+.primary { background: var(--accent); color: white; font-weight: 600; }
+.msg { min-height: 1.4em; margin: 0; color: var(--warn); }
+.settings label { display: flex; flex-direction: column; gap: 6px; color: var(--text); }
+.settings label.row { flex-direction: row; align-items: center; gap: 10px; }
+.settings output { color: var(--muted); font-variant-numeric: tabular-nums; }
+.settings input[type="range"] { width: 100%; }
+.settings input[type="checkbox"] { width: 20px; height: 20px; flex: none; }
+
+/* custom shortcut editor */
+.custom-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.custom-list li { display: flex; align-items: center; gap: 6px; background: #11141a; border-radius: 10px; padding: 6px 6px 6px 10px; }
+.custom-list .combo { font-weight: 600; min-width: 64px; }
+.custom-list .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 13px; }
+.custom-list button { width: 36px; height: 36px; flex: none; }
+.sc-form { display: flex; flex-direction: column; gap: 10px; background: #11141a; border-radius: 12px; padding: 12px; }
+.sc-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.sc-form input, .sc-form select, .io textarea, .io-log textarea {
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid #2f3540;
+  border-radius: 10px;
+  padding: 10px;
+}
+.mod-picks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.mod-picks button { height: 42px; }
+.mod-picks button[aria-pressed="true"] { background: var(--accent); color: white; }
+.preview { margin: 0; font-size: 15px; }
+#scPreview { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+.row-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.row-buttons button { flex: 1; height: 44px; font-size: 14px; }
+.io summary, .io-log summary { cursor: pointer; color: var(--muted); padding: 4px 0; }
+.io textarea, .io-log textarea { width: 100%; resize: vertical; font-size: 13px; font-family: ui-monospace, Menlo, monospace; margin: 8px 0; }
+.io-buttons { display: flex; gap: 8px; }
+.io-buttons button { flex: 1; }
+
+.version { margin: -4px 0 4px; }
+.version.bad { color: var(--warn); }
+
+.haptic { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+
+/* key row editor (PKM-3-1 ②) */
+.keys .row-edit { color: var(--muted); }
+.rowedit { width: min(520px, 100%); }
+.rowedit .panel-head { display: flex; align-items: center; gap: 8px; }
+.row-current { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.row-current li { display: flex; align-items: center; gap: 8px; background: var(--key); border-radius: 10px; padding: 4px 6px; min-height: 44px; }
+.row-current li.dragging { background: var(--accent-soft); outline: 1px solid var(--accent); }
+.row-current .handle { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 20px; touch-action: none; cursor: grab; }
+.row-current .lbl { min-width: 54px; font-weight: 600; font-size: 16px; }
+.row-current .nm { flex: 1; font-size: 13px; color: var(--muted); }
+.row-current button { width: 36px; height: 36px; padding: 0; font-size: 15px; }
+.row-catalog h3 { margin: 10px 0 6px; font-size: 13px; color: var(--muted); font-weight: 500; }
+.row-catalog .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.row-catalog .chips button { padding: 6px 10px; font-size: 14px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; min-width: 52px; }
+.row-catalog .chips button small { font-size: 10px; color: var(--muted); }
+.row-catalog .chips button[aria-pressed="true"] { background: var(--accent-soft); outline: 1px solid var(--accent); }
+.row-catalog .empty { font-size: 13px; color: var(--muted); margin: 0; }
+.row-foot { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (orientation: landscape) {
+  .rowedit { width: min(760px, 100%); }
+  .row-current { flex-direction: row; flex-wrap: wrap; }
+  .row-current li { flex: 0 0 auto; }
+  .row-current .nm { display: none; }
+}

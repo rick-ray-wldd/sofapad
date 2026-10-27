@@ -1,0 +1,185 @@
+{
+ "scenario": "switch",
+ "build": "old",
+ "mode": "live",
+ "textMode": "paste",
+ "kind": "stop",
+ "tag": "switch-old-live-paste",
+ "startedAt": "2026-10-27T18:43:10.695Z",
+ "rounds": [
+  {
+   "k": 1,
+   "label": "r01",
+   "sentToSwitchMs": 1077,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 2,
+   "label": "r02",
+   "sentToSwitchMs": 1010,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 3,
+   "label": "r03",
+   "sentToSwitchMs": 1023,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 4,
+   "label": "r04",
+   "sentToSwitchMs": 1169,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 5,
+   "label": "r05",
+   "sentToSwitchMs": 1184,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 6,
+   "label": "r06",
+   "sentToSwitchMs": 1197,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 7,
+   "label": "r07",
+   "sentToSwitchMs": 1206,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 8,
+   "label": "r08",
+   "sentToSwitchMs": 1196,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 9,
+   "label": "r09",
+   "sentToSwitchMs": 1219,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 10,
+   "label": "r10",
+   "sentToSwitchMs": 1203,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": false
+  },
+  {
+   "k": 11,
+   "label": "r11",
+   "sentToSwitchMs": 1194,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 12,
+   "label": "r12",
+   "sentToSwitchMs": 1205,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 13,
+   "label": "r13",
+   "sentToSwitchMs": 1204,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 14,
+   "label": "r14",
+   "sentToSwitchMs": 1170,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  },
+  {
+   "k": 15,
+   "label": "r15",
+   "sentToSwitchMs": 1176,
+   "inA": 1,
+   "inB": 0,
+   "pieceInB": true
+  }
+ ],
+ "notes": [
+  "leaks recomputed after the run with the final rule (any 3+ character piece of the round text in B)"
+ ],
+ "textA": "r01 orca lr02 orca lr03 orca lr04 orca r05 orcar06 orca line 6x\nr07 orca r08 orca r09 orcar10 orca line 10x\nr11 orca r12 orca r13 orca r14 orca r15 orca ",
+ "textB": "ine 1\nxine 2\nxine 3\nxline 4\nxline 5\nxxline 7\nxline 8\nxline 9\nxxline 11\nxline 12\nxline 13\nxline 14\nxline 15\nx",
+ "guardTripped": false,
+ "closed": {
+  "ok": false,
+  "windowsLeft": 2
+ },
+ "timing": [],
+ "late": [],
+ "leaks": 13,
+ "dupes": 0,
+ "missing": 0,
+ "bOnlyX": false,
+ "switches": [],
+ "serverLog": [
+  "[02:43:11] 端對端測試模式：只有前景 App 是 pid 22579、而且點擊／捲動落在它的視窗上時才送事件",
+  "[02:43:11] 網路介面：en1 192.168.x.x；utun5 100.x.x.x：不使用，不是區網位址（KeyMouse 只接受區網裡的手機）",
+  "",
+  "========== Phone KeyMouse ==========",
+  "手機和這台 Mac 連同一個 Wi-Fi，用 Safari 打開：",
+  "  http://127.0.0.1:33571/",
+  "配對碼：******（15 分鐘內有效；之後手機可以按「要求配對」，Mac 螢幕會跳出新碼）",
+  "網頁資料夾：<scratch>/v3src/web",
+  "已配對手機：0 支",
+  "人在 Mac 前面時，也可以用手機相機掃這個 QR code（內含配對碼）：",
+  "\u001b[30;47m                                 \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█ ▀ ▄▄▀██▄▀▀▄██ █▀▀▀▀▀█  \u001b[0m",
+  "\u001b[30;47m  █ ███ █ ▄▄▄█▀ ▀  █▄▄█ █ ███ █  \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ █▀▄▄█   ▄█▄▀▄ █ ▀▀▀ █  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ █ █ █▄▀▄█▄▀ ▀ ▀▀▀▀▀▀▀  \u001b[0m",
+  "\u001b[30;47m  ▀▄▄▄▀ ▀█▀ █▀██▄ ▄▄ ▄█▀█▀██▄▄█  \u001b[0m",
+  "\u001b[30;47m  ▀█▀▀█▀▀ ▄▀ ▀  ▄ ▀▀▀▀▀▄ ▀▀  ▄█  \u001b[0m",
+  "\u001b[30;47m  ▄█▀ ▄█▀▀▄▄██ ▀▀▀▀▄███▀▀█▄█▄█▄  \u001b[0m",
+  "\u001b[30;47m  ▀▄▄▄▀ ▀▀██▄█▀█▀█▄▄█ █ ▀▄  ▄▄█  \u001b[0m",
+  "\u001b[30;47m  █▀▄▄▀ ▀ ██▀ ▀█▄ ▄ ▄ █▀█▀  ▀█▄  \u001b[0m",
+  "\u001b[30;47m    ▄█ █▀█▄▄▀▄█ ▄ ▀█▀▀▄   ▀██▄█  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀   ▀ ▄ ██▀▀▀▀  █ █▀▀▀█▀▄ █  \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█ ▀▀ ▄ █▀██ ▀▀█ ▀ ███▄█  \u001b[0m",
+  "\u001b[30;47m  █ ███ █ ▀▀▄▀ █▄▄  █▀███▀█▄▄▀   \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █  ▀▀▀ ▄ ▄█ ▀ ▄▀█▀▀ ▀██  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ ▀▀  ▀▀  ▀▀▀ ▀   ▀▀▀▀   \u001b[0m",
+  "\u001b[30;47m                                 \u001b[0m",
+  "",
+  "在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。",
+  "",
+  "[02:43:15] 手機已配對。要再配對另一支手機：在這裡按 Enter，或用選單列的「配對新手機」。",
+  "[02:43:15] authenticated iPhone from 127.0.0.1 (new pairing)",
+  "[02:45:03] 結束中…",
+  ""
+ ],
+ "leakedChars": 93
+}

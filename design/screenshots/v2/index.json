@@ -1,0 +1,118 @@
+[
+ {
+  "name": "before-portrait-no-keyboard",
+  "note": "v1：直拿、鍵盤收起（基準）；觸控板 370×463"
+ },
+ {
+  "name": "after-portrait-no-keyboard",
+  "note": "v2：直拿、鍵盤收起（基準）；觸控板 370×463"
+ },
+ {
+  "name": "before-portrait-keyboard-homescreen",
+  "note": "v1：直拿、點文字框、注音鍵盤彈出（主畫面 App：鍵盤＋選字列 336 px）；觸控板 370×199"
+ },
+ {
+  "name": "after-portrait-keyboard-homescreen",
+  "note": "v2：直拿、點文字框、注音鍵盤彈出（主畫面 App：鍵盤＋選字列 336 px）；觸控板 370×349"
+ },
+ {
+  "name": "before-portrait-keyboard-safari",
+  "note": "v1：同上，但在 Safari 分頁（再多表單輔助列 44 px）；觸控板 370×155"
+ },
+ {
+  "name": "after-portrait-keyboard-safari",
+  "note": "v2：同上，但在 Safari 分頁（再多表單輔助列 44 px）；觸控板 370×305"
+ },
+ {
+  "name": "before-portrait-keyboard-shortcuts",
+  "note": "v1：鍵盤彈出（Safari）＋打開快捷鍵面板；觸控板 370×120"
+ },
+ {
+  "name": "after-portrait-keyboard-shortcuts",
+  "note": "v2：鍵盤彈出（Safari）＋打開快捷鍵面板；觸控板 370×305"
+ },
+ {
+  "name": "before-portrait-keyboard-multiline",
+  "note": "v1：鍵盤彈出（Safari）＋整段模式打了三行字；觸控板 370×120"
+ },
+ {
+  "name": "after-portrait-keyboard-multiline",
+  "note": "v2：鍵盤彈出（Safari）＋整段模式打了三行字；觸控板 370×285"
+ },
+ {
+  "name": "v2-01-portrait-main",
+  "note": "直拿主畫面：提示多了捏合和三指手勢"
+ },
+ {
+  "name": "v2-03-portrait-shortcut-panel",
+  "note": "快捷鍵面板：我的、編輯、截圖、切換、其他（蓋在觸控板上）"
+ },
+ {
+  "name": "v2-04-portrait-editor",
+  "note": "自訂快捷鍵：修飾鍵用按的、按鍵用選的，下方即時預覽"
+ },
+ {
+  "name": "v2-02-portrait-typing-keyboard",
+  "note": "直拿打字（鍵盤彈出）：觸控板 305 px；狀態點、收鍵盤、快捷鍵、拖曳鎖定變成觸控板上的小按鈕"
+ },
+ {
+  "name": "v2-05-landscape-fullscreen",
+  "note": "橫拿：觸控板全螢幕；左邊浮動按鈕列（連線、鍵盤、快捷鍵、拖曳鎖定、設定），右邊捲動條"
+ },
+ {
+  "name": "v2-06-landscape-typing",
+  "note": "橫拿打字：觸控板在上，文字框＋按鍵列一列在下，鍵盤在最下面"
+ },
+ {
+  "name": "v2-07-landscape-shortcut-panel",
+  "note": "橫拿：快捷鍵面板"
+ },
+ {
+  "name": "v2-08-landscape-lefthand",
+  "note": "橫拿＋左手模式：浮動按鈕在右邊、捲動條在左邊"
+ },
+ {
+  "name": "pkm23-before-portrait-390",
+  "note": "PKM-2-3 修改前：直 390×844，有迷你地圖；觸控板 370×463；按鍵列 16 顆只看得到 6 顆"
+ },
+ {
+  "name": "pkm23-after-portrait-390",
+  "note": "PKM-2-3 修改後：沒有迷你地圖；觸控板 370×535；按鍵列右端有 › 提示"
+ },
+ {
+  "name": "pkm23-before-portrait-375",
+  "note": "修改前：直 375×667（iPhone SE）；觸控板 355×347"
+ },
+ {
+  "name": "pkm23-after-portrait-375",
+  "note": "修改後：直 375×667；觸控板 355×419"
+ },
+ {
+  "name": "pkm23-before-portrait-390-swiped",
+  "note": "修改前：從「⌘ 快捷鍵」往左滑 → 按鍵列沒動，快捷鍵面板反而被打開（I-19）"
+ },
+ {
+  "name": "pkm23-after-portrait-390-swiped",
+  "note": "修改後：同樣的滑動 → 按鍵列捲動，什麼都沒送；兩端 ‹ ›"
+ },
+ {
+  "name": "pkm23-before-portrait-375-swiped",
+  "note": "修改前（375 寬）：同上，沒捲動、面板打開"
+ },
+ {
+  "name": "pkm23-after-portrait-375-swiped",
+  "note": "修改後（375 寬）：捲動到方向鍵和修飾鍵"
+ },
+ {
+  "name": "pkm23-before-landscape-844",
+  "note": "修改前：橫向 844×390 全螢幕觸控板（本來就沒有迷你地圖）"
+ },
+ {
+  "name": "pkm23-after-landscape-844",
+  "note": "修改後：橫向不變 844×390"
+ },
+ {
+  "name": "pkm23-after-hint",
+  "note": "dry-run Mac 只有 1 個空間：三指左右滑後手機上方的提示"
+ }
+]

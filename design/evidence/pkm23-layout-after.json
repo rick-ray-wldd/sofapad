@@ -1,0 +1,196 @@
+[
+ {
+  "name": "portrait-390",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "pad": {
+   "x": 10,
+   "y": 95,
+   "w": 370,
+   "h": 535
+  },
+  "minimap": null,
+  "keys": {
+   "x": 10,
+   "y": 758,
+   "w": 370,
+   "h": 44
+  },
+  "keyCount": 16,
+  "keysScrollable": 513,
+  "hiddenKeys": [
+   "←",
+   "↑",
+   "↓",
+   "→",
+   "⌘",
+   "⌥",
+   "⌃",
+   "⇧",
+   "space",
+   "⌦"
+  ],
+  "moreHint": {
+   "left": false,
+   "right": true
+  },
+  "swipe": {
+   "startButton": "⌘ 快捷鍵",
+   "scrollLeft": 225,
+   "sent": [],
+   "panelOpened": false
+  },
+  "afterSwipe": {
+   "pad": {
+    "x": 10,
+    "y": 95,
+    "w": 370,
+    "h": 535
+   },
+   "minimap": null,
+   "keys": {
+    "x": 10,
+    "y": 758,
+    "w": 370,
+    "h": 44
+   },
+   "keyCount": 16,
+   "keysScrollable": 513,
+   "hiddenKeys": [
+    "⌘",
+    "⌥",
+    "⌃",
+    "⇧",
+    "space",
+    "⌦"
+   ],
+   "moreHint": {
+    "left": true,
+    "right": true
+   }
+  },
+  "tapKey": {
+   "k": "enter",
+   "sent": [
+    {
+     "t": "key",
+     "k": "enter",
+     "mods": []
+    }
+   ]
+  }
+ },
+ {
+  "name": "portrait-375",
+  "viewport": {
+   "width": 375,
+   "height": 667
+  },
+  "pad": {
+   "x": 10,
+   "y": 68,
+   "w": 355,
+   "h": 419
+  },
+  "minimap": null,
+  "keys": {
+   "x": 10,
+   "y": 615,
+   "w": 355,
+   "h": 44
+  },
+  "keyCount": 16,
+  "keysScrollable": 528,
+  "hiddenKeys": [
+   "←",
+   "↑",
+   "↓",
+   "→",
+   "⌘",
+   "⌥",
+   "⌃",
+   "⇧",
+   "space",
+   "⌦"
+  ],
+  "moreHint": {
+   "left": false,
+   "right": true
+  },
+  "swipe": {
+   "startButton": "⌘ 快捷鍵",
+   "scrollLeft": 225,
+   "sent": [],
+   "panelOpened": false
+  },
+  "afterSwipe": {
+   "pad": {
+    "x": 10,
+    "y": 68,
+    "w": 355,
+    "h": 419
+   },
+   "minimap": null,
+   "keys": {
+    "x": 10,
+    "y": 615,
+    "w": 355,
+    "h": 44
+   },
+   "keyCount": 16,
+   "keysScrollable": 528,
+   "hiddenKeys": [
+    "⌘",
+    "⌥",
+    "⌃",
+    "⇧",
+    "space",
+    "⌦"
+   ],
+   "moreHint": {
+    "left": true,
+    "right": true
+   }
+  },
+  "tapKey": {
+   "k": "enter",
+   "sent": [
+    {
+     "t": "key",
+     "k": "enter",
+     "mods": []
+    }
+   ]
+  }
+ },
+ {
+  "name": "landscape-844",
+  "viewport": {
+   "width": 844,
+   "height": 390
+  },
+  "pad": {
+   "x": 0,
+   "y": 0,
+   "w": 844,
+   "h": 390
+  },
+  "minimap": null,
+  "keys": null,
+  "keyCount": 16,
+  "keysScrollable": 0,
+  "hiddenKeys": [],
+  "moreHint": {
+   "left": false,
+   "right": false
+  }
+ },
+ {
+  "name": "hints",
+  "status": "三指手勢需要的 Mac 快速鍵有 1 個是關閉的：⌃←。請在 Mac 打開：系統設定 → 鍵盤 → 鍵盤快速鍵… → Mission Control，勾選「移到左邊的空間」。\nMac 目前只有 1 個桌面：三指左右滑沒有地方可以切換。三指往上滑打開 Mission Control，在畫面最上方按「＋」新增桌面。",
+  "swipeRight": "⌃← 在 Mac 上是關閉的，所以沒有反應。請在 Mac 打開：系統設定 → 鍵盤 → 鍵盤快速鍵… → Mission Control，勾選「移到左邊的空間」（⌃←）。",
+  "swipeLeft": "Mac 目前只有 1 個桌面，沒有地方可以切換。三指往上滑打開 Mission Control，在畫面最上方按「＋」新增桌面。"
+ }
+]

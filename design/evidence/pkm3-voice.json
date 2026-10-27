@@ -1,0 +1,67 @@
+[
+ {
+  "name": "http（現在的 iPhone）：按 🎤 開預覽框，改用鍵盤聽寫，說明要 https",
+  "ok": true,
+  "detail": "{\"open\":true,\"engine\":\"keyboard\",\"status\":\"keyboard\",\"text\":\"iPhone 只讓 https 網頁用語音辨識，現在是 http，所以先用鍵盤的聽寫。\\n➜ 點鍵盤右下角（或左下角）的 🎤 開始說，說完按「送出到 Mac」。\",\"preview\":\"\",\"focused\":\"voiceText\",\"lang\":null}"
+ },
+ {
+  "name": "http：送出 → Mac 收到一則文字、預覽框關閉",
+  "ok": true,
+  "detail": "[{\"t\":\"text\",\"s\":\"用鍵盤聽寫說的一句話\"}]"
+ },
+ {
+  "name": "https：按 🎤 直接開始聽（不用開鍵盤），語言 zh-TW",
+  "ok": true,
+  "detail": "{\"open\":true,\"engine\":\"speech\",\"status\":\"listening\",\"text\":\"正在聽（中文）… 說完停一下會自動結束\",\"preview\":\"\",\"focused\":\"\",\"lang\":\"zh-TW\"}"
+ },
+ {
+  "name": "https：辨識中的字即時出現在預覽框",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "https：按停止 → 說完了，等你檢查（沒有自動送出）",
+  "ok": true,
+  "detail": "{\"open\":true,\"engine\":\"speech\",\"status\":\"done\",\"text\":\"說完了：檢查一下（可以直接改字），再按「送出到 Mac」。\",\"preview\":\"幫我把下面的按鍵列改成可以自訂\",\"focused\":\"voiceAgain\",\"lang\":\"zh-TW\"}"
+ },
+ {
+  "name": "https：預覽框改過的字照改的送出（一則）",
+  "ok": true,
+  "detail": "[{\"t\":\"text\",\"s\":\"幫我把下面的按鍵列改成可以自訂，謝謝\"}]"
+ },
+ {
+  "name": "換成 English：下一次辨識用 en-US",
+  "ok": true,
+  "detail": "{\"open\":true,\"engine\":\"speech\",\"status\":\"listening\",\"text\":\"正在聽（English）… 說完停一下會自動結束\",\"preview\":\"\",\"focused\":\"voiceAgain\",\"lang\":\"en-US\"}"
+ },
+ {
+  "name": "取消：什麼都不送、預覽框關閉",
+  "ok": true,
+  "detail": "[]"
+ },
+ {
+  "name": "設定「辨識完直接送出」：說完就送、預覽框自己關",
+  "ok": true,
+  "detail": "[{\"t\":\"text\",\"s\":\"send it right away\"}]"
+ },
+ {
+  "name": "麥克風被拒：說明原因和去哪裡開",
+  "ok": true,
+  "detail": "{\"open\":true,\"engine\":\"speech\",\"status\":\"error\",\"text\":\"麥克風或語音辨識被拒絕了。iPhone「設定 → App → Safari → 麥克風」改成「詢問」或「允許」，回來再按一次 🎤。也可以先用鍵盤的聽寫。\",\"preview\":\"\",\"focused\":\"\",\"lang\":\"en-US\"}"
+ },
+ {
+  "name": "加入主畫面的 App：改用鍵盤聽寫，說明 Apple 不支援",
+  "ok": true,
+  "detail": "{\"open\":true,\"engine\":\"keyboard\",\"status\":\"keyboard\",\"text\":\"Apple 不讓「加入主畫面」的網頁 App 用語音辨識，所以先用鍵盤的聽寫。想按一下就說：用 Safari 開 https 網址（見下面）。\\n➜ 點鍵盤右下角（或左下角）的 🎤 開始說，說完按「送出到 Mac」。\",\"preview\":\"\",\"focused\":\"voiceText\",\"lang\":null}"
+ },
+ {
+  "name": "橫拿全螢幕：左側浮動按鈕列有 🎤",
+  "ok": true,
+  "detail": "{\"x\":47,\"y\":121,\"w\":44,\"h\":44,\"shown\":true}"
+ },
+ {
+  "name": "橫拿：按 🎤 開始聽，預覽框貼在上方",
+  "ok": true,
+  "detail": "{\"s\":{\"open\":true,\"engine\":\"speech\",\"status\":\"listening\",\"text\":\"正在聽（English）… 說完停一下會自動結束\",\"preview\":\"橫拿也可以直接說\",\"focused\":\"\",\"lang\":\"en-US\"},\"card\":{\"y\":8,\"h\":231.1875}}"
+ }
+]

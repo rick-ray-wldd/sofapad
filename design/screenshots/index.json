@@ -1,0 +1,42 @@
+[
+ {
+  "name": "01-portrait-pairing",
+  "note": "第一次打開：輸入 Mac 上的 6 位數配對碼，或請 Mac 顯示配對碼"
+ },
+ {
+  "name": "02-portrait-main",
+  "note": "直拿：觸控板（右側捲動條）＋迷你地圖＋左鍵／拖曳鎖定／右鍵＋文字框＋特殊鍵"
+ },
+ {
+  "name": "03-portrait-long-press-drag",
+  "note": "長按 450 ms 後進入拖曳（藍框＋「拖曳中」）"
+ },
+ {
+  "name": "04-portrait-typing-shortcuts",
+  "note": "打字：注音組字中（還沒送出）、⌘ 已預備、快捷鍵面板展開"
+ },
+ {
+  "name": "05-portrait-keyboard-open",
+  "note": "手機鍵盤打開時（模擬可視區縮成 508 px）：觸控板仍可用，迷你地圖暫時隱藏"
+ },
+ {
+  "name": "06-portrait-settings",
+  "note": "設定：游標速度、加速度、捲動速度、反向捲動、左手模式、長按拖曳、迷你地圖、觸覺回饋"
+ },
+ {
+  "name": "07-landscape-main",
+  "note": "橫拿：左邊控制區、右邊大觸控板"
+ },
+ {
+  "name": "08-landscape-lefthand",
+  "note": "橫拿＋左手模式：觸控板和捲動條換到左邊"
+ },
+ {
+  "name": "09-portrait-offline",
+  "note": "斷線時：紅點＋提示，自動重連"
+ },
+ {
+  "name": "10-portrait-no-permission",
+  "note": "Mac 還沒開輔助使用權限：紅色提示＋開權限路徑"
+ }
+]

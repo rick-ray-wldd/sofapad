@@ -1,0 +1,411 @@
+{
+ "scenario": "reconnect",
+ "build": "new",
+ "mode": "live",
+ "textMode": "paste",
+ "kind": "stop",
+ "tag": "reconnect-new-live-paste-stop",
+ "startedAt": "2026-10-27T19:04:57.243Z",
+ "rounds": [
+  {
+   "k": 1,
+   "label": "d01",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6914,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 2,
+   "label": "d02",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6787,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 3,
+   "label": "d03",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6626,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 4,
+   "label": "d04",
+   "reconnected": true,
+   "reconnectMs": 22,
+   "outageMs": 6630,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 5,
+   "label": "d05",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6802,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 6,
+   "label": "d06",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6846,
+   "inA": 1,
+   "inB": 0
+  },
+  {
+   "k": 7,
+   "label": "d07",
+   "reconnected": true,
+   "reconnectMs": 21,
+   "outageMs": 6867,
+   "inA": 1,
+   "inB": 0
+  }
+ ],
+ "notes": [
+  "stopped after 7 rounds: 2-minute limit"
+ ],
+ "textA": "d01 ok d02 ok d03 ok d04 ok d05 ok d06 ok d07 ok ",
+ "textB": "x\nx\nx\nx\nx\nx\nx\n",
+ "guardTripped": false,
+ "closed": {
+  "ok": true,
+  "windowsLeft": 0
+ },
+ "timing": [
+  {
+   "at": 1793127907671,
+   "done": 1793127907740.916,
+   "id": 1,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127907671.726,
+   "via": "paste"
+  },
+  {
+   "at": 1793127907672,
+   "done": 1793127908452.188,
+   "id": 2,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793127908410.406,
+   "via": "paste"
+  },
+  {
+   "at": 1793127916459,
+   "done": 1793127916497.03,
+   "id": 4,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127916460.256,
+   "via": "paste"
+  },
+  {
+   "at": 1793127918233,
+   "done": 1793127918236.095,
+   "id": 5,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793127918233.9238
+  },
+  {
+   "at": 1793127921071,
+   "done": 1793127921105.571,
+   "id": 6,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127921071.803,
+   "via": "paste"
+  },
+  {
+   "at": 1793127921073,
+   "done": 1793127921873.9,
+   "id": 7,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793127921839.19,
+   "via": "paste"
+  },
+  {
+   "at": 1793127929712,
+   "done": 1793127929747.0078,
+   "id": 9,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127929713.001,
+   "via": "paste"
+  },
+  {
+   "at": 1793127931356,
+   "done": 1793127931360.124,
+   "id": 10,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793127931357.2632
+  },
+  {
+   "at": 1793127934697,
+   "done": 1793127934733.0889,
+   "id": 11,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127934698.215,
+   "via": "paste"
+  },
+  {
+   "at": 1793127934699,
+   "done": 1793127935493.151,
+   "id": 12,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793127935456.219,
+   "via": "paste"
+  },
+  {
+   "at": 1793127943508,
+   "done": 1793127943545.845,
+   "id": 14,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127943509.2139,
+   "via": "paste"
+  },
+  {
+   "at": 1793127945239,
+   "done": 1793127945246.321,
+   "id": 15,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793127945240.263
+  },
+  {
+   "at": 1793127948551,
+   "done": 1793127948585.603,
+   "id": 16,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127948551.48,
+   "via": "paste"
+  },
+  {
+   "at": 1793127948552,
+   "done": 1793127949356.385,
+   "id": 17,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793127949322.955,
+   "via": "paste"
+  },
+  {
+   "at": 1793127957354,
+   "done": 1793127957391.0552,
+   "id": 19,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127957355.2197,
+   "via": "paste"
+  },
+  {
+   "at": 1793127959114,
+   "done": 1793127959117.118,
+   "id": 20,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793127959114.8538
+  },
+  {
+   "at": 1793127961941,
+   "done": 1793127961973.781,
+   "id": 21,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127961941.5933,
+   "via": "paste"
+  },
+  {
+   "at": 1793127961943,
+   "done": 1793127962742.5781,
+   "id": 22,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793127962706.207,
+   "via": "paste"
+  },
+  {
+   "at": 1793127970591,
+   "done": 1793127970626.3198,
+   "id": 24,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127970592.134,
+   "via": "paste"
+  },
+  {
+   "at": 1793127972348,
+   "done": 1793127972351.295,
+   "id": 25,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793127972349.0042
+  },
+  {
+   "at": 1793127976030,
+   "done": 1793127976064.038,
+   "id": 26,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127976031.145,
+   "via": "paste"
+  },
+  {
+   "at": 1793127976032,
+   "done": 1793127976825.989,
+   "id": 27,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793127976789.3281,
+   "via": "paste"
+  },
+  {
+   "at": 1793127984828,
+   "done": 1793127984864.481,
+   "id": 29,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127984829.115,
+   "via": "paste"
+  },
+  {
+   "at": 1793127986578,
+   "done": 1793127986582.8398,
+   "id": 30,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793127986578.522
+  },
+  {
+   "at": 1793127990280,
+   "done": 1793127990313.457,
+   "id": 31,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127990280.865,
+   "via": "paste"
+  },
+  {
+   "at": 1793127990282,
+   "done": 1793127991075.1418,
+   "id": 32,
+   "kind": "text",
+   "n": 6,
+   "recv": 1793127991040.186,
+   "via": "paste"
+  },
+  {
+   "at": 1793127999111,
+   "done": 1793127999146.771,
+   "id": 34,
+   "kind": "text",
+   "n": 1,
+   "recv": 1793127999111.4758,
+   "via": "paste"
+  },
+  {
+   "at": 1793128000864,
+   "done": 1793128000869.974,
+   "id": 35,
+   "kind": "key:enter",
+   "n": 1,
+   "recv": 1793128000864.701
+  }
+ ],
+ "late": [
+  "[03:05:15] late by 5954 ms: id 3 not typed",
+  "[03:05:28] late by 5884 ms: id 8 not typed",
+  "[03:05:42] late by 5720 ms: id 13 not typed",
+  "[03:05:56] late by 5716 ms: id 18 not typed",
+  "[03:06:09] late by 5907 ms: id 23 not typed",
+  "[03:06:24] late by 5920 ms: id 28 not typed",
+  "[03:06:38] late by 5936 ms: id 33 not typed"
+ ],
+ "lostInA": 0,
+ "lostInB": 0,
+ "okTwice": 0,
+ "reconnects": 7,
+ "reconnectMeanMs": 21,
+ "reconnectMaxMs": 22,
+ "latency": {
+  "n": 28,
+  "p50": 36,
+  "p95": 801,
+  "max": 804
+ },
+ "switches": [],
+ "serverLog": [
+  "[03:04:57] 端對端測試模式：只有前景 App 是 pid 81160、前景視窗是 [16890, 16892]、而且點擊／捲動落在它的視窗上時才送事件",
+  "[03:04:57] 版本 4.0.0（建置 dev）",
+  "[03:04:57] 網路介面：en1 192.168.x.x；utun5 100.x.x.x：不使用，不是區網位址（KeyMouse 只接受區網裡的手機）",
+  "",
+  "========== SofaPad 4.0.0 ==========",
+  "手機和這台 Mac 連同一個 Wi-Fi，用 iPhone 相機掃下面的 QR code，或用 Safari 打開：",
+  "  http://127.0.0.1:31691/",
+  "配對碼：******（15 分鐘內有效；之後手機可以按「要求配對」，Mac 螢幕會跳出新碼）",
+  "網頁資料夾：phone-keymouse/web",
+  "已配對手機：0 支",
+  "人在 Mac 前面時，也可以用手機相機掃這個 QR code（內含配對碼）：",
+  "\u001b[30;47m                                 \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█  █▄██  ▀▀▀▄   █▀▀▀▀▀█  \u001b[0m",
+  "\u001b[30;47m  █ ███ █ █ ▄▀  ▀ █ ▀▄█ █ ███ █  \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ ██▀█▄███▄█▄▄▀ █ ▀▀▀ █  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ █ ▀ ▀▄▀▄▀ █ ▀ ▀▀▀▀▀▀▀  \u001b[0m",
+  "\u001b[30;47m  ▀ ▀▀██▀ ▄▄ ▀  ▀█▄▄ ▀ ▄█▀█▀▀ ▄  \u001b[0m",
+  "\u001b[30;47m   ▄▀▀▄█▀▀▀▀▀▄  ▄ ▄▄▄▀▀▄█▄▄  ▄   \u001b[0m",
+  "\u001b[30;47m  ▄▄▄▀▄▄▀█ ▄▀ ▀▄▄▄▀▄█  ▄▀█▄ ▀ ▄  \u001b[0m",
+  "\u001b[30;47m  ▀███▄▄▀▀▄███▄█▀█▀▀  █ ▄▀█ ▄▄   \u001b[0m",
+  "\u001b[30;47m  █▀▀█ █▀ █▄ ▀▄ ▀█▄ ▄█ ▄█▀ █▄ ▄  \u001b[0m",
+  "\u001b[30;47m  █ ▀██▀▀ █ █▄▄ ▄ ▄ ▄█▄ ██▄██▄   \u001b[0m",
+  "\u001b[30;47m  ▀ ▀ ▀ ▀▀██▀ ▄▄▄▄  █▄█▀▀▀█▄▀██  \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█ ▄▀█  █▀█ █▄ █ ▀ ███▄   \u001b[0m",
+  "\u001b[30;47m  █ ███ █ █  ▀▀▄▀▀  ▀█▀▀█▀█▀▀▄   \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ ▀▀█▀▄▄▀ ██▀▄▀█ ▄▄ ▀█   \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ ▀▀   ▀ ▀ ▀  ▀   ▀      \u001b[0m",
+  "\u001b[30;47m                                 \u001b[0m",
+  "",
+  "在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。",
+  "",
+  "[03:05:01] 手機已配對。要再配對另一支手機：在這裡按 Enter，或用選單列的「配對新手機」。",
+  "[03:05:01] authenticated iPhone from 127.0.0.1 (new pairing)",
+  "[03:05:15] late by 5954 ms: id 3 not typed",
+  "[03:05:15] controller disconnected: iPhone",
+  "[03:05:15] authenticated iPhone from 127.0.0.1",
+  "[03:05:28] late by 5884 ms: id 8 not typed",
+  "[03:05:28] controller disconnected: iPhone",
+  "[03:05:28] authenticated iPhone from 127.0.0.1",
+  "[03:05:42] late by 5720 ms: id 13 not typed",
+  "[03:05:42] controller disconnected: iPhone",
+  "[03:05:42] authenticated iPhone from 127.0.0.1",
+  "[03:05:56] controller disconnected: iPhone",
+  "[03:05:56] late by 5716 ms: id 18 not typed",
+  "[03:05:56] authenticated iPhone from 127.0.0.1",
+  "[03:06:09] controller disconnected: iPhone",
+  "[03:06:09] late by 5907 ms: id 23 not typed",
+  "[03:06:09] authenticated iPhone from 127.0.0.1",
+  "[03:06:24] controller disconnected: iPhone",
+  "[03:06:24] late by 5920 ms: id 28 not typed",
+  "[03:06:24] authenticated iPhone from 127.0.0.1",
+  "[03:06:38] controller disconnected: iPhone",
+  "[03:06:38] late by 5936 ms: id 33 not typed",
+  "[03:06:38] authenticated iPhone from 127.0.0.1",
+  "[03:06:42] 結束中…",
+  ""
+ ]
+}

@@ -1,0 +1,203 @@
+[
+ {
+  "name": "portrait-390",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "pad": {
+   "x": 10,
+   "y": 95,
+   "w": 370,
+   "h": 463
+  },
+  "minimap": {
+   "x": 120,
+   "y": 566,
+   "w": 150,
+   "h": 64
+  },
+  "keys": {
+   "x": 10,
+   "y": 758,
+   "w": 370,
+   "h": 44
+  },
+  "keyCount": 16,
+  "keysScrollable": 513,
+  "hiddenKeys": [
+   "←",
+   "↑",
+   "↓",
+   "→",
+   "⌘",
+   "⌥",
+   "⌃",
+   "⇧",
+   "space",
+   "⌦"
+  ],
+  "moreHint": null,
+  "swipe": {
+   "startButton": "⌘ 快捷鍵",
+   "scrollLeft": 0,
+   "sent": [],
+   "panelOpened": true
+  },
+  "afterSwipe": {
+   "pad": {
+    "x": 10,
+    "y": 95,
+    "w": 370,
+    "h": 463
+   },
+   "minimap": {
+    "x": 120,
+    "y": 566,
+    "w": 150,
+    "h": 64
+   },
+   "keys": {
+    "x": 10,
+    "y": 758,
+    "w": 370,
+    "h": 44
+   },
+   "keyCount": 16,
+   "keysScrollable": 513,
+   "hiddenKeys": [
+    "←",
+    "↑",
+    "↓",
+    "→",
+    "⌘",
+    "⌥",
+    "⌃",
+    "⇧",
+    "space",
+    "⌦"
+   ],
+   "moreHint": null
+  },
+  "tapKey": {
+   "k": "escape",
+   "sent": [
+    {
+     "t": "key",
+     "k": "escape",
+     "mods": []
+    }
+   ]
+  }
+ },
+ {
+  "name": "portrait-375",
+  "viewport": {
+   "width": 375,
+   "height": 667
+  },
+  "pad": {
+   "x": 10,
+   "y": 68,
+   "w": 355,
+   "h": 347
+  },
+  "minimap": {
+   "x": 113,
+   "y": 423,
+   "w": 150,
+   "h": 64
+  },
+  "keys": {
+   "x": 10,
+   "y": 615,
+   "w": 355,
+   "h": 44
+  },
+  "keyCount": 16,
+  "keysScrollable": 528,
+  "hiddenKeys": [
+   "←",
+   "↑",
+   "↓",
+   "→",
+   "⌘",
+   "⌥",
+   "⌃",
+   "⇧",
+   "space",
+   "⌦"
+  ],
+  "moreHint": null,
+  "swipe": {
+   "startButton": "⌘ 快捷鍵",
+   "scrollLeft": 0,
+   "sent": [],
+   "panelOpened": true
+  },
+  "afterSwipe": {
+   "pad": {
+    "x": 10,
+    "y": 68,
+    "w": 355,
+    "h": 347
+   },
+   "minimap": {
+    "x": 113,
+    "y": 423,
+    "w": 150,
+    "h": 64
+   },
+   "keys": {
+    "x": 10,
+    "y": 615,
+    "w": 355,
+    "h": 44
+   },
+   "keyCount": 16,
+   "keysScrollable": 528,
+   "hiddenKeys": [
+    "←",
+    "↑",
+    "↓",
+    "→",
+    "⌘",
+    "⌥",
+    "⌃",
+    "⇧",
+    "space",
+    "⌦"
+   ],
+   "moreHint": null
+  },
+  "tapKey": {
+   "k": "escape",
+   "sent": [
+    {
+     "t": "key",
+     "k": "escape",
+     "mods": []
+    }
+   ]
+  }
+ },
+ {
+  "name": "landscape-844",
+  "viewport": {
+   "width": 844,
+   "height": 390
+  },
+  "pad": {
+   "x": 0,
+   "y": 0,
+   "w": 844,
+   "h": 390
+  },
+  "minimap": null,
+  "keys": null,
+  "keyCount": 16,
+  "keysScrollable": 0,
+  "hiddenKeys": [],
+  "moreHint": null
+ }
+]

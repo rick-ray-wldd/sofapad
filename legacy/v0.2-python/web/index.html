@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SofaPad">
+<meta name="theme-color" content="#11181f">
+<title>SofaPad</title>
+<style>
+:root{
+  --bg:#11181f; --pad:#18222c; --pad-line:#2c3a48; --ink:#e8eef4; --muted:#8c9aa8;
+  --key:#212d39; --key-on:#0e8a95; --accent:#4fc1c9; --bad:#e07777; --good:#43c78a;
+  --vh:100%;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden;
+  font:15px/1.4 -apple-system,"PingFang TC","Noto Sans TC",system-ui,sans-serif;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
+#app{position:fixed;left:0;right:0;top:0;height:var(--vh);display:flex;flex-direction:column;gap:8px;
+  padding:calc(var(--safe-t) + 6px) calc(var(--safe-r) + 10px) calc(var(--safe-b) + 8px) calc(var(--safe-l) + 10px)}
+body.typing #app{padding-bottom:6px}
+button{font:inherit;color:inherit;border:1px solid var(--pad-line);background:var(--key);border-radius:12px;
+  min-height:44px;padding:0 6px;touch-action:manipulation}
+button:active,button.pressed{background:#2d3d4c}
+button.on{background:var(--key-on);border-color:var(--key-on);color:#fff}
+button.locked{background:var(--key-on);border-color:#fff;color:#fff;box-shadow:inset 0 0 0 2px #fff}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);min-height:32px}
+.status{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bad);flex:none}
+.dot.ok{background:var(--good)} .dot.wait{background:#e2a35f}
+.bar button{min-height:32px;padding:0 10px;font-size:13px;border-radius:9px}
+#pad{flex:1;min-height:70px;position:relative;border:1px solid var(--pad-line);border-radius:22px;background:var(--pad);
+  touch-action:none;overflow:hidden}
+#pad .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
+  color:var(--muted);font-size:13px;line-height:1.7;pointer-events:none;padding:0 50px}
+body.typing #pad .hint{display:none}
+#strip{position:absolute;top:10px;bottom:10px;right:8px;width:34px;border-radius:17px;border:1px dashed var(--pad-line);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;font-size:16px;touch-action:none}
+body.lefty #strip{right:auto;left:8px}
+#swipeToast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(14,138,149,.92);color:#fff;
+  border-radius:12px;padding:8px 14px;font-size:14px;pointer-events:none;white-space:nowrap}
+#swipeToast[hidden]{display:none}
+#strip.active{background:rgba(79,193,201,.12);border-color:var(--accent);color:var(--accent)}
+#dragbadge{position:absolute;top:10px;left:12px;font-size:12px;color:#fff;background:var(--key-on);border-radius:8px;padding:2px 8px}
+body.lefty #dragbadge{left:auto;right:12px}
+.row{display:flex;gap:6px}
+.row>button{flex:1}
+.row>button.big{flex:2}
+.typing-only{display:none}
+body.typing .typing-only{display:flex}
+body.typing .pad-only{display:none}
+body.lefty .row.mirror{flex-direction:row-reverse}
+#composer{display:flex;gap:6px;align-items:stretch}
+#ta{flex:1;min-width:0;min-height:44px;max-height:30vh;resize:none;border-radius:12px;border:1px solid var(--pad-line);
+  background:#0d1319;color:var(--ink);padding:10px 12px;font:16px/1.4 -apple-system,"PingFang TC",sans-serif;
+  -webkit-user-select:text;user-select:text}
+body:not(.typing):not(.draft) #composer{position:absolute;left:-9999px;opacity:0;height:1px;overflow:hidden}
+body.draft #ta{min-height:88px}
+#sendDraft{display:none}
+body.draft #sendDraft{display:block}
+#last{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:16px}
+#last b{color:var(--accent);font-weight:500}
+/* sheets */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet[hidden]{display:none}
+.card{width:100%;max-width:520px;background:#1a242e;border-radius:20px 20px 0 0;padding:20px calc(var(--safe-r) + 18px) calc(var(--safe-b) + 20px) calc(var(--safe-l) + 18px);
+  display:flex;flex-direction:column;gap:14px}
+.card h2{margin:0;font-size:18px}
+.card label{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px}
+.card input[type=range]{flex:1;max-width:60%}
+.card .note{font-size:12px;color:var(--muted)}
+#pinSheet .card{border-radius:20px;margin:auto 16px;align-self:center}
+#pin{font:600 28px/1 ui-monospace,Menlo,monospace;letter-spacing:.35em;text-align:center;padding:12px;border-radius:12px;
+  border:1px solid var(--pad-line);background:#0d1319;color:var(--ink);width:100%;-webkit-user-select:text;user-select:text}
+#pinMsg{color:var(--bad);font-size:13px;min-height:18px}
+.primary{background:var(--key-on);border-color:var(--key-on);color:#fff;font-weight:600}
+#haptic{position:absolute;left:-9999px}
+/* side column wrapper: transparent in portrait */
+#side{display:contents}
+#exitFull{display:none}
+/* full-screen trackpad: only the pad */
+body.fullpad .bar, body.fullpad #side, body.fullpad #axWarn:not([hidden]) {display:none}
+body.fullpad #pad .hint{display:none}
+body.fullpad #exitFull{display:block;position:absolute;top:10px;left:10px;min-height:36px;width:36px;padding:0;border-radius:18px;
+  background:rgba(33,45,57,.8);font-size:14px;z-index:2}
+body.fullpad.lefty #exitFull{left:auto;right:10px}
+body.fullpad #app{padding:calc(var(--safe-t) + 4px) calc(var(--safe-r) + 4px) calc(var(--safe-b) + 4px) calc(var(--safe-l) + 4px)}
+/* landscape: wide trackpad on the left, controls in a column on the right (like a MacBook) */
+@media (orientation: landscape) and (max-height: 560px) {
+  #app{display:grid;grid-template-columns:1fr minmax(270px,40%);grid-template-rows:auto auto 1fr;column-gap:10px;row-gap:6px}
+  .bar{grid-column:1 / -1;grid-row:1;min-height:28px}
+  #axWarn{grid-column:1 / -1;grid-row:2}
+  #pad{grid-column:1;grid-row:3;min-height:0}
+  #side{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;grid-column:2;grid-row:3;min-height:0;overflow:auto}
+  body.lefty #app{grid-template-columns:minmax(270px,40%) 1fr}
+  body.lefty #pad{grid-column:2}
+  body.lefty #side{grid-column:1}
+  #side button{min-height:38px;font-size:13px;padding:0 4px}
+  #pad .hint{font-size:12px;line-height:1.6}
+  body.fullpad #app{display:flex}
+}
+.card.keys{max-height:85vh;overflow:auto;gap:10px}
+.keygroup h3{margin:4px 0 6px;font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.04em}
+.keygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+.keygrid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;font-size:12px;line-height:1.2}
+.keygrid button b{font:600 15px/1.1 -apple-system,ui-monospace,Menlo,monospace;color:var(--ink)}
+.bar button{padding:0 8px;white-space:nowrap}
+button{white-space:nowrap}
+
+#axWarn{background:#4a1f1f;border:1px solid var(--bad);color:#ffd9d9;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+#axWarn[hidden]{display:none}
+#axWarn b{color:#fff}
+#axWarn button{min-height:32px;font-size:12px;flex:none;border-color:var(--bad);background:transparent}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bar">
+    <div class="status"><span class="dot" id="dot"></span><span id="statusText">連線中…</span></div>
+    <div class="row" style="gap:6px">
+      <button id="keysBtn" type="button" aria-label="快捷鍵">⌘ 快捷</button>
+      <button id="fullBtn" type="button" aria-label="全螢幕觸控板">⤢</button>
+      <button id="modeBtn" type="button" aria-label="切換即時或草稿模式">即時</button>
+      <button id="setBtn" type="button" aria-label="設定">設定</button>
+    </div>
+  </div>
+
+  <div id="axWarn" role="alert" hidden><div><b>Mac 尚未允許控制，動作都會被擋掉。</b><br>請在 Mac 的「系統設定 &gt; 隱私權與安全性 &gt; 輔助使用」打開「終端機」，再把終端機 ⌘Q 結束、重新雙擊 start.command。</div><button id="axRetry" type="button">重新檢查</button></div>
+
+  <div id="pad" aria-label="觸控板">
+    <div class="hint">單指滑動移動游標<br>輕點＝左鍵　長按＝右鍵<br>點兩下後按住滑動＝拖曳<br>兩指滑動＝捲動　兩指捏合＝縮放<br>三指左右滑＝切換桌面　三指上滑＝Mission Control<br>三指下滑＝App Exposé　三指輕點＝查詢<br>四指張開＝顯示桌面　四指捏合＝啟動台</div>
+    <div id="strip" aria-label="捲動帶">⇅</div>
+    <div id="dragbadge" hidden>拖曳中</div>
+    <div id="swipeToast" hidden></div>
+    <button id="exitFull" type="button" aria-label="離開全螢幕">✕</button>
+  </div>
+
+  <div id="side">
+
+  <div id="last" class="typing-only"></div>
+  <div id="composer">
+    <textarea id="ta" rows="1" autocomplete="off" autocorrect="on" spellcheck="false" enterkeyhint="enter" placeholder="打字會即時送到 Mac" aria-label="輸入文字"></textarea>
+    <button id="sendDraft" class="primary" type="button">送出</button>
+  </div>
+
+  <div class="row mirror">
+    <button data-mod="cmd" type="button">⌘</button>
+    <button data-mod="alt" type="button">⌥</button>
+    <button data-mod="ctrl" type="button">⌃</button>
+    <button data-mod="shift" type="button">⇧</button>
+    <button data-key="escape" type="button">esc</button>
+    <button data-key="backspace" type="button" aria-label="刪除">⌫</button>
+  </div>
+  <div class="row typing-only">
+    <button data-key="tab" type="button">tab</button>
+    <button data-key="left" type="button" aria-label="左">←</button>
+    <button data-key="up" type="button" aria-label="上">↑</button>
+    <button data-key="down" type="button" aria-label="下">↓</button>
+    <button data-key="right" type="button" aria-label="右">→</button>
+    <button data-key="return" type="button" aria-label="Return">⏎</button>
+    <button id="kbDone" type="button">收起</button>
+  </div>
+  <div class="row mirror pad-only">
+    <button id="leftBtn" class="big" type="button">左鍵</button>
+    <button id="lockBtn" type="button">拖曳鎖</button>
+    <button id="rightBtn" class="big" type="button">右鍵</button>
+  </div>
+  <div class="row mirror pad-only">
+    <button data-combo="ctrl+left" type="button" aria-label="切到左邊的桌面">◀</button>
+    <button data-combo="ctrl+up" type="button">Mission</button>
+    <button data-combo="ctrl+right" type="button" aria-label="切到右邊的桌面">▶</button>
+    <button data-combo="cmd+tab" type="button">⌘Tab</button>
+    <button data-combo="ctrl+cmd+shift+4" type="button" aria-label="選取範圍截圖並複製">截圖</button>
+    <button id="kbBtn" class="primary" type="button" aria-label="打開鍵盤">打字</button>
+  </div>
+  </div>
+</div>
+
+<div class="sheet" id="pinSheet" hidden>
+  <div class="card">
+    <h2>輸入 Mac 上顯示的 PIN</h2>
+    <input id="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-label="PIN">
+    <div id="pinMsg"></div>
+    <button id="pinOk" class="primary" type="button">配對</button>
+    <div class="note">PIN 顯示在 Mac 執行 sofapad.py 的終端機視窗裡。配對後這支手機會記住它。</div>
+  </div>
+</div>
+
+<div class="sheet" id="setSheet" hidden>
+  <div class="card">
+    <h2>設定</h2>
+    <label>游標速度 <input id="sens" type="range" min="0.4" max="2.5" step="0.1"></label>
+    <label>捲動速度 <input id="scrollSens" type="range" min="0.3" max="3" step="0.1"></label>
+    <label>自然捲動（Mac 預設） <input id="natural" type="checkbox"></label>
+    <label>左手模式 <input id="lefty" type="checkbox"></label>
+    <label>觸覺回饋 <input id="hapticOn" type="checkbox"></label>
+    <div class="note">打中文前，請把 Mac 的輸入法切到英文（ABC），選字在手機上完成。</div>
+    <button id="forget" type="button">忘記 PIN 並重新配對</button>
+    <button id="setClose" class="primary" type="button">完成</button>
+  </div>
+</div>
+
+<div class="sheet" id="keysSheet" hidden>
+  <div class="card keys">
+    <h2>快捷鍵</h2>
+    <div class="keygroup"><h3>編輯</h3><div class="keygrid">
+      <button data-combo="cmd+c" type="button"><b>⌘C</b>複製</button>
+      <button data-combo="cmd+v" type="button"><b>⌘V</b>貼上</button>
+      <button data-combo="cmd+x" type="button"><b>⌘X</b>剪下</button>
+      <button data-combo="cmd+z" type="button"><b>⌘Z</b>復原</button>
+      <button data-combo="shift+cmd+z" type="button"><b>⇧⌘Z</b>重做</button>
+      <button data-combo="cmd+a" type="button"><b>⌘A</b>全選</button>
+      <button data-combo="cmd+f" type="button"><b>⌘F</b>尋找</button>
+      <button data-combo="cmd+s" type="button"><b>⌘S</b>儲存</button>
+      <button data-combo="alt+backspace" type="button"><b>⌥⌫</b>刪一個詞</button>
+      <button data-combo="cmd+backspace" type="button"><b>⌘⌫</b>刪到行首</button>
+      <button data-combo="cmd+left" type="button"><b>⌘←</b>行首</button>
+      <button data-combo="cmd+right" type="button"><b>⌘→</b>行尾</button>
+    </div></div>
+    <div class="keygroup"><h3>瀏覽器與分頁</h3><div class="keygrid">
+      <button data-combo="cmd+t" type="button"><b>⌘T</b>新分頁</button>
+      <button data-combo="cmd+w" type="button"><b>⌘W</b>關閉分頁</button>
+      <button data-combo="shift+cmd+t" type="button"><b>⇧⌘T</b>重開分頁</button>
+      <button data-combo="ctrl+shift+tab" type="button"><b>⌃⇧⇥</b>上個分頁</button>
+      <button data-combo="ctrl+tab" type="button"><b>⌃⇥</b>下個分頁</button>
+      <button data-combo="cmd+l" type="button"><b>⌘L</b>網址列</button>
+      <button data-combo="cmd+[" type="button"><b>⌘[</b>上一頁</button>
+      <button data-combo="cmd+]" type="button"><b>⌘]</b>下一頁</button>
+      <button data-combo="cmd+r" type="button"><b>⌘R</b>重新整理</button>
+      <button data-combo="cmd+=" type="button"><b>⌘+</b>放大</button>
+      <button data-combo="cmd+-" type="button"><b>⌘−</b>縮小</button>
+      <button data-combo="cmd+0" type="button"><b>⌘0</b>實際大小</button>
+    </div></div>
+    <div class="keygroup"><h3>視窗與 App</h3><div class="keygrid">
+      <button data-combo="cmd+tab" type="button"><b>⌘⇥</b>切換 App</button>
+      <button data-combo="cmd+`" type="button"><b>⌘`</b>同 App 視窗</button>
+      <button data-combo="cmd+n" type="button"><b>⌘N</b>新視窗</button>
+      <button data-combo="cmd+m" type="button"><b>⌘M</b>縮到 Dock</button>
+      <button data-combo="cmd+h" type="button"><b>⌘H</b>隱藏 App</button>
+      <button data-combo="ctrl+cmd+f" type="button"><b>⌃⌘F</b>全螢幕</button>
+      <button data-combo="cmd+q" type="button"><b>⌘Q</b>結束 App</button>
+      <button data-combo="alt+cmd+escape" type="button"><b>⌥⌘⎋</b>強制結束</button>
+    </div></div>
+    <div class="keygroup"><h3>系統</h3><div class="keygrid">
+      <button data-combo="cmd+space" type="button"><b>⌘␣</b>Spotlight</button>
+      <button data-combo="ctrl+cmd+space" type="button"><b>⌃⌘␣</b>表情符號</button>
+      <button data-combo="ctrl+up" type="button"><b>⌃↑</b>Mission</button>
+      <button data-combo="ctrl+down" type="button"><b>⌃↓</b>App Exposé</button>
+      <button data-combo="f11" type="button"><b>F11</b>顯示桌面</button>
+      <button data-app="launchpad" type="button"><b>⌗</b>啟動台</button>
+      <button data-combo="ctrl+cmd+d" type="button"><b>⌃⌘D</b>查詢</button>
+      <button data-combo="ctrl+cmd+q" type="button"><b>⌃⌘Q</b>鎖定螢幕</button>
+      <button data-combo="shift+cmd+3" type="button"><b>⇧⌘3</b>全螢幕截圖</button>
+      <button data-combo="shift+cmd+4" type="button"><b>⇧⌘4</b>選取截圖</button>
+      <button data-combo="ctrl+cmd+shift+4" type="button"><b>⌃⇧⌘4</b>截圖到剪貼簿</button>
+      <button data-combo="shift+cmd+5" type="button"><b>⇧⌘5</b>截圖工具</button>
+    </div></div>
+    <button id="keysClose" class="primary" type="button">完成</button>
+  </div>
+</div>
+
+<label id="haptic"><input type="checkbox" switch id="hapticSwitch">h</label>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- settings ----------
+  var DEFAULTS = { sens: 1.0, scrollSens: 1.0, invert: false, lefty: false, haptic: true, mode: "live", full: false };
+  var cfg = Object.assign({}, DEFAULTS);
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  try { Object.assign(cfg, JSON.parse(load("sofapad.cfg") || "{}")); } catch (e) {}
+  function saveCfg() { store("sofapad.cfg", JSON.stringify(cfg)); applyCfg(); }
+  function applyCfg() {
+    document.body.classList.toggle("lefty", !!cfg.lefty);
+    document.body.classList.toggle("draft", cfg.mode === "draft");
+    $("modeBtn").textContent = cfg.mode === "draft" ? "草稿" : "即時";
+    $("sens").value = cfg.sens; $("scrollSens").value = cfg.scrollSens;
+    $("natural").checked = !cfg.invert; $("lefty").checked = cfg.lefty; $("hapticOn").checked = cfg.haptic;
+    document.body.classList.toggle("fullpad", !!cfg.full);
+  }
+
+  // ---------- haptics (iOS 18 switch trick, vibrate elsewhere) ----------
+  function buzz() {
+    if (!cfg.haptic) return;
+    if (navigator.vibrate) { navigator.vibrate(8); return; }
+    try { $("haptic").click(); } catch (e) {}
+  }
+
+  // ---------- connection ----------
+  var ws = null, authed = false, retry = 0, pingTimer = null, pingSent = {}, pingId = 0;
+  var queue = [];
+  function setStatus(state, text) {
+    $("dot").className = "dot" + (state === "ok" ? " ok" : state === "wait" ? " wait" : "");
+    $("statusText").textContent = text;
+  }
+  function send(obj) {
+    if (ws && ws.readyState === 1 && authed) ws.send(JSON.stringify(obj));
+  }
+  function connect() {
+    if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+    setStatus("wait", "連線中…");
+    var proto = location.protocol === "https:" ? "wss://" : "ws://";
+    ws = new WebSocket(proto + location.host + "/ws");
+    authed = false;
+    ws.onopen = function () {
+      retry = 0;
+      var pin = load("sofapad.pin");
+      if (pin) ws.send(JSON.stringify({ t: "auth", pin: pin }));
+      else showPin("");
+    };
+    ws.onmessage = function (ev) {
+      var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+      if (m.t === "auth_ok") {
+        authed = true; $("pinSheet").hidden = true;
+        hostName = m.host || "Mac";
+        setStatus("ok", hostName);
+        $("axWarn").hidden = !(m.post === false || m.selftest === false);
+        startPing();
+      } else if (m.t === "auth_fail") {
+        store("sofapad.pin", "");
+        showPin(m.reason === "locked" ? "嘗試太多次，請等一分鐘再試" : "PIN 不對，請再確認一次");
+      } else if (m.t === "pong") {
+        var t0 = pingSent[m.id]; delete pingSent[m.id];
+        if (t0) setStatus("ok", hostName + " · " + Math.round(performance.now() - t0) + " ms");
+      } else if (m.t === "selftest") {
+        $("axWarn").hidden = m.ok !== false;
+      } else if (m.t === "error") {
+        console.warn("helper error", m.msg);
+      }
+    };
+    ws.onclose = function () {
+      authed = false; stopPing();
+      setStatus("bad", "已斷線，重新連線中…");
+      var delay = Math.min(5000, 300 * Math.pow(2, retry++));
+      setTimeout(connect, delay);
+    };
+  }
+  var hostName = "Mac";
+  function startPing() {
+    stopPing();
+    // Frequent small packets also keep the phone's Wi-Fi out of power-save.
+    pingTimer = setInterval(function () {
+      if (!ws || ws.readyState !== 1) return;
+      var id = ++pingId; pingSent[id] = performance.now();
+      ws.send(JSON.stringify({ t: "ping", id: id }));
+    }, 1000);
+  }
+  function stopPing() { if (pingTimer) clearInterval(pingTimer); pingTimer = null; pingSent = {}; }
+  function showPin(msg) {
+    $("pinMsg").textContent = msg || "";
+    $("pinSheet").hidden = false;
+    setStatus("wait", "等待配對");
+    setTimeout(function () { $("pin").focus(); }, 50);
+  }
+  $("pinOk").addEventListener("click", function () {
+    var pin = $("pin").value.replace(/\D/g, "");
+    if (pin.length !== 6) { $("pinMsg").textContent = "PIN 是 6 位數字"; return; }
+    store("sofapad.pin", pin);
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: "auth", pin: pin }));
+    else connect();
+  });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) connect(); });
+
+  // ---------- modifiers ----------
+  var mods = {}; // name -> "armed" | "locked"
+  var lastModTap = {};
+  function modList() { return Object.keys(mods); }
+  function renderMods() {
+    document.querySelectorAll("[data-mod]").forEach(function (b) {
+      var s = mods[b.dataset.mod];
+      b.classList.toggle("on", s === "armed");
+      b.classList.toggle("locked", s === "locked");
+    });
+  }
+  function consumeMods() {
+    Object.keys(mods).forEach(function (k) { if (mods[k] === "armed") delete mods[k]; });
+    renderMods();
+  }
+  document.querySelectorAll("[data-mod]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var k = b.dataset.mod, now = Date.now();
+      if (mods[k] === "armed" && now - (lastModTap[k] || 0) < 350) mods[k] = "locked";
+      else if (mods[k]) delete mods[k];
+      else mods[k] = "armed";
+      lastModTap[k] = now; buzz(); renderMods();
+    });
+  });
+  function sendKey(k, extra) {
+    var list = (extra || []).concat(modList().filter(function (m) { return (extra || []).indexOf(m) < 0; }));
+    send({ t: "k", k: k, mods: list });
+    consumeMods();
+  }
+  document.querySelectorAll("[data-key]").forEach(function (b) {
+    b.addEventListener("click", function () { sendKey(b.dataset.key); buzz(); keepTyping(); });
+  });
+  document.querySelectorAll("[data-combo]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var parts = b.dataset.combo.split("+"); var k = parts.pop();
+      sendKey(k, parts); buzz();
+    });
+  });
+
+  // ---------- buttons ----------
+  var dragLocked = false;
+  function click(button) { send({ t: "c", b: button, mods: modList() }); consumeMods(); }
+  $("leftBtn").addEventListener("click", function () { if (dragLocked) setDragLock(false); click("l"); buzz(); });
+  $("rightBtn").addEventListener("click", function () { click("r"); buzz(); });
+  function setDragLock(on) {
+    dragLocked = on;
+    send({ t: "b", down: on });
+    $("lockBtn").classList.toggle("on", on);
+    $("dragbadge").hidden = !on && !touchDragging;
+  }
+  $("axRetry").addEventListener("click", function () { send({ t: "selftest" }); });
+  $("lockBtn").addEventListener("click", function () { setDragLock(!dragLocked); buzz(); });
+
+  // ---------- trackpad ----------
+  var pad = $("pad"), strip = $("strip");
+  var pend = { dx: 0, dy: 0, sx: 0, sy: 0 }, rafOn = false;
+  function flush() {
+    rafOn = false;
+    if (pend.dx || pend.dy) { send({ t: "m", dx: +pend.dx.toFixed(2), dy: +pend.dy.toFixed(2) }); pend.dx = pend.dy = 0; }
+    var sx = Math.trunc(pend.sx), sy = Math.trunc(pend.sy);
+    if (sx || sy) { send({ t: "s", dx: sx, dy: sy }); pend.sx -= sx; pend.sy -= sy; }
+  }
+  function schedule() { if (!rafOn) { rafOn = true; requestAnimationFrame(flush); } }
+
+  // Speed-dependent gain (generalized logistic), after Siddhpuria et al. CHI 2018.
+  var G_MIN = 1.0, G_MAX = 5.5, V_INF = 0.55, LAMBDA = 7; // speed in CSS px per ms
+  function gain(v) { return (G_MIN + (G_MAX - G_MIN) / (1 + Math.exp(-LAMBDA * (v - V_INF)))) * cfg.sens; }
+  function addMove(dx, dy, dt) {
+    var v = Math.sqrt(dx * dx + dy * dy) / Math.max(dt, 4);
+    var g = gain(v);
+    pend.dx += dx * g; pend.dy += dy * g; schedule();
+  }
+  function addScroll(dx, dy) {
+    var s = 2.2 * cfg.scrollSens * (cfg.invert ? -1 : 1);
+    // Content follows the finger: finger down => wheel up (positive).
+    pend.sx += dx * s; pend.sy += dy * s; schedule();
+  }
+
+  var TAP_MS = 250, TAP_SLOP = 9, LONG_MS = 450, DEAD = 3, SWIPE_PX = 45, PINCH_STEP = 0.18, SPREAD_PX = 40;
+  var SWIPE_LABEL = { left: "◀ 左邊的桌面", right: "右邊的桌面 ▶", up: "Mission Control", down: "App Exposé" };
+  function toast(text) {
+    var el = $("swipeToast"); el.textContent = text; el.hidden = false;
+    clearTimeout(toast.t); toast.t = setTimeout(function () { el.hidden = true; }, 700);
+  }
+  var g = null;          // current gesture
+  var lastTapEnd = 0, lastTapX = 0, lastTapY = 0;
+  var touchDragging = false;
+  var inertia = null;
+
+  function centroid(touches) {
+    var x = 0, y = 0;
+    for (var i = 0; i < touches.length; i++) { x += touches[i].clientX; y += touches[i].clientY; }
+    return { x: x / touches.length, y: y / touches.length };
+  }
+  // average distance of the fingers from their centroid (for pinch)
+  function spread(touches, c) {
+    var d = 0;
+    for (var i = 0; i < touches.length; i++) d += Math.hypot(touches[i].clientX - c.x, touches[i].clientY - c.y);
+    return d / touches.length;
+  }
+  function stopInertia() { if (inertia) { cancelAnimationFrame(inertia.raf); inertia = null; } }
+  // Momentum scrolling after the fingers lift, like a Mac trackpad.
+  function glide(vx, vy, kx, ky) {
+    if (Math.abs(vy) < 0.15 && Math.abs(vx) < 0.15) return;
+    stopInertia();
+    var last = performance.now();
+    inertia = { raf: 0 };
+    (function step() {
+      var now = performance.now(), dt = now - last; last = now;
+      vx *= Math.pow(0.995, dt); vy *= Math.pow(0.995, dt);
+      addScroll(vx * dt * kx, vy * dt * ky);
+      if (Math.abs(vy) > 0.02 || Math.abs(vx) > 0.02) inertia.raf = requestAnimationFrame(step);
+      else inertia = null;
+    })();
+  }
+  function combo(str, label) {
+    var parts = str.split("+"); var k = parts.pop();
+    sendKey(k, parts); buzz(); if (label) toast(label);
+  }
+
+  pad.addEventListener("touchstart", function (e) {
+    if (e.target === strip || e.target.closest("#exitFull")) return;
+    e.preventDefault(); stopInertia();
+    var c = centroid(e.touches), now = performance.now();
+    if (!g || e.touches.length === 1) {
+      g = { start: now, x0: c.x, y0: c.y, lx: c.x, ly: c.y, lt: now, moved: 0, maxF: e.touches.length,
+            consumed: false, pastDead: false, dragArm: false, longTimer: null, mode: null, vx: 0, vy: 0 };
+      // second tap of a double-tap: arm drag
+      if (e.touches.length === 1 && now - lastTapEnd < 300 &&
+          Math.abs(c.x - lastTapX) < 40 && Math.abs(c.y - lastTapY) < 40) g.dragArm = true;
+      if (e.touches.length === 1) {
+        g.longTimer = setTimeout(function () {
+          if (g && !g.pastDead && g.maxF === 1 && !g.dragArm) { g.consumed = true; click("r"); buzz(); }
+        }, LONG_MS);
+      }
+    } else {
+      clearTimeout(g.longTimer);
+    }
+    if (e.touches.length >= 2 && e.touches.length > (g.n || 0)) {
+      // a finger was added: restart the multi-finger baseline
+      g.maxF = Math.max(g.maxF, e.touches.length);
+      g.bx = c.x; g.by = c.y; g.bs = spread(e.touches, c); g.pinchRef = g.bs; g.mode = null;
+    }
+    g.n = e.touches.length;
+    g.lx = c.x; g.ly = c.y; g.lt = now;
+  }, { passive: false });
+
+  pad.addEventListener("touchmove", function (e) {
+    if (!g || e.target === strip) return;
+    e.preventDefault();
+    var n = e.touches.length;
+    var c = centroid(e.touches), now = performance.now();
+    var dx = c.x - g.lx, dy = c.y - g.ly, dt = Math.max(now - g.lt, 1);
+    g.lx = c.x; g.ly = c.y; g.lt = now;
+    g.moved = Math.max(g.moved, Math.hypot(c.x - g.x0, c.y - g.y0));
+    if (n >= 2) g.moved = Math.max(g.moved, Math.abs(spread(e.touches, c) - g.bs));
+    if (!g.pastDead) {
+      if (g.moved < DEAD) return;
+      g.pastDead = true;
+    }
+    if (g.moved > TAP_SLOP) clearTimeout(g.longTimer);
+    if (g.maxF >= 3) {
+      // Three/four-finger gestures fire once per gesture.
+      if (!g.swiped && n >= 3) {
+        var sx = c.x - g.bx, sy = c.y - g.by, ds = spread(e.touches, c) - g.bs;
+        if (g.maxF >= 4 && Math.abs(ds) > SPREAD_PX && Math.abs(ds) > Math.max(Math.abs(sx), Math.abs(sy))) {
+          g.swiped = true;
+          if (ds > 0) combo("f11", "顯示桌面");
+          else { send({ t: "app", name: "launchpad" }); buzz(); toast("啟動台"); }
+        } else if (Math.max(Math.abs(sx), Math.abs(sy)) > SWIPE_PX) {
+          g.swiped = true;
+          var key = Math.abs(sx) > Math.abs(sy) ? (sx < 0 ? "right" : "left") : (sy < 0 ? "up" : "down");
+          combo("ctrl+" + key, SWIPE_LABEL[key]);
+        }
+      }
+    } else if (n >= 2) {
+      var sp = spread(e.touches, c);
+      if (!g.mode) {
+        var cm = Math.hypot(c.x - g.bx, c.y - g.by), dsp = Math.abs(sp - g.bs);
+        if (Math.max(cm, dsp) < 8) return;
+        g.mode = dsp > cm * 1.2 ? "pinch" : "scroll";
+      }
+      if (g.mode === "scroll") {
+        addScroll(dx, dy);
+        g.vx = 0.7 * g.vx + 0.3 * (dx / dt); g.vy = 0.7 * g.vy + 0.3 * (dy / dt);
+      } else {
+        // Pinch: step the app's zoom with ⌘+ / ⌘− (macOS has no public pinch event API)
+        var ratio = sp / g.pinchRef;
+        if (ratio > 1 + PINCH_STEP) { g.pinchRef = sp; combo("cmd+=", "放大"); }
+        else if (ratio < 1 - PINCH_STEP) { g.pinchRef = sp; combo("cmd+-", "縮小"); }
+      }
+    } else if (n === 1 && g.maxF === 1) {
+      if (g.dragArm && !touchDragging && !dragLocked) {
+        touchDragging = true; send({ t: "b", down: true }); $("dragbadge").hidden = false; buzz();
+      }
+      addMove(dx, dy, dt);
+    }
+  }, { passive: false });
+
+  function padEnd(e) {
+    if (!g || e.target === strip) return;
+    e.preventDefault();
+    if (e.touches.length > 0) {
+      var c = centroid(e.touches); g.lx = c.x; g.ly = c.y; g.n = e.touches.length;
+      if (e.touches.length >= 2) { g.bs = spread(e.touches, c); g.pinchRef = g.bs; }
+      return;
+    }
+    clearTimeout(g.longTimer);
+    var now = performance.now(), dur = now - g.start;
+    if (touchDragging) {
+      touchDragging = false; send({ t: "b", down: false }); $("dragbadge").hidden = !dragLocked;
+    } else if (g.maxF >= 3) {
+      // three-finger tap = Look Up (Mac: "Look up & data detectors")
+      if (!g.swiped && g.maxF === 3 && g.moved < TAP_SLOP && dur < TAP_MS + 100) combo("ctrl+cmd+d", "查詢");
+    } else if (g.mode === "scroll") {
+      if (now - g.lt < 80) glide(g.vx, g.vy, 1, 1);
+    } else if (!g.mode && !g.consumed && dur < TAP_MS + (g.dragArm ? 150 : 0) && g.moved < TAP_SLOP) {
+      if (g.maxF >= 2) { click("r"); buzz(); }
+      else {
+        if (dragLocked) setDragLock(false);
+        click("l");
+        lastTapEnd = now; lastTapX = g.x0; lastTapY = g.y0;
+      }
+    }
+    if (g.dragArm) lastTapEnd = 0;
+    g = null;
+  }
+  pad.addEventListener("touchend", padEnd, { passive: false });
+  pad.addEventListener("touchcancel", padEnd, { passive: false });
+
+  // One-thumb scroll strip with inertia
+  var st = null;
+  strip.addEventListener("touchstart", function (e) {
+    e.preventDefault(); e.stopPropagation(); stopInertia();
+    var t = e.touches[0];
+    st = { lx: t.clientX, ly: t.clientY, lt: performance.now(), vx: 0, vy: 0 };
+    strip.classList.add("active");
+  }, { passive: false });
+  strip.addEventListener("touchmove", function (e) {
+    if (!st) return;
+    e.preventDefault(); e.stopPropagation();
+    var t = e.touches[0], now = performance.now(), dt = Math.max(now - st.lt, 1);
+    var dx = t.clientX - st.lx, dy = t.clientY - st.ly;
+    st.vx = 0.7 * st.vx + 0.3 * (dx / dt); st.vy = 0.7 * st.vy + 0.3 * (dy / dt);
+    st.lx = t.clientX; st.ly = t.clientY; st.lt = now;
+    addScroll(dx * 0.6, dy * 1.4);
+  }, { passive: false });
+  function stripEnd(e) {
+    if (!st) return;
+    e.preventDefault(); e.stopPropagation();
+    strip.classList.remove("active");
+    var vx = st.vx, vy = st.vy; st = null;
+    glide(vx, vy, 0.6, 1.4);
+  }
+  strip.addEventListener("touchend", stripEnd, { passive: false });
+  strip.addEventListener("touchcancel", stripEnd, { passive: false });
+
+  // ---------- text input ----------
+  // The iPhone keyboard (with its own IME) types into a textarea. Nothing is sent while
+  // the IME is composing. After each committed change we diff against what the Mac has
+  // already received and send "backspace x N + new text", so autocorrect replacements work.
+  var ta = $("ta"), SENT = "​";
+  var synced = "", composing = false;
+  var seg = (typeof Intl !== "undefined" && Intl.Segmenter) ? new Intl.Segmenter() : null;
+  function graphemes(s) {
+    if (!s) return 0;
+    if (seg) { var n = 0; for (var _ of seg.segment(s)) n++; return n; }
+    return Array.from(s).length;
+  }
+  function resetTa() {
+    if (cfg.mode === "draft") { ta.value = ""; synced = ""; return; }
+    ta.value = SENT; synced = SENT;
+    try { ta.setSelectionRange(1, 1); } catch (e) {}
+  }
+  // What the Mac should now show at the end of the line (for the "已送出" preview).
+  var macTail = [];
+  function showLast(ins, del) {
+    for (var i = 0; i < (del || 0); i++) macTail.pop();
+    if (ins) macTail = macTail.concat(seg ? Array.from(seg.segment(ins), function (x) { return x.segment; }) : Array.from(ins));
+    macTail = macTail.slice(-40);
+    $("last").innerHTML = "";
+    var b = document.createElement("b"); b.textContent = macTail.join("").replace(/\n/g, "⏎");
+    $("last").append("已送出：", b);
+  }
+  function sendText(s) {
+    if (!s) return;
+    var armed = modList();
+    if (isShortcut(s)) {
+      sendKey(s.toLowerCase()); return true;   // e.g. ⌘ then "c" => cmd+c
+    }
+    var parts = s.split("\n");
+    parts.forEach(function (p, i) {
+      if (i > 0) send({ t: "k", k: "return", mods: [] });
+      if (p) send({ t: "txt", s: p });
+    });
+    showLast(s, 0);
+    return false;
+  }
+  function isShortcut(s) {
+    return modList().length > 0 && s.length === 1 && /^[a-z0-9`\-=\[\]\\;',.\/]$/i.test(s);
+  }
+  function sync() {
+    if (composing || cfg.mode === "draft") return;
+    var a = synced, b = ta.value;
+    if (a === b) return;
+    var p = 0;
+    while (p < a.length && p < b.length && a.charCodeAt(p) === b.charCodeAt(p)) p++;
+    if (p > 0 && p < a.length && a.charCodeAt(p - 1) >= 0xD800 && a.charCodeAt(p - 1) <= 0xDBFF) p--;
+    var del = graphemes(a.slice(p)), ins = b.slice(p);
+    if (!del && isShortcut(ins)) {
+      // The letter was a shortcut, not text: take it back out of the field.
+      sendText(ins); ta.value = a; synced = a;
+      try { ta.setSelectionRange(a.length, a.length); } catch (e) {}
+      return;
+    }
+    if (del) { send({ t: "bs", n: del }); showLast("", del); }
+    synced = b;
+    if (ins) sendText(ins);
+    if (b.indexOf(SENT) !== 0 || ins.indexOf("\n") >= 0 || b.length > 80) resetTa();
+  }
+  ta.addEventListener("compositionstart", function () { composing = true; });
+  ta.addEventListener("compositionend", function () { composing = false; setTimeout(sync, 0); });
+  ta.addEventListener("input", function (e) { if (!e.isComposing) sync(); });
+  // keep caret at the end so diffs stay at the tail
+  document.addEventListener("selectionchange", function () {
+    if (document.activeElement !== ta || composing || cfg.mode === "draft") return;
+    var L = ta.value.length;
+    if (ta.selectionStart !== L || ta.selectionEnd !== L) { try { ta.setSelectionRange(L, L); } catch (e) {} }
+  });
+  $("sendDraft").addEventListener("click", function () {
+    var v = ta.value; if (!v) return;
+    sendText(v); ta.value = ""; synced = ""; buzz(); keepTyping();
+  });
+
+  function keepTyping() { if (document.body.classList.contains("typing")) ta.focus(); }
+  $("kbBtn").addEventListener("click", function () { document.body.classList.add("typing"); resetTa(); ta.focus(); });
+  $("kbDone").addEventListener("click", function () { ta.blur(); });
+  ta.addEventListener("focus", function () { document.body.classList.add("typing"); });
+  ta.addEventListener("blur", function () {
+    setTimeout(function () {
+      if (document.activeElement !== ta && cfg.mode !== "draft") document.body.classList.remove("typing");
+    }, 120);
+  });
+  // buttons in typing mode should not steal focus from the textarea
+  document.querySelectorAll(".typing-only button, [data-mod], [data-key]").forEach(function (b) {
+    if (b.id === "kbDone") return;
+    b.addEventListener("mousedown", function (e) { e.preventDefault(); });
+    b.addEventListener("touchend", function (e) {
+      if (!document.body.classList.contains("typing")) return;
+      e.preventDefault(); b.click();
+    });
+  });
+
+  // Fit the layout above the on-screen keyboard
+  function fit() {
+    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty("--vh", h + "px");
+    window.scrollTo(0, 0);
+  }
+  if (window.visualViewport) {
+    visualViewport.addEventListener("resize", fit);
+    visualViewport.addEventListener("scroll", fit);
+  }
+  window.addEventListener("resize", fit);
+
+  // ---------- settings sheet ----------
+  $("modeBtn").addEventListener("click", function () {
+    cfg.mode = cfg.mode === "draft" ? "live" : "draft"; saveCfg(); resetTa();
+    if (cfg.mode === "draft") { document.body.classList.add("typing"); ta.focus(); }
+  });
+  $("setBtn").addEventListener("click", function () { $("setSheet").hidden = false; });
+  $("setClose").addEventListener("click", function () { $("setSheet").hidden = true; });
+  $("sens").addEventListener("input", function () { cfg.sens = +this.value; saveCfg(); });
+  $("scrollSens").addEventListener("input", function () { cfg.scrollSens = +this.value; saveCfg(); });
+  $("natural").addEventListener("change", function () { cfg.invert = !this.checked; saveCfg(); });
+  $("fullBtn").addEventListener("click", function () { cfg.full = true; saveCfg(); });
+  $("exitFull").addEventListener("click", function (e) { e.stopPropagation(); cfg.full = false; saveCfg(); });
+  $("exitFull").addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+  $("keysBtn").addEventListener("click", function () { $("keysSheet").hidden = false; });
+  $("keysClose").addEventListener("click", function () { $("keysSheet").hidden = true; });
+  $("keysSheet").addEventListener("click", function (e) { if (e.target === this) this.hidden = true; });
+  document.querySelectorAll("[data-app]").forEach(function (b) {
+    b.addEventListener("click", function () { send({ t: "app", name: b.dataset.app }); buzz(); });
+  });
+  $("lefty").addEventListener("change", function () { cfg.lefty = this.checked; saveCfg(); });
+  $("hapticOn").addEventListener("change", function () { cfg.haptic = this.checked; saveCfg(); });
+  $("forget").addEventListener("click", function () {
+    store("sofapad.pin", ""); $("setSheet").hidden = true; if (ws) ws.close();
+  });
+
+  // Keep the screen on where allowed (needs HTTPS on iOS; ignored otherwise)
+  function wake() { try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(function () {}); } catch (e) {} }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) wake(); });
+
+  // test hook
+  window.__sofapad = { cfg: cfg, sync: sync, resetTa: resetTa };
+
+  applyCfg(); resetTa(); fit(); wake(); connect();
+})();
+</script>
+</body>
+</html>

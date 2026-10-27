@@ -1,0 +1,9 @@
+{
+  "name": "pkm-tools",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only tools for Phone KeyMouse: screenshots, latency bench, end-to-end driver. Uses the system Google Chrome via playwright-core (no browser download).",
+  "devDependencies": {
+    "playwright-core": "^1.55.0"
+  }
+}

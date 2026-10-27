@@ -1,0 +1,35 @@
+PASS 文字：中文、全形標點、英文、emoji、ZWJ 家庭 emoji 各成一組 Unicode 事件
+PASS 文字：每個 keyDown 都有對應的 keyUp
+PASS 文字：換行送 Return 鍵（keycode 36）
+PASS 文字：Unicode 事件不帶修飾鍵
+PASS 快捷鍵 ⌘C：⌘ 按下 → C 按下／放開（帶 ⌘）→ ⌘ 放開
+PASS 快捷鍵 ⇧⌘Z：主鍵同時帶 ⌘ 和 ⇧
+PASS 快捷鍵 ⇧⌘Z：修飾鍵最後全部放開
+PASS ⌃←→↑↓（三指滑動）和實體鍵盤一樣：keycode 123／124／126／125，旗標 ⌃＋Fn＋數字鍵盤＝0xA40000（I-18）
+PASS 一般按鍵不會多帶 Fn／數字鍵盤旗標（⌘C 主鍵只有 ⌘）
+PASS 雙擊：連點兩下 clickState = 1, 2
+PASS 滑鼠事件 flags 清空（不會變成 ⌃-點擊）
+PASS 右鍵：rightMouseDown＋rightMouseUp
+PASS 拖曳：按住 → leftMouseDragged → 放開
+PASS 拖曳：位移 +10 pt、delta 欄位 = 10
+PASS 捲動：30.6 + 0.6 px → 30, 1 px（小數累積）
+PASS 捲動：continuous（像觸控板）
+PASS 迷你地圖：jump(0.5, 0.5) → 螢幕中央
+PASS 游標不會跑出螢幕：往左超出 → 停在左邊界
+PASS 長文字（250 字）自動改用貼上：剪貼簿放入文字＋送出 ⌘V
+PASS 貼上後還原原本的剪貼簿
+PASS 暫存剪貼簿項目標成 transient／concealed（剪貼簿管理工具會略過）
+PASS ⌫ 後面接貼上：⌘V 至少晚 45 ms 才送，接收端不會把 ⌫ 和貼上併成一包（I-21）
+PASS 連續貼上至少間隔 140 ms（慢的 App 不會讀到下一段的剪貼簿）
+PASS 連續貼上之後，剪貼簿回到第一次貼上之前的內容（不會留下聽寫的字）
+PASS 「用 iPhone 掃描」QR code 掃出來就是 IP 網址，不含配對碼（PKM-3-2）
+PASS e2e 保護：點擊目標用真正的 hit test，自己的視窗在游標下 → 判定是自己（上面蓋著的透明視窗：Notification Center(layer 21)、Dock(layer 20)）
+PASS e2e 保護：視窗在游標下、但這個程式不在前景 → 點擊照樣擋（不只看視窗）
+PASS e2e 保護：前景 App 是目標時，按鍵放行
+PASS e2e 保護：前景 App 是目標、但游標下是別人的視窗 → 點擊擋下（不只看前景）
+PASS e2e 保護：⌃→（切換桌面）、⌃↑（Mission Control）、⌃⇧⌘4（截圖）即使前景是目標也擋下
+PASS e2e 保護：⌘A、⌘=、⌥⌘K 這類只影響前景 App 的快捷鍵照常放行
+PASS e2e 保護：不接點擊的視窗（像 Dock、通知中心的全螢幕透明層）會被略過
+PASS e2e 保護：拿不到視窗（螢幕外）→ 沒有擁有者 → 判定不是 probe
+資訊：目前 Mac 輸入來源是輸入法（會自動改用貼上）＝true；螢幕鎖定＝false；輔助使用權限＝true；三指手勢需要但被關掉的系統快速鍵＝無；空間（桌面＋全螢幕 App）數＝1
+SELF-TEST OK

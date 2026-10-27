@@ -1,0 +1,102 @@
+{
+ "scenario": "reconnect",
+ "build": "old",
+ "mode": "live",
+ "textMode": "paste",
+ "kind": "stop",
+ "tag": "reconnect-old-live-paste-stop",
+ "startedAt": "2026-10-27T19:02:44.022Z",
+ "rounds": [
+  {
+   "k": 1,
+   "label": "d01",
+   "reconnected": false,
+   "reconnectMs": null,
+   "outageMs": 6880,
+   "inA": 1,
+   "inB": 1
+  },
+  {
+   "k": 2,
+   "label": "d02",
+   "reconnected": false,
+   "reconnectMs": null,
+   "outageMs": 7141,
+   "inA": 1,
+   "inB": 1
+  },
+  {
+   "k": 3,
+   "label": "d03",
+   "reconnected": false,
+   "reconnectMs": null,
+   "outageMs": 6835,
+   "inA": 1,
+   "inB": 1
+  },
+  {
+   "k": 4,
+   "label": "d04",
+   "reconnected": false,
+   "reconnectMs": null,
+   "outageMs": 7563,
+   "inA": 1,
+   "inB": 1
+  }
+ ],
+ "notes": [
+  "stopped after 4 rounds: 2-minute limit"
+ ],
+ "textA": "d01 okd02 ok d03 ok d04 ok ",
+ "textB": " d01 lost x\nd02 lost x\nd03 lost x\nd04 lost x\n",
+ "guardTripped": false,
+ "closed": {
+  "ok": true,
+  "windowsLeft": 0
+ },
+ "timing": [],
+ "late": [],
+ "lostInA": 0,
+ "lostInB": 4,
+ "okTwice": 0,
+ "reconnects": 0,
+ "reconnectMeanMs": null,
+ "reconnectMaxMs": null,
+ "switches": [],
+ "serverLog": [
+  "[03:02:44] 端對端測試模式：只有前景 App 是 pid 76374、而且點擊／捲動落在它的視窗上時才送事件",
+  "[03:02:44] 網路介面：en1 192.168.x.x；utun5 100.x.x.x：不使用，不是區網位址（KeyMouse 只接受區網裡的手機）",
+  "",
+  "========== Phone KeyMouse ==========",
+  "手機和這台 Mac 連同一個 Wi-Fi，用 Safari 打開：",
+  "  http://127.0.0.1:37827/",
+  "配對碼：******（15 分鐘內有效；之後手機可以按「要求配對」，Mac 螢幕會跳出新碼）",
+  "網頁資料夾：<scratch>/v3src/web",
+  "已配對手機：0 支",
+  "人在 Mac 前面時，也可以用手機相機掃這個 QR code（內含配對碼）：",
+  "\u001b[30;47m                                 \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█ ▄▀▄ ▀▄▀  █ ▄▀ █▀▀▀▀▀█  \u001b[0m",
+  "\u001b[30;47m  █ ███ █  ▀▄█▄▄ ▀▄▄█ ▄ █ ███ █  \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ ▀ ▀█▄▀▄▄█▀    █ ▀▀▀ █  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ ▀▄█ █ ▀▄▀▄▀▄▀ ▀▀▀▀▀▀▀  \u001b[0m",
+  "\u001b[30;47m  ▀ █ █▄▀▄▄▄ ▄▄▄ ▄█ ▄█▀▄▄▄▀▄ ▀▄  \u001b[0m",
+  "\u001b[30;47m  ▀▄ █ ▄▀▀▄  ▀█▄█▀█  █ █▄  ▄▀█▀  \u001b[0m",
+  "\u001b[30;47m  ▀▄▄▀▀ ▀█▀ ▀▀█ ██  ▀▄▀█ ▀ ▄ ▀█  \u001b[0m",
+  "\u001b[30;47m  ▀▄▄▄  ▀▀▄██ █▀ ▄ █▄▄▄▀██▀▄██▀  \u001b[0m",
+  "\u001b[30;47m     █ ▄▀█▀█▀▄▄▄ ▄█▄ ▀▀█▄█▄▀█▀█  \u001b[0m",
+  "\u001b[30;47m  ▀▄ ▀▄▄▀ █▀▀▄█▄█▀█▄ █ ▀▄▀ ▀▄█▀  \u001b[0m",
+  "\u001b[30;47m  ▀ ▀▀  ▀▀█ ▄▄▄ ██▀▄▀▄█▀▀▀█  ▄▄  \u001b[0m",
+  "\u001b[30;47m  █▀▀▀▀▀█  ▀█ ▄▀ ▄▀█ ▀█ ▀ █▀▄█▀  \u001b[0m",
+  "\u001b[30;47m  █ ███ █ ▀▄ ▀▄▄  █▀█▄▀▀██▀█ █▀  \u001b[0m",
+  "\u001b[30;47m  █ ▀▀▀ █ ▀█ ▄ ▄█▀█▀▄  ▄█  ▄ ▄▀  \u001b[0m",
+  "\u001b[30;47m  ▀▀▀▀▀▀▀ ▀    ▀▀▀▀ ▀ ▀   ▀ ▀▀▀  \u001b[0m",
+  "\u001b[30;47m                                 \u001b[0m",
+  "",
+  "在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。",
+  "",
+  "[03:02:48] 手機已配對。要再配對另一支手機：在這裡按 Enter，或用選單列的「配對新手機」。",
+  "[03:02:48] authenticated iPhone from 127.0.0.1 (new pairing)",
+  "[03:04:49] 結束中…",
+  ""
+ ]
+}
