@@ -8,11 +8,14 @@ public struct LANURL: Equatable {
     /// e.g. "192.168.1.20（en0）" or "Laptop.local"
     public let label: String
     public let isIP: Bool
+    /// BSD name of the interface an IP URL is on, e.g. "en0" (SOFA-5: the pairing window shows it)
+    public let interface: String?
 
-    public init(url: String, label: String, isIP: Bool) {
+    public init(url: String, label: String, isIP: Bool, interface: String? = nil) {
         self.url = url
         self.label = label
         self.isIP = isIP
+        self.interface = interface
     }
 }
 
@@ -41,7 +44,7 @@ public enum LANURLs {
         var seen = Set<String>()
         var out: [LANURL] = []
         for i in ips where seen.insert(i.ip).inserted {
-            out.append(LANURL(url: "http://\(i.ip):\(port)/", label: "\(i.ip)（\(i.name)）", isIP: true))
+            out.append(LANURL(url: "http://\(i.ip):\(port)/", label: "\(i.ip)（\(i.name)）", isIP: true, interface: i.name))
         }
         if let host = localHostName, !host.isEmpty {
             out.append(LANURL(url: "http://\(host).local:\(port)/", label: "\(host).local", isIP: false))

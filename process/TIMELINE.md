@@ -237,3 +237,12 @@
 | v4-M7 | phone-keymouse commit（PKM-4 程式＋紀錄） | 03:31（3b00778） | git log |
 | v4-M8 | sofapad 匯入 commit 準備好（不 push；40dc24c 之後的唯一一個 commit，Swift 65/65、JS 81/81 在匯出的樹上重跑過）、紀錄 commit、station review | 03:32（匯入 commit）；約 03:36（紀錄、station） | ~/Workspace/sofapad git log |
 | v4-M9 | 總控驗收功能通過；§7 三處隱私補修（Tailscale IP、測試配對碼、總控的其他工作），修改 sofapad 原匯入 commit（不 push），新 id 見 orchestration 回覆 | 03:34 收到 → 約 03:47 | design/PUBLIC-CHECK.md 2b、docs/PUBLIC-CHECK.md |
+
+## SOFA-5（SofaPad 4.1，2026-10-28）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S5-M0 | 收到派工（Safari 黑屏：拒絕要說明、同網段 IPv6、換網路自動更新、README 排查表） | 15:53 | — |
+| S5-M1 | 補充：手機開著 Tailscale → 加「允許 Tailscale 裝置」開關 | 約 15:58 | — |
+| S5-M2 | 程式＋單元測試（Swift 75/75、JS 81/81） | 16:05 | `swift test`、`node --test` |
+| S5-M3 | `tools/build-app.sh` → dist/SofaPad.app 4.1.0；`--self-test` OK；`--dry-run` 實機檢查；截圖 | 16:04–16:09 | design/evidence/sofa5/ |

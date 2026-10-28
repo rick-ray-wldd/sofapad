@@ -8,19 +8,26 @@ enum NetInfo {
     /// Every IPv4 address of an active, non-loopback interface, private or not (LANURLs decides which to offer,
     /// and says why the others are left out).
     static func interfaces() -> [LANURLs.Interface] {
-        var result: [LANURLs.Interface] = []
-        var ifaddr: UnsafeMutablePointer<ifaddrs>?
-        guard getifaddrs(&ifaddr) == 0, let first = ifaddr else { return [] }
-        defer { freeifaddrs(ifaddr) }
-        for p in sequence(first: first, next: { $0.pointee.ifa_next }) {
-            let flags = Int32(p.pointee.ifa_flags)
-            guard flags & IFF_UP != 0, flags & IFF_LOOPBACK == 0,
-                  let sa = p.pointee.ifa_addr, sa.pointee.sa_family == UInt8(AF_INET) else { continue }
-            var host = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-            guard getnameinfo(sa, socklen_t(sa.pointee.sa_len), &host, socklen_t(host.count), nil, 0, NI_NUMERICHOST) == 0 else { continue }
-            result.append(LANURLs.Interface(name: String(cString: p.pointee.ifa_name), ip: String(cString: host)))
+        LocalAddresses.scan().compactMap { e in
+            guard case .v4 = e.address else { return nil }
+            return LANURLs.Interface(name: e.name, ip: e.text)
         }
-        return result
+    }
+
+    /// "Wi-Fi", "乙太網路", "Thunderbolt 橋接器"… for a BSD name such as en0 (SOFA-5: shown in the pairing window).
+    static func displayName(of bsdName: String) -> String? {
+        guard let all = SCNetworkInterfaceCopyAll() as? [SCNetworkInterface] else { return nil }
+        for i in all where SCNetworkInterfaceGetBSDName(i) as String? == bsdName {
+            return SCNetworkInterfaceGetLocalizedDisplayName(i) as String?
+        }
+        return nil
+    }
+
+    /// One line for the pairing and scan windows: "192.168.1.20 · Wi-Fi（en0）", or the .local name.
+    static func describe(_ url: LANURL) -> String {
+        guard url.isIP, let name = url.interface else { return url.label }
+        let ip = url.label.components(separatedBy: "（").first ?? url.label
+        return "\(ip) · " + (displayName(of: name).map { "\($0)（\(name)）" } ?? name)
     }
 
     /// Fresh list of addresses a phone can open (IP first, then .local), scanned now.

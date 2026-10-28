@@ -373,3 +373,25 @@
 - 選項：(A) **一個匯入 commit，只放清理過的檔案（選這個）**；(B) 用 filter-repo 改寫 phone-keymouse 的 54 個 commit。改寫的風險：作者 email 在每個 commit、私人內容分散在每個版本、PNG 沒辦法用文字取代；漏一處就公開了。
 - 舊的 Python 版搬到 `legacy/v0.2-python/`（不改寫 sofapad 的歷史，總控會在 40dc24c 打 `v0.2-python` tag）。
 - 清理規則（照 sofapad 原本的慣例：IP 改 192.168.x.x、電腦名稱和使用者名稱遮蔽、檔頭註明）：電腦名稱、IP、`/Users/…` 路徑、個人助理系統的 station／task／run／terminal id、他人姓名和 email、私人對話內容改成概述；Ray 的原話保留。詳見 design/PUBLIC-CHECK.md（私人版，含實際被替換的值）和 sofapad 的 docs/PUBLIC-CHECK.md（公開版，只有類別和數量）。
+
+## D-36 被拒的手機要看得到原因（SOFA-5，4.1）
+- 之前：非區網來源 `nw.cancel()`，Safari 只會一直轉或空白，Mac 端只有 log。
+- 現在：被拒的連線照樣讀完 HTTP 標頭，任何路徑（包括 `/ws`）都只回一頁 403 說明（中文＋英文：來源位址、三個排查方法：關 VPN／Tailscale 或打開 Mac 的開關、連同一個 Wi-Fi 不是訪客網路、關掉 AP 隔離），`Cache-Control: no-store`、CSP `default-src 'none'`，然後關閉。不建立 session、不給檔案、不升級 WebSocket，所以一樣不能控制 Mac。
+- 同時最多 8 個被拒的連線、10 秒逾時；log 每個來源每分鐘記一次；選單列顯示最近一次被拒的來源和時間。
+
+## D-37 同網段的 IPv6 算區網（SOFA-5，4.1）
+- 來源是全域 IPv6（2000::/3），而且前 64 位元等於 Mac 自己任一個全域 IPv6 位址的前 64 位元，就是同一個 Wi-Fi（SLAAC 的 /64）。Mac 的位址只在這種來源連進來時才掃（getifaddrs）。
+- 其他全域 IPv6 照樣拒絕，但會看到說明頁。IPv4 不比對網段：公開 IPv4 的網路照舊不接受。
+
+## D-38 「允許 Tailscale 裝置」開關（SOFA-5 補充，4.1）
+- 選單列一個開關，預設關。打開時接受 100.64.0.0/10 的來源，仍要配對（配對碼／HMAC 和錯誤次數限制都不變）。關掉時立刻斷開已連上的 Tailscale 連線。
+- Tailscale 的 IPv6（fd7a:115c:a1e0::/48）在 fc00::/7 裡，4.0 會當成區網接受；4.1 把它也歸到這個開關（預設拒絕），否則開關關著時 Tailscale 還是進得來。
+- 記在 `~/Library/Application Support/SofaPad/settings.json`（`allowTailscale`）；`--allow-tailscale` 只影響這次執行。
+- 不做：不在 QR／選單提供 Mac 自己的 Tailscale 網址（那是從別的網路遙控 Mac，沒有被要求）。
+
+## D-39 換網路自動更新（SOFA-5，4.1）
+- NWPathMonitor 一有變化，0.3、2、6 秒後各重掃一次網址（DHCP 可能晚一點才給新 IP）；另外每 10 秒掃一次，接住沒有 path 事件的位址變化。
+- 網址有變：記 log（舊 → 新、介面）、重建選單；開著的「用 iPhone 掃描」視窗和配對視窗原地換內容（不搶焦點，配對碼和剩下的時間不變）。兩個視窗都多一行「這台 Mac：IP · 網路介面（BSD 名稱）」。
+
+## D-40 版本 4.1.0（SOFA-5）
+- 行為有改（拒絕頁、IPv6、Tailscale 開關），升成 4.1.0，Ray 可以用第 7 步確認 MacBook 上跑的是不是新版。

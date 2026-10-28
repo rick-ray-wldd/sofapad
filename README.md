@@ -57,7 +57,7 @@ macOS requires you to allow any program that presses keys or moves the mouse for
 
 ### 4. Firewall and Local Network
 
-- **macOS firewall** (System Settings > Network > Firewall), if it's on: the first time the phone connects, **you'll see** "Do you want the application "SofaPad" to accept incoming network connections?" Click "**Allow**". If the firewall is off, it won't ask.
+- **macOS firewall** (System Settings > Network > Firewall), if it's on: the first time the phone connects, **you'll see** "Do you want the application "SofaPad" to accept incoming network connections?" Click "**Allow**". If the firewall is off, it won't ask. If you clicked "Deny" before, the phone keeps loading after you scan the QR code: in Firewall > Options, set SofaPad to allow incoming connections.
 - **Local Network** (System Settings > Privacy & Security > Local Network): SofaPad only accepts connections from your phone. It doesn't connect out to other devices, so macOS doesn't ask about this (Apple TN3179). If SofaPad is listed there, it doesn't matter whether it's on or off.
 
 ### 5. Start at login (optional)
@@ -79,8 +79,8 @@ macOS requires you to allow any program that presses keys or moves the mouse for
 
 ### 7. Check the version
 
-- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.0.0 (build 2026-10-28 05:12)".
-- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the column of small buttons on the left). The top line reads "Web page 4.0.0 (build …) · Mac app 4.0.0 (build …)".
+- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.1.0 (build 2026-10-28 05:12)".
+- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the column of small buttons on the left). The top line reads "Web page 4.1.0 (build …) · Mac app 4.1.0 (build …)".
 - If the two versions differ, or it says "Old version (no version info)": install the new app on the Mac, then reload the page. For the Home Screen app, swipe it away in the app switcher and open it again.
 
 ### 8. Common problems
@@ -115,7 +115,7 @@ After the rename, macOS treats the app as a new one, so you have to grant Access
 
 Before 4.0, after you sent some text and switched to another window, the previous text could sometimes be typed again into the new window (for example, what you wrote in Orca ended up in LINE), and typing stuttered. For how 4.0 fixes this, see [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md#40-stale-text-and-lag). Do the following once to confirm:
 
-**Prepare** (don't use a real chat, so you don't send the test sentence to someone): open two windows on the Mac to stand in for "Orca" and "LINE", for example a new note in Notes and a new document in TextEdit. First check with step 7 that the phone and the Mac are both 4.0.0.
+**Prepare** (don't use a real chat, so you don't send the test sentence to someone): open two windows on the Mac to stand in for "Orca" and "LINE", for example a new note in Notes and a new document in TextEdit. First check with step 7 that the phone and the Mac are both 4.0.0 or later.
 
 1. **Batch mode + dictation** (about 1 minute): click into Notes. On the phone, switch to "Batch (整段)", tap 🎤 on the keyboard and say "This is the first paragraph; it must not appear in the second window." (Chinese dictation works too.) Tap "Send (送出)". Right away, use the phone's trackpad to click into TextEdit, type a single "OK" on the phone, and tap "Send".
    - **Correct**: TextEdit contains only "OK".
@@ -193,7 +193,8 @@ The version is at the top. Then: pointer speed, acceleration, scroll speed, reve
 
 ## Security
 
-- It only accepts connections from the same local network (home Wi-Fi, a hotspot). The internet can't reach it, and nothing goes through a cloud.
+- It only accepts connections from the same local network (home Wi-Fi, a hotspot). The internet can't reach it, and nothing goes through a cloud. For IPv6, only addresses in the Mac's own network (/64) are accepted. A device outside the local network only gets a short explanation page (403) and can't control the Mac.
+- **Tailscale**: when the phone has Tailscale on, its connection may arrive from a Tailscale address (100.64.0.0/10), which is refused by default. If the phone has Tailscale on, turn it off, or turn on "允許 Tailscale 裝置" (Allow Tailscale devices) in the Mac's menu bar (off by default). With it on, Tailscale devices are accepted too, but they still have to pair; every device in the same tailnet can reach the pairing screen, so turn it off when you don't need it.
 - The first time, you enter the pairing code shown on the Mac screen (or scan the QR code in the pairing window; the code is valid for 10 minutes). After that, the phone proves its identity with a one-time challenge (HMAC), and the long-term secret never appears on the Wi-Fi again. The QR code under "Scan with iPhone (用 iPhone 掃描)" in the menu bar contains only the address, not the pairing code.
 - Five wrong pairing codes lock it for 30 seconds, and the lockout doubles after that. After too many wrong tries, the Mac changes the code automatically and closes pairing. In the menu bar you can "Forget all paired phones (忘記所有已配對手機)".
 - While the Mac is locked, it types nothing. Text that reaches the Mac more than 3 seconds late (a stalled connection) isn't typed, so it can't land in a window you've already switched to.
@@ -206,6 +207,7 @@ The version is at the top. Then: pointer speed, acceleration, scroll speed, reve
 | Problem | What to do |
 |---|---|
 | The phone can't open the page | Same Wi-Fi? Is the app running on the Mac? Try the `.local` address. "Advanced" in the menu bar shows the status of each network interface (for example, "169.254 means it didn't get an IP from the router") |
+| You scanned the QR code and Safari keeps loading or stays black | The phone can't reach the Mac. Three common causes: **(1) VPN on the phone**: with Tailscale (or another VPN) on, the phone's connection may go through the VPN instead of the Wi-Fi. If the phone has Tailscale on, turn it off, or turn on "允許 Tailscale 裝置（100.64.0.0/10，仍要配對）" (Allow Tailscale devices; they still have to pair) in the SofaPad menu on the Mac (off by default). **(2) Not on the same network**: the phone is on a guest network, on cellular or on another Wi-Fi, or the router has AP isolation (client isolation) on, so devices on the same Wi-Fi can't reach each other. **(3) The Mac changed networks and its IP changed**: from 4.1, the QR code, the menu and the pairing window switch to the new IP by themselves; just scan again. Also check that the macOS firewall allows SofaPad (step 4). **How to tell**: if the phone shows the page "Your phone is not on the Mac's local network (你的手機不在 Mac 的區網裡)", the Mac refused it, and the menu bar shows "最近拒絕的連線" (last refused connection) with the address. If nothing shows on the Mac and Safari keeps loading, the connection never reached the Mac (VPN route, guest network, AP isolation, firewall). **Log**: `~/Library/Logs/SofaPad.log`; look for "拒絕非區網來源" (refused) and "網路變了" (network changed) |
 | "Scan with iPhone" in the menu bar says "Can't find a local network IP" | The Mac isn't on Wi-Fi yet, or is on a network that can't be used. The QR code uses the `.local` name at first. Once you're on Wi-Fi, reopen the menu and it switches to the IP |
 | A "Secure Input" notice appears while typing | The Mac is taking a password (a password field, or Terminal's "Secure Keyboard Entry"). macOS blocks simulated keyboard input, but the mouse still works |
 | The Mac also has Zhuyin turned on | SofaPad switches to sending text by "paste" automatically (and restores the clipboard afterwards). The smoothest setup: keep the Mac on ABC and type all Chinese on the phone |

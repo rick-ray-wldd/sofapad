@@ -54,3 +54,19 @@ this file, which quotes them), none of them private:
 The same search over `legacy/` finds nothing.
 
 The Python version in `legacy/v0.2-python/` was moved as it was; its own history in this repository is unchanged.
+
+## 4.1 (2026-10-28)
+
+Before the 4.1 commit, the same search over the whole tree, plus the computer's own local host name, LAN address and
+Tailscale addresses (IPv4 and IPv6) read from its interfaces at the time, finds none of those real values. Besides the
+lines in the table above it finds only made-up test values:
+
+| File | What matches | Why it stays |
+|---|---|---|
+| `mac/Tests/PKMCoreTests/SOFA5Tests.swift` | `100.64.0.1`, `100.127.255.254`, `fd7a:115c:a1e0::1`, `fd7a:115c:a1e0:ab12::5` | made-up examples: the two ends of the Tailscale range, refused until the switch is on |
+
+`100.64.0.0/10` and `fd7a:115c:a1e0::/48` now also appear in the code, README and records as the names of the ranges
+that the "允許 Tailscale 裝置" switch covers. The added lines were also checked for every private IPv4 range, IPv6
+addresses, `.local` names, local paths, email addresses, six-digit codes and assistant-system ids: only example values
+(`192.168.1.20`, `10.0.0.5`, `2001:db8::/32`, `Studio.local`, …). The test logs in `design/evidence/sofa5/` show this
+computer's Tailscale address as `100.x.x.x`. The four new screenshots show only example addresses.

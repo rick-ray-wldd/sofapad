@@ -55,3 +55,11 @@
 | I-33 | 02:46–03:23 | writer 的量測：(1) 外洩判定第一版只找標籤（r01），漏掉「ine 1⏎」這種行尾；改成 3 字片段又會跨輪誤算；最後改成「該輪的行尾（e 7）或標籤出現在 B」，所有檔案用 B 視窗的原文重算（第一輪 3.x 從 0 改成 13/15）。(2) XCUITest 一次 typeText 一串字時，iOS 把大部分字當成一個輸入事件（像聽寫），新版會等 0.7 秒或 Enter，所以「連續打一串」的延遲 p95 約 650 ms；一般打字延遲改用一次一個鍵量（p95 37 ms）。(3) 3.x ABC 模式那輪 XCUITest 等 Safari 閒置超過 60 秒逾時，重跑 8 輪 | 報告數字要照最後的規則 | runs.json 是重算後的；逾時那輪另存 switch-old-live-auto-timeout.json，不算進結果 |
 | I-20（追蹤） | 02:32 | Neo 配對視窗沒有 QR：原因仍未在 Neo 上查明 | — | 這次再加兩道保險：QR 一定有網址（沒有 IP 時用 .local，連名稱都沒有時用電腦名稱）；CoreImage 的 GPU 繪製失敗時改用軟體繪製。仍列為未解（要 Neo 實測） |
 | I-34 | 03:34–03:45 | writer 的漏：公開版檢查的 grep 沒有包含 100.64.0.0/10（Tailscale／CGNAT），漏了 22 個證據 JSON 伺服器記錄裡的 Tailscale 位址；測試伺服器印的（已過期）配對碼、COORDINATOR-LOG 兩行提到總控的其他工作也沒有規則。總控驗收時發現（DISPATCH-PKM-4 §7） | 推上 sofapad 會公開 Tailscale 位址和總控的其他工作 | export-sofapad.py 加三條規則（記錄和文件裡的 100.64/10 位址 → 100.x.x.x，程式和測試的假位址、網段寫法不改；配對碼 → ******；其他工作 → 「總控當時在處理其他工作」），重新匯出、修改原匯入 commit；最後的 grep 加上這三類：只剩測試假值和網段名稱 5 行（PUBLIC-CHECK 2b）。教訓：grep 規則要從「這台機器上有哪些位址和識別碼」列出來（ifconfig 每個介面），不是從已知的例子列 |
+
+## SofaPad 4.1（SOFA-5，2026-10-28）
+
+| 編號 | 時間 | 問題 | 影響 | 處理 |
+|---|---|---|---|---|
+| I-35 | 15:53 | Ray：新版掃 QR 後 Safari 一直轉、黑屏，兩個網址都一樣。App 在另一台 MacBook 上跑，手機和它在同一個 Wi-Fi，手機開著 Tailscale（Ray 確認）。程式面讓原因看不出來的地方：(1) 非區網來源（例如 Tailscale 的 100.x）只記 log 就關掉連線，手機什麼都看不到；(2) 全域 IPv6 一律拒絕，用 .local 網址時手機可能用全域 IPv6 連進來；(3) Mac 換網路後 QR、選單、配對視窗還是舊 IP（選單每次打開會重掃，但開著的視窗不會） | 手機只看到空白頁，Mac 上也沒有提示 | 4.1：拒絕時回 403 說明頁（中英）＋選單列顯示最近一次被拒的來源和時間（D-36）；同 /64 的 IPv6 算區網（D-37）；選單列「允許 Tailscale 裝置」開關，預設關（D-38）；NWPathMonitor 換網路自動更新（D-39）；README 疑難排解加一列。手機的連線如果根本沒到 Mac（Tailscale 的 exit node 或子網路由、訪客網路、AP 隔離、防火牆擋掉），Mac 端看不到，只能靠 README 那一列排查 |
+| I-36 | 16:01 | 匯入時 export-sofapad.py 用重寫的方式複製文字檔，`tools/build-app.sh`、`tools/e2e.sh` 的執行權限掉了（sofapad 裡是 100644），`./tools/build-app.sh` 回 permission denied | 照 README／DEVELOPMENT 執行會失敗 | 兩個檔案改回 100755（這次的 commit） |
+| I-37 | 16:06–16:08 | 想用真的 App 驗證 Tailscale 來源：伺服器綁在這台 Mac 自己的 Tailscale 位址，用 curl 連自己。伺服器收到連線、記錄「拒絕非區網來源 100.x.x.x（Tailscale）」，但 curl 一直等不到回應（關掉沙盒也一樣）：連自己的 Tailscale 位址的封包經過 Tailscale 的網路擴充，回應沒有回來 | 不能在這台 Mac 上從 Tailscale 位址實際收到 403 頁 | 改用：真的 App 的記錄證明分類正確（預設拒絕、開關打開後不拒絕）；403 頁的內容和「每個請求都只回說明頁、不給 WebSocket」用單元測試在真的 socket 上驗（RefusalServerTests）；頁面截圖用 headless Chrome 畫同一份 HTML |

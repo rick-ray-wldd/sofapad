@@ -1,0 +1,19 @@
+SOFA-5 (SofaPad 4.1.0), 2026-10-28, on this tree before the commit
+
+swift test --package-path mac (DEVELOPER_DIR=Xcode)   75 tests, 0 failures (65 before + 10 new: SOFA5Tests 8, RefusalServerTests 1, NetWatchTests 1)
+cd web && node --test test/*.test.mjs                  81 tests, 81 pass, 0 fail
+tools/build-app.sh                                     dist/SofaPad.app, CFBundleShortVersionString 4.1.0, codesign "valid on disk"
+dist/SofaPad.app/Contents/MacOS/SofaPad --self-test    SELF-TEST OK (self-test.txt)
+--dry-run checks of the real app                       dry-run-checks.txt
+browser regressions (headless Chrome, dry-run Mac):
+  node tools/pkm4-browser.mjs                          10/10 (the version check now reads VERSION; it had 4.0.0 written in)
+  node tools/v2-browser.mjs                            41/41
+  node tools/pkm31-keyrow.mjs                          14/14
+  node tools/pkm31-dictation.mjs --label after         7/7
+  node tools/pkm33-send-clear.mjs --label after        13/13
+  (the first time, run back to back right after the other suites, pkm31-dictation and pkm33-send-clear exited with an
+   error whose output was not kept; run again 2 times each, alone and back to back: all pass. Not explained.)
+The browser suites rewrite the PKM-4 / v2 evidence files; this run's copies are here, the originals were restored.
+
+Not run: the iOS Simulator + TextEdit bench (no change in typing or injection), anything on a real iPhone or another Mac,
+changing networks (not allowed on this Mac: the network watcher is covered by NetWatchTests).

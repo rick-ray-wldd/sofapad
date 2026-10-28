@@ -3,7 +3,7 @@
 // silent connection and reconnects, 整段 keeps the text when offline.
 //   node tools/pkm4-browser.mjs
 import { chromium } from 'playwright-core';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { startServer, ROOT, IPHONE_UA, INSETS } from './test-server.mjs';
 
@@ -41,7 +41,8 @@ try {
   await page.tap('#settingsBtn');
   await sleep(200);
   const ver = await page.textContent('#versionLine');
-  check('⚙︎ 最上面顯示網頁和 Mac App 的版本、建置時間', /網頁 4\.0\.0（開發版）・Mac App 4\.0\.0（開發版）/.test(ver), ver);
+  const v = readFileSync(join(ROOT, 'VERSION'), 'utf8').trim();
+  check('⚙︎ 最上面顯示網頁和 Mac App 的版本、建置時間', ver.includes(`網頁 ${v}（開發版）・Mac App ${v}（開發版）`), ver);
   await page.screenshot({ path: join(shots, 'pkm4-settings-version.png') });
   await page.tap('#closeSettings');
 

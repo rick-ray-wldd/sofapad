@@ -20,6 +20,7 @@ struct Options {
     var selfTest = false
     var noPost = false
     var snapshotScan: String?
+    var allowTailscale = false
 }
 
 func usage() -> Never {
@@ -27,6 +28,7 @@ func usage() -> Never {
     用法：pkm-server [選項]
       --port N              監聽的 port（預設 8765）
       --bind IP             只在這個本機位址監聽（預設：所有網路介面，但只接受區網來源）
+      --allow-tailscale     這次也接受 Tailscale 裝置（100.64.0.0/10）連線，仍要配對（選單列也有這個開關）
       --web-root DIR        手機網頁所在資料夾（預設自動尋找）
       --text-mode MODE      auto（預設）｜type｜paste
       --pairing-window SEC  啟動後配對碼有效秒數（預設 600）
@@ -50,6 +52,7 @@ func parseOptions() -> Options {
         switch a {
         case "--port": guard let p = UInt16(value()) else { usage() }; o.port = p
         case "--bind": o.bind = value()
+        case "--allow-tailscale": o.allowTailscale = true
         case "--web-root": o.webRoot = value()
         case "--text-mode": guard let m = CGInjector.TextMode(rawValue: value()) else { usage() }; o.textMode = m
         case "--pairing-window": guard let s = TimeInterval(value()) else { usage() }; o.pairingWindow = s
@@ -171,6 +174,19 @@ config.timingLog = ProcessInfo.processInfo.environment["PKM_E2E_TIMING"] == "1"
 log("版本 \(BuildInfo.version)（建置 \(BuildInfo.build)）")
 let server = PKMServer(config: config, pairing: pairing, injector: injector)
 server.log = log
+// SOFA-5: the 允許 Tailscale 裝置 switch, kept next to devices.json (off until the user turns it on)
+let prefsURL = stateDir.appendingPathComponent("settings.json")
+func loadPrefs() -> [String: Any] {
+    (try? Data(contentsOf: prefsURL)).flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] } ?? [:]
+}
+func savePrefs(_ change: [String: Any]) {
+    let all = loadPrefs().merging(change) { $1 }
+    try? FileManager.default.createDirectory(at: stateDir, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
+    if let data = try? JSONSerialization.data(withJSONObject: all, options: [.prettyPrinted, .sortedKeys]) {
+        try? data.write(to: prefsURL, options: .atomic)
+    }
+}
+server.allowTailscale = options.allowTailscale || (loadPrefs()["allowTailscale"] as? Bool ?? false)
 var ui: StatusUI?
 var serverPort = options.port
 
@@ -201,7 +217,7 @@ func announce(code: String, reason: String) {
         ui?.pairingOpen = open
         ui?.refresh()
         if open && reason == "phone-request" {
-            ui?.showPairingPanel(code: code, url: pairURL(scanURL().url, code), seconds: 120)
+            ui?.showPairingPanel(code: code, seconds: 120)
         } else if !open {
             ui?.hidePairingPanel()
         }
@@ -209,6 +225,25 @@ func announce(code: String, reason: String) {
 }
 
 pairing.onCodeChange = { code, reason in announce(code: code, reason: reason) }
+
+// SOFA-5: the network changed → new addresses in the QR codes, the menu and the pairing window, and in the log
+let netWatch = NetWatch(current: { NetWatch.State(urls: currentURLs(), scan: scanURL()) })
+netWatch.onChange = { before, now in
+    let ips = now.urls.filter(\.isIP).map(\.label).joined(separator: "、")
+    if before.scan != now.scan {
+        log("網路變了：QR code 網址 \(before.scan.url) → \(now.scan.url)（\(NetInfo.describe(now.scan))）；區網 IP：\(ips.isEmpty ? "沒有" : ips)；網路介面：\(NetInfo.scanSummary())")
+    } else {
+        log("網路變了：QR code 網址不變（\(now.scan.url)）；區網 IP：\(ips.isEmpty ? "沒有" : ips)")
+    }
+    DispatchQueue.main.async { ui?.networkChanged() }
+}
+
+server.onRefused = { peer, at in
+    DispatchQueue.main.async {
+        ui?.lastRefused = (peer, at)
+        ui?.refresh()
+    }
+}
 
 server.onReady = { port in
     serverPort = port
@@ -231,13 +266,14 @@ server.onReady = { port in
         print(qr)
     }
     print("在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。\n")
+    netWatch.start()
     DispatchQueue.main.async {
         ui?.code = pairing.code
         ui?.pairingOpen = pairing.isPairingOpen
         ui?.refresh()
         // Show the startup code on screen too: inside Vision Pro the Mac display is the only place to read it.
         if pairing.isPairingOpen && pairing.devices.isEmpty {
-            ui?.showPairingPanel(code: pairing.code, url: pairURL(main.url, pairing.code), seconds: options.pairingWindow)
+            ui?.showPairingPanel(code: pairing.code, seconds: options.pairingWindow)
         }
     }
 }
@@ -296,6 +332,13 @@ if options.noUI {
         log("已忘記所有配對過的手機")
     }
     statusUI.onOpenSettings = { NSWorkspace.shared.open(settingsURL) }
+    statusUI.allowTailscale = server.allowTailscale
+    statusUI.onToggleTailscale = { on in
+        server.allowTailscale = on
+        savePrefs(["allowTailscale": on])
+        statusUI.allowTailscale = on
+        statusUI.refresh()
+    }
     statusUI.urlProvider = currentURLs
     statusUI.scanURL = scanURL
     statusUI.scanSummary = NetInfo.scanSummary

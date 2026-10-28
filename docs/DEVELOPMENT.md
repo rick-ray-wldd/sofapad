@@ -23,7 +23,7 @@ swift run --package-path mac pkm-server            # menu bar + QR code in Termi
 swift run --package-path mac pkm-server -- --help  # all options
 ```
 
-Options: `--port 8765`, `--text-mode auto|type|paste`, `--forget-devices`, `--no-ui`, `--dry-run` (print events, touch nothing), `--no-post`, `--self-test`, `--state-dir DIR`, `--snapshot-scan PNG`.
+Options: `--port 8765`, `--allow-tailscale` (this run only: also accept Tailscale devices, 100.64.0.0/10; they still pair), `--text-mode auto|type|paste`, `--forget-devices`, `--no-ui`, `--dry-run` (print events, touch nothing), `--no-post`, `--self-test`, `--state-dir DIR`, `--snapshot-scan PNG`.
 
 Run this way, the Accessibility permission belongs to Terminal (or whatever runs it), which lets everything in that terminal control the Mac. Use `SofaPad.app` for everyday use.
 

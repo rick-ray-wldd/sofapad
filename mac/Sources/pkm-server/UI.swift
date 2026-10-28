@@ -9,6 +9,8 @@ final class StatusUI: NSObject, NSMenuDelegate {
     private var panel: NSPanel?
     private var hideTimer: Timer?
     private var scanPanel: NSPanel?
+    private var pairingCode = ""
+    private var pairingUntil = Date()
 
     /// Scans the network interfaces again every time the menu opens or a QR code is shown (I-20).
     var urlProvider: () -> [LANURL] = { [] }
@@ -19,6 +21,11 @@ final class StatusUI: NSObject, NSMenuDelegate {
     var pairingOpen = false
     var controller: String?
     var permission = true
+    /// SOFA-5: the last phone refused for not being on the local network (address, when).
+    var lastRefused: (peer: String, at: Date)?
+    /// SOFA-5: accept Tailscale devices (100.64.0.0/10); off by default.
+    var allowTailscale = false
+    var onToggleTailscale: ((Bool) -> Void)?
 
     var onNewCode: (() -> Void)?
     var onForgetDevices: (() -> Void)?
@@ -51,6 +58,13 @@ final class StatusUI: NSObject, NSMenuDelegate {
         let title = NSMenuItem(title: controller.map { "已連線：\($0)" } ?? "沒有手機連線", action: nil, keyEquivalent: "")
         title.isEnabled = false
         menu.addItem(title)
+        if let r = lastRefused {
+            let f = DateFormatter()
+            f.dateFormat = Calendar.current.isDateInToday(r.at) ? "HH:mm:ss" : "M/d HH:mm"
+            let item = NSMenuItem(title: "⚠️ 最近拒絕的連線：\(r.peer)（\(f.string(from: r.at))，不在區網；手機上有說明頁）", action: nil, keyEquivalent: "")
+            item.isEnabled = false
+            menu.addItem(item)
+        }
         if !permission {
             let warn = NSMenuItem(title: "⚠️ 尚未開啟「輔助使用」權限：打開系統設定…", action: #selector(openSettings), keyEquivalent: "")
             warn.target = self
@@ -75,6 +89,10 @@ final class StatusUI: NSObject, NSMenuDelegate {
         let forget = NSMenuItem(title: "忘記所有已配對手機", action: #selector(forgetClicked), keyEquivalent: "")
         forget.target = self
         menu.addItem(forget)
+        let tailscale = NSMenuItem(title: "允許 Tailscale 裝置（100.64.0.0/10，仍要配對）", action: #selector(tailscaleClicked), keyEquivalent: "")
+        tailscale.target = self
+        tailscale.state = allowTailscale ? .on : .off
+        menu.addItem(tailscale)
         let advanced = NSMenu()
         for u in shown.more { advanced.addItem(copyItem("拷貝網址 \(u.url)（\(u.label)）", u.url)) }
         let net = NSMenuItem(title: "網路介面：\(scanSummary())", action: nil, keyEquivalent: "")
@@ -107,13 +125,21 @@ final class StatusUI: NSObject, NSMenuDelegate {
 
     /// One QR code: this Mac's address (an IP when there is one, D-31). Only the address: pairing stays in its own
     /// flow (D-26). Always shows a QR, even with no network yet (I-20).
-    func showScanPanel() {
-        scanPanel?.orderOut(nil)
+    func showScanPanel(activate: Bool = true) {
+        if activate { scanPanel?.orderOut(nil) }
         let urls = urlProvider()
         let summary = urls.contains(where: \.isIP) ? "" : scanSummary()
         if !summary.isEmpty { print("用 iPhone 掃描：找不到區網 IP 網址（\(summary)）") }
         let main = scanURL()
         let alt = LANURLs.shown(urls).alternate
+        let view = ScanView(url: main, alternate: alt, summary: summary, place: NetInfo.describe(main))
+        if !activate {
+            // network changed while it is open (SOFA-5): new contents, same place, no focus change
+            guard let open = scanPanel, open.isVisible else { return }
+            open.contentView = view
+            open.setContentSize(view.fittingSize)
+            return
+        }
         let p = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 380, height: 480),
                         styleMask: [.titled, .closable, .utilityWindow, .hudWindow],
                         backing: .buffered, defer: false)
@@ -123,7 +149,6 @@ final class StatusUI: NSObject, NSMenuDelegate {
         p.hidesOnDeactivate = false
         p.isReleasedWhenClosed = false
         p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        let view = ScanView(url: main, alternate: alt, summary: summary)
         p.contentView = view
         p.setContentSize(view.fittingSize)
         p.center()
@@ -133,11 +158,27 @@ final class StatusUI: NSObject, NSMenuDelegate {
         scanPanel = p
     }
     @objc private func forgetClicked() { onForgetDevices?() }
+    @objc private func tailscaleClicked() { onToggleTailscale?(!allowTailscale) }
     @objc private func openSettings() { onOpenSettings?() }
 
-    /// Big code on top of everything, without stealing focus.
-    func showPairingPanel(code: String, url: String?, seconds: TimeInterval) {
+    /// SOFA-5: the network changed. The menu is rebuilt each time it opens; open windows get the new address now.
+    func networkChanged() {
+        refresh()
+        if let s = scanPanel, s.isVisible { showScanPanel(activate: false) }
+        if let p = panel {
+            let left = pairingUntil.timeIntervalSinceNow
+            guard left > 1 else { return }
+            let view = pairingContent(code: pairingCode, seconds: left)
+            p.contentView = view
+            p.setContentSize(view.fittingSize)
+        }
+    }
+
+    /// Big code on top of everything, without stealing focus. The QR code holds the current address and the code.
+    func showPairingPanel(code: String, seconds: TimeInterval) {
         hidePairingPanel()
+        pairingCode = code
+        pairingUntil = Date().addingTimeInterval(seconds)
         let p = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 360, height: 420),
                         styleMask: [.titled, .closable, .nonactivatingPanel, .utilityWindow, .hudWindow],
                         backing: .buffered, defer: false)
@@ -146,46 +187,17 @@ final class StatusUI: NSObject, NSMenuDelegate {
         p.isFloatingPanel = true
         p.hidesOnDeactivate = false
         p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-
-        let heading = NSTextField(labelWithString: "在手機上輸入這組配對碼")
-        heading.font = .systemFont(ofSize: 16, weight: .medium)
-        let digits = NSTextField(labelWithString: code.map(String.init).joined(separator: " "))
-        digits.font = .monospacedDigitSystemFont(ofSize: 54, weight: .bold)
-        let note = NSTextField(labelWithString: "\(Int(seconds / 60)) 分鐘內有效；別人看不到你的螢幕就無法配對")
-        note.font = .systemFont(ofSize: 12)
-        note.textColor = .secondaryLabelColor
-        var views: [NSView] = [heading, digits, note]
-        if let url, let img = QRCode.image(for: url, scale: 5) {
-            let iv = NSImageView(image: img)
-            iv.imageScaling = .scaleProportionallyUpOrDown
-            iv.widthAnchor.constraint(equalToConstant: 180).isActive = true
-            iv.heightAnchor.constraint(equalToConstant: 180).isActive = true
-            let scan = NSTextField(labelWithString: "用 iPhone 相機掃描就會自動配對")
-            scan.font = .systemFont(ofSize: 12)
-            scan.textColor = .secondaryLabelColor
-            let address = NSTextField(labelWithString: url.components(separatedBy: "#").first ?? url)
-            address.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
-            address.isSelectable = true
-            views += [iv, scan, address]
-        } else {
-            // I-20: say why there is no QR code instead of silently leaving it out
-            print("配對視窗沒有 QR code：\(url == nil ? "沒有可用的網址" : "QR code 產生失敗")（\(url ?? "")；網路介面：\(scanSummary())）")
-            let none = NSTextField(labelWithString: url == nil ? "找不到這台 Mac 的網址，請用選單列的「拷貝網址」" : "QR code 產生失敗，請用選單列的「拷貝網址」")
-            none.font = .systemFont(ofSize: 12)
-            none.textColor = .secondaryLabelColor
-            views.append(none)
-        }
-        let stack = NSStackView(views: views)
-        stack.orientation = .vertical
-        stack.alignment = .centerX
-        stack.spacing = 10
-        stack.edgeInsets = NSEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-        p.contentView = stack
-        p.setContentSize(stack.fittingSize)
+        let view = pairingContent(code: code, seconds: seconds)
+        p.contentView = view
+        p.setContentSize(view.fittingSize)
         p.center()
         p.orderFrontRegardless()
         panel = p
         hideTimer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: false) { [weak self] _ in self?.hidePairingPanel() }
+    }
+
+    private func pairingContent(code: String, seconds: TimeInterval) -> NSView {
+        pairingView(code: code, seconds: seconds, main: scanURL(), summary: scanSummary)
     }
 
     func hidePairingPanel() {
@@ -196,10 +208,54 @@ final class StatusUI: NSObject, NSMenuDelegate {
     }
 }
 
+/// Contents of the pairing window: the code, a QR code with the address and the code, and (SOFA-5) which IP and
+/// network this is. Also drawn off screen for the screenshots (PKM_SNAPSHOT_PAIRING).
+func pairingView(code: String, seconds: TimeInterval, main: LANURL, summary: () -> String) -> NSView {
+    let url: String? = main.url.isEmpty ? nil : LANURLs.pairingPayload(main.url, code: code)
+    let heading = NSTextField(labelWithString: "在手機上輸入這組配對碼")
+    heading.font = .systemFont(ofSize: 16, weight: .medium)
+    let digits = NSTextField(labelWithString: code.map(String.init).joined(separator: " "))
+    digits.font = .monospacedDigitSystemFont(ofSize: 54, weight: .bold)
+    let note = NSTextField(labelWithString: "\(Int((seconds / 60).rounded(.up))) 分鐘內有效；別人看不到你的螢幕就無法配對")
+    note.font = .systemFont(ofSize: 12)
+    note.textColor = .secondaryLabelColor
+    var views: [NSView] = [heading, digits, note]
+    if let url, let img = QRCode.image(for: url, scale: 5) {
+        let iv = NSImageView(image: img)
+        iv.imageScaling = .scaleProportionallyUpOrDown
+        iv.widthAnchor.constraint(equalToConstant: 180).isActive = true
+        iv.heightAnchor.constraint(equalToConstant: 180).isActive = true
+        let scan = NSTextField(labelWithString: "用 iPhone 相機掃描就會自動配對")
+        scan.font = .systemFont(ofSize: 12)
+        scan.textColor = .secondaryLabelColor
+        let address = NSTextField(labelWithString: url.components(separatedBy: "#").first ?? url)
+        address.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        address.isSelectable = true
+        // SOFA-5: which IP and network this is; it follows network changes while the window is open
+        let place = NSTextField(labelWithString: "這台 Mac：\(NetInfo.describe(main))")
+        place.font = .systemFont(ofSize: 12)
+        place.textColor = .secondaryLabelColor
+        views += [iv, scan, address, place]
+    } else {
+        // I-20: say why there is no QR code instead of silently leaving it out
+        print("配對視窗沒有 QR code：\(url == nil ? "沒有可用的網址" : "QR code 產生失敗")（\(url ?? "")；網路介面：\(summary())）")
+        let none = NSTextField(labelWithString: url == nil ? "找不到這台 Mac 的網址，請用選單列的「拷貝網址」" : "QR code 產生失敗，請用選單列的「拷貝網址」")
+        none.font = .systemFont(ofSize: 12)
+        none.textColor = .secondaryLabelColor
+        views.append(none)
+    }
+    let stack = NSStackView(views: views)
+    stack.orientation = .vertical
+    stack.alignment = .centerX
+    stack.spacing = 10
+    stack.edgeInsets = NSEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    return stack
+}
+
 /// Contents of the "用 iPhone 掃描" panel: one QR code, its address, and the .local name as the one alternative.
 /// Also rendered off screen for the screenshots (`--snapshot-scan PATH`).
 final class ScanView: NSStackView {
-    init(url: LANURL, alternate: LANURL?, summary: String) {
+    init(url: LANURL, alternate: LANURL?, summary: String, place: String? = nil) {
         super.init(frame: .zero)
         orientation = .vertical
         alignment = .centerX
@@ -221,6 +277,12 @@ final class ScanView: NSStackView {
         address.isSelectable = true
         addArrangedSubview(image)
         addArrangedSubview(address)
+        if let place {
+            let line = NSTextField(labelWithString: "這台 Mac：\(place)")
+            line.font = .systemFont(ofSize: 12)
+            line.textColor = .secondaryLabelColor
+            addArrangedSubview(line)
+        }
         if !summary.isEmpty {
             let warn = NSTextField(wrappingLabelWithString: "找不到區網 IP，只能用名稱（.local）。\(summary)")
             warn.font = .systemFont(ofSize: 11)
@@ -242,6 +304,7 @@ final class ScanView: NSStackView {
 
 /// `--snapshot-scan PATH`: draws the scan panel's contents into a PNG without showing anything (screenshots).
 /// PKM_SNAPSHOT_INTERFACES="en0=192.168.1.20,en7=10.0.0.5" replaces the real interfaces (to show other cases).
+/// PKM_SNAPSHOT_PAIRING=<code> draws the pairing window instead.
 func snapshotScanView(to path: String, port: UInt16) -> Bool {
     _ = NSApplication.shared
     var interfaces = NetInfo.interfaces()
@@ -257,7 +320,9 @@ func snapshotScanView(to path: String, port: UInt16) -> Bool {
     let summary = urls.contains(where: \.isIP) ? "" :
         (interfaces.isEmpty ? "沒有任何網路介面有 IPv4 位址（Wi-Fi 還沒連上？）"
             : interfaces.map { i in "\(i.name) \(i.ip)" + (LANURLs.rejection(i).map { "：不使用，\($0)" } ?? "") }.joined(separator: "；"))
-    let view = ScanView(url: main, alternate: shown.alternate, summary: summary)
+    // PKM_SNAPSHOT_PAIRING=<code>: draw the pairing window instead (SOFA-5: it shows the IP and the network)
+    let view: NSView = ProcessInfo.processInfo.environment["PKM_SNAPSHOT_PAIRING"].map { pairingView(code: $0, seconds: 600, main: main, summary: { summary }) }
+        ?? ScanView(url: main, alternate: shown.alternate, summary: summary, place: NetInfo.describe(main))
     let box = NSView()
     box.appearance = NSAppearance(named: .darkAqua)
     box.wantsLayer = true

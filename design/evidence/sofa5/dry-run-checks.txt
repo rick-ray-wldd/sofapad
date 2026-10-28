@@ -1,0 +1,44 @@
+# SOFA-5: the real dist/SofaPad.app 4.1.0, --dry-run --no-ui (nothing is typed), bound to one address each run
+# Addresses redacted: this Mac's Tailscale IPv4 → 100.x.x.x, its Tailscale IPv6 → fd7a:115c:a1e0::(redacted).
+# Connecting to the Mac's own Tailscale address never gets a reply on this Mac (the packets go through the Tailscale
+# network extension; I-37), so curl shows 000 there. What these runs show is the server's own decision, from its log:
+# A: refused as Tailscale by default (A also ran 11 s, past the network watcher's 10 s rescan: no "網路變了" line)
+# B: --allow-tailscale → switch on, the same connections are not refused · C: settings.json {"allowTailscale": true} → same as B
+# D: the Tailscale IPv6 connection did not reach the server at all (same loop), inconclusive · E: 127.0.0.1 → 200 / 200 / 101.
+# The 403 page itself over a real socket: mac/Tests/PKMCoreTests/SOFA5Tests.swift, RefusalServerTests.
+
+2026-10-28 16:06
+== A-tailscale-v4-default: bind 100.x.x.x 
+GET /          → 000
+GET /js/app.js → 000
+WS upgrade     → 000
+log:
+  [16:06:08] 版本 4.1.0（建置 2026-10-28 16:06）
+  [16:06:09] 拒絕非區網來源 100.x.x.x（Tailscale），回說明頁（403）：手機關掉 Tailscale，或在選單列打開「允許 Tailscale 裝置」
+== B-tailscale-v4-switch-on: bind 100.x.x.x --allow-tailscale
+GET /          → 000
+GET /js/app.js → 000
+WS upgrade     → 000
+log:
+  [16:06:28] 版本 4.1.0（建置 2026-10-28 16:06）
+  [16:06:28] 已允許 Tailscale 裝置（100.64.0.0/10）連線，仍要配對
+== C-saved-switch: bind 100.x.x.x 
+GET /          → 000
+GET /js/app.js → 000
+WS upgrade     → 000
+log:
+  [16:06:38] 版本 4.1.0（建置 2026-10-28 16:06）
+  [16:06:38] 已允許 Tailscale 裝置（100.64.0.0/10）連線，仍要配對
+== D-tailscale-v6-default: bind fd7a:115c:a1e0::(redacted) 
+GET /          → 000
+GET /js/app.js → 000
+WS upgrade     → 000
+log:
+  [16:06:48] 版本 4.1.0（建置 2026-10-28 16:06）
+== E-loopback: bind 127.0.0.1 
+GET /          → 200
+GET /js/app.js → 200
+WS upgrade     → 101
+page: SofaPad
+log:
+  [16:06:57] 版本 4.1.0（建置 2026-10-28 16:06）

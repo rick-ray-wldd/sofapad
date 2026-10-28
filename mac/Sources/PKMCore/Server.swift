@@ -25,6 +25,21 @@ public final class PKMServer {
     /// Fired with the bound port once listening.
     public var onReady: ((UInt16) -> Void)?
     public var onControllerChange: ((String?) -> Void)?
+    /// SOFA-5: a peer outside the local network was refused (its address, when). The menu bar shows the last one.
+    public var onRefused: ((String, Date) -> Void)?
+    /// This Mac's own addresses, for the same-/64 IPv6 check (SOFA-5). Scanned only when a global IPv6 peer connects.
+    public var ownAddresses: () -> [IPAddress] = { LocalAddresses.scan().map(\.address) }
+    /// SOFA-5: accept Tailscale peers (100.64.0.0/10, fd7a:115c:a1e0::/48) too. Off by default; they still have to
+    /// pair. Turning it off closes the Tailscale connections that are open.
+    public var allowTailscale: Bool {
+        get { queue.sync { tailscaleAllowed } }
+        set { queue.async { self.setTailscale(newValue) } }
+    }
+    private var tailscaleAllowed = false
+    /// Who may connect (tests replace it to see a refusal from 127.0.0.1).
+    lazy var isAllowedPeer: (String) -> Bool = { [unowned self] peer in
+        IPAddress.parse(peer)?.isAllowedPeer(sameLinkAs: self.ownAddresses(), allowTailscale: self.tailscaleAllowed) ?? false
+    }
 
     let queue = DispatchQueue(label: "pkm.server")
     /// All injection, in order, off the network queue (see ControlSession.work).
@@ -37,6 +52,7 @@ public final class PKMServer {
     private let dedup = DedupStore()
     private let files: StaticFiles
     private var timer: DispatchSourceTimer?
+    private var refusalLogged: [String: Date] = [:]
 
     public init(config: Config, pairing: PairingManager, injector: InputInjector) {
         self.config = config
@@ -94,7 +110,7 @@ public final class PKMServer {
     private func tick() {
         let now = Date()
         for c in connections.values {
-            let limit = c.session?.isAuthenticated == true ? config.idleTimeout : config.authTimeout
+            let limit = c.refused ? 10 : c.session?.isAuthenticated == true ? config.idleTimeout : config.authTimeout
             if now.timeIntervalSince(c.lastActivity) > limit {
                 log("closing idle connection from \(c.peer)")
                 c.closeWS(.idle, "idle")
@@ -108,12 +124,13 @@ public final class PKMServer {
 
     private func accept(_ nw: NWConnection) {
         let peer = PKMServer.peerAddress(nw.endpoint)
-        guard IPAddress.isLocalNetwork(peer) else {
-            log("rejected non-local peer \(peer)")
-            nw.cancel()
-            return
+        // SOFA-5: a peer outside the local network is told why (a 403 page) instead of being dropped silently
+        let refused = !isAllowedPeer(peer)
+        if refused {
+            guard connections.values.filter(\.refused).count < 8 else { nw.cancel(); return }
+            noteRefused(peer)
         }
-        let c = Connection(nw: nw, peer: peer, server: self)
+        let c = Connection(nw: nw, peer: peer, server: self, refused: refused)
         connections[ObjectIdentifier(c)] = c
         nw.stateUpdateHandler = { [weak self, weak c] state in
             guard let self, let c else { return }
@@ -124,6 +141,29 @@ public final class PKMServer {
         }
         nw.start(queue: queue)
         c.receive()
+    }
+
+    private func setTailscale(_ on: Bool) {
+        guard on != tailscaleAllowed else { return }
+        tailscaleAllowed = on
+        log(on ? "已允許 Tailscale 裝置（100.64.0.0/10）連線，仍要配對" : "已不允許 Tailscale 裝置連線")
+        guard !on else { return }
+        for c in connections.values where !c.refused && IPAddress.parse(c.peer)?.isTailscale == true {
+            c.closeWS(.unauthorized, "tailscale not allowed")
+        }
+    }
+
+    private func noteRefused(_ peer: String) {
+        let now = Date()
+        // one page load opens a few connections: one log line per address per minute
+        if now.timeIntervalSince(refusalLogged[peer] ?? .distantPast) > 60 {
+            if refusalLogged.count > 64 { refusalLogged.removeAll() }
+            refusalLogged[peer] = now
+            let tailscale = IPAddress.parse(peer)?.isTailscale == true
+            log("拒絕非區網來源 \(peer)\(tailscale ? "（Tailscale）" : "")，回說明頁（403）："
+                + (tailscale ? "手機關掉 Tailscale，或在選單列打開「允許 Tailscale 裝置」" : "手機要關掉 VPN、和 Mac 連同一個 Wi-Fi（不是訪客網路）、路由器不能開 AP 隔離"))
+        }
+        onRefused?(peer, now)
     }
 
     fileprivate func remove(_ c: Connection) {
@@ -137,6 +177,10 @@ public final class PKMServer {
     }
 
     fileprivate func handleHTTP(_ c: Connection, _ req: HTTPRequest) {
+        if c.refused {
+            c.sendAndClose(Refusal.response(peer: c.peer))
+            return
+        }
         guard HostPolicy.isAllowedHost(req.header("host")) else {
             c.sendAndClose(HTTPResponse.text(421, "Misdirected Request", "bad host"))
             return
@@ -189,6 +233,8 @@ public final class PKMServer {
 final class Connection {
     let nw: NWConnection
     let peer: String
+    /// Not on the local network: every request gets the refusal page, nothing else (SOFA-5).
+    let refused: Bool
     unowned let server: PKMServer
     var session: ControlSession?
     var lastActivity = Date()
@@ -198,9 +244,10 @@ final class Connection {
     private var assembler = WSMessageAssembler()
     private var closing = false
 
-    init(nw: NWConnection, peer: String, server: PKMServer) {
+    init(nw: NWConnection, peer: String, server: PKMServer, refused: Bool) {
         self.nw = nw
         self.peer = peer
+        self.refused = refused
         self.server = server
     }
 

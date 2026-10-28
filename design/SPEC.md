@@ -210,3 +210,10 @@
 - Mac：注入在自己的序列佇列；網路佇列只解析、回 pong、轉交。
 - 網址：`LANURLs.shown` → `scan`（IP 優先）、`alternate`（.local）、`more`（其他介面，放「進階」）；沒有任何位址時用 `fallback(computerName:)`。
 - 名稱：SofaPad；bundle id `io.github.rick-ray-wldd.sofapad`；資料夾 `~/Library/Application Support/SofaPad`（第一次啟動從 PhoneKeyMouse 複製 devices.json）；記錄檔 `~/Library/Logs/SofaPad.log`。
+
+## 4.1（SOFA-5）連線來源和網址
+
+- 誰可以連：loopback、RFC 1918、169.254、fe80::/10、fc00::/7（Tailscale 的 fd7a:115c:a1e0::/48 除外），以及和 Mac 自己的全域 IPv6 同一個 /64 的全域 IPv6（D-37）。Tailscale（100.64.0.0/10、fd7a:115c:a1e0::/48）只有在「允許 Tailscale 裝置」打開時（D-38）。連得進來的仍要配對。
+- 其他來源：任何請求都回 403 說明頁（`Refusal.page`），不建立 session；選單列顯示最近一次被拒的來源和時間；log「拒絕非區網來源 …」每個來源每分鐘一次（D-36）。
+- 換網路：`NetWatch`（NWPathMonitor＋10 秒重掃）→ log「網路變了：…」、選單、開著的掃描／配對視窗換成新網址（D-39）。
+- 新選項：`--allow-tailscale`。新設定檔：`settings.json`（`allowTailscale`）。
