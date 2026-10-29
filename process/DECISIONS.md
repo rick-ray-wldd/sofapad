@@ -416,3 +416,8 @@
 
 ## D-45 4.2.0 本機打包（SOFA-6）
 - `tools/package.sh`：build → `dist/release/SofaPad-4.2.0-macOS.zip`（SofaPad.app、RELEASE-NOTES.md、INSTALL.md、LICENSE）＋ `.sha256`。只有 ad-hoc 簽章，沒有 Developer ID、沒有公證；只有 arm64。沒有 push、tag、Release 或上傳：要放到哪個平台等 Ray 決定。
+
+## D-46 release 執行檔不帶本機路徑（SOFA-6，4.2.0，I-47）
+- `swift build -c release` 的連結器把除錯對照（原始碼資料夾和 .o 檔的絕對路徑）留在執行檔的符號表。`tools/build-app.sh`：dsymutil 先把除錯資訊存成 `dist/SofaPad.app.dSYM`（留在本機，不打包；UUID 和 App 一樣，之後看當機報告用），再 `strip -S -x` 拿掉除錯對照和本機符號，然後簽章。
+- 試過 `-Xswiftc -file-prefix-map`：除錯資訊裡引用的 .pcm 也變成相對路徑，dsymutil 找不到（一串警告，dSYM 不完整），而且它管不到連結器寫的 .o 路徑。路徑只在符號表，strip 就夠，所以不用。
+- 簽章後 `grep -r -a` 找 repo 路徑和家目錄，有就讓 build 失敗；`tools/package.sh` 壓縮前再查一次。以後 release 程式碼如果又用到 `#filePath`，也會在這裡擋下。

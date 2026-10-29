@@ -1,0 +1,30 @@
+SofaPad 4.2.0 release zip: byte-by-byte scan (SOFA-6, process/ISSUES.md I-47), 2026-10-29 17:22
+zip: SofaPad-4.2.0-macOS.zip
+SHA-256: 4fc968ee7f73160b0f8470ac651ffcb6be2b4b61235726ee0a8a951a02aa3f0b
+built by tools/package.sh (tools/build-app.sh: dSYM kept outside the app, executable stripped, ad-hoc signed)
+
+Unzipped into an empty folder: 20 files
+  SofaPad.app/Contents/MacOS/SofaPad (the executable), Info.plist, _CodeSignature/CodeResources, 14 web files,
+  RELEASE-NOTES.md, INSTALL.md, LICENSE; no __MACOSX entries
+Every file read as raw bytes (like grep -a; not strings, which skips the executable's symbol table):
+
+/Users/                                                        0
+the home folder                                                0
+account name, full name                                        0
+computer name, host name, git user name                        0
+this Mac's addresses (4, read from its interfaces at the time) 0
+the owner's email address                                      0
+any email address                                              0
+assistant-system ids and file names (10)                       0
+10.0.0.0/8                                                     0
+172.16.0.0/12                                                  0
+192.168.0.0/16                                                 2  192.168.1.20: the self-test's example address (executable)
+100.64.0.0/10                                                  3  the range name "100.64.0.0/10" in the menu and --help text (executable)
+fd7a:115c:a1e0::/48 (Tailscale IPv6)                           0
+.local names                                                   0
+
+Executable's symbol table (nm -a): debug-map entries (SO, OSO, SOL, FUN, BNSYM, ENSYM, GSYM, STSYM)   0
+Before the fix (same check on the first 4.2.0 zip): 47 absolute paths with the user name, all in that debug map.
+
+SofaPad --self-test on this executable: 33 PASS, SELF-TEST OK (the same 33 items as before stripping)
+codesign: Signature=adhoc, TeamIdentifier=not set; dSYM UUID = executable UUID (A1D27D98-72A8-340F-B0C7-B5BC90FAC6F7)

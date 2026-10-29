@@ -79,7 +79,15 @@ made-up test values listed above (`SOFA6Tests.swift` uses `192.168.1.20` only). 
 every private IPv4 range, IPv6, `.local` names, local paths, email addresses, six-digit codes, assistant-system ids and
 names of other projects: only example values, the names of the Tailscale ranges, and the made-up test sentence of
 `tools/pkm33-send-clear.mjs` in its results file. The release zip is built from the same tree (`tools/package.sh`) and
-holds the app, the release notes, the install guide and the licence. Every file in it was searched too, including the
-strings inside the app's executable: that found one absolute source path with the user name, compiled in from
-`#filePath` since 4.0 (process/ISSUES.md I-46). Release builds no longer contain it; the search of the zip now finds
-nothing. The two new screenshots show only the test page.
+holds the app, the release notes, the install guide and the licence. Every file in it was searched too. The first
+search read the executable with `strings`: it found one absolute source path with the user name, compiled in from
+`#filePath` since 4.0 (process/ISSUES.md I-46; release builds no longer contain it), but `strings` on macOS skips the
+symbol table, where the release build had left 47 more absolute paths as its debug map. The coordinator's scan found
+them before anything was uploaded (I-47). `tools/build-app.sh` now keeps that map in a dSYM outside the app, strips it
+from the app, and fails if the repo path or the home folder is anywhere in the app. The new zip was searched byte by
+byte, every file including the executable, for `/Users/`, the home folder, the account and full name, the computer's
+names, its LAN and Tailscale addresses read from its interfaces, any address in the private ranges, email addresses
+and the assistant-system ids: none of the real values. The only private-range matches are the self-test's example
+`192.168.1.20` and the Tailscale range name `100.64.0.0/10` in the menu text
+([`design/evidence/sofa6/release-zip-scan.txt`](../design/evidence/sofa6/release-zip-scan.txt)). The two new
+screenshots show only the test page.

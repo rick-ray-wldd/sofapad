@@ -17,6 +17,7 @@ sed -e 's|](\.\./INSTALL\.md)|](INSTALL.md)|g' -e "s|](\.\./\.\./|]($REPO/|g" \
 sed -e "s|](\.\./|]($REPO/|g" "$ROOT/docs/INSTALL.md" > "$OUT/$NAME/INSTALL.md"
 cp "$ROOT/LICENSE" "$OUT/$NAME/LICENSE"
 cd "$OUT"
+if LC_ALL=C grep -r -a -l -F -e "$ROOT" -e "$HOME/" "$NAME"; then echo "a local path is in the package (above)" >&2; exit 1; fi
 ditto -c -k --sequesterRsrc --keepParent "$NAME" "$NAME-macOS.zip"
 shasum -a 256 "$NAME-macOS.zip" > "$NAME-macOS.zip.sha256"
 echo "architectures: $(lipo -archs "$NAME/SofaPad.app/Contents/MacOS/SofaPad")"

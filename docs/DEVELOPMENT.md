@@ -8,7 +8,7 @@
 |---|---|
 | `mac/` | Swift package. `PKMCore`: protocol, pairing, LAN server, sessions, pacing, addresses. `pkm-server`: CGEvent injection, menu bar, self-test (built into `SofaPad.app`). `pkm-probe`: window for the older end-to-end test |
 | `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable key row, `shortcuts.js`, `sha256.js` login proof, `version.js` |
-| `tools/` | `build-app.sh` (builds `dist/SofaPad.app`), `package.sh` (`dist/release/SofaPad-<version>-macOS.zip` + SHA-256), browser tests (Playwright + headless Chrome, dry-run Mac), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
+| `tools/` | `build-app.sh` (builds `dist/SofaPad.app`, stripped, with its dSYM next to it in `dist/`), `package.sh` (`dist/release/SofaPad-<version>-macOS.zip` + SHA-256), browser tests (Playwright + headless Chrome, dry-run Mac), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
 | `design/` | `SPEC.md`, screenshots, test evidence |
 | `research/` | The research report from v1 (papers, GitHub projects, products, Apple's own features) |
 | `process/` | Development records, in Chinese (timeline, decisions, issues, research log, tool log, summaries) |

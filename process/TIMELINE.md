@@ -257,3 +257,4 @@
 | S6-M3 | 游標板：手機（caret.js、單元測試 7）、Mac（caret 訊息、白名單、單元測試 5）、瀏覽器 15/15 | 15:29–15:44 | caret-browser.json、SOFA6Tests |
 | S6-M4 | 真實注入：15:45 Mac 鎖定沒跑；16:00–16:11 被 Siri 浮層擋 4 次（I-45）；16:11 5/6（第 6 項預期寫錯）；16:14 6/6 | 15:45–16:14 | — |
 | S6-M5 | 4.2.0：CHANGELOG、README、INSTALL、release notes、package.sh | 15:46–15:48 | dist/release（不提交） |
+| S6-M6 | 總控推之前發現 zip 的執行檔還有本機路徑（I-47）：build-app.sh 加 dSYM＋strip＋路徑檢查（D-46），重新打包；`--self-test` 33/33；zip 逐位元組掃 0 筆；新的 SHA-256 `4fc968ee…3f0b` | 17:17–17:25 | design/evidence/sofa6/release-zip-scan.txt |
