@@ -223,6 +223,26 @@ button:active, button.active { background: var(--key-active); }
 #input:focus { outline: none; border-color: var(--accent); }
 .send { padding: 0 16px; background: var(--accent); color: white; font-weight: 600; }
 
+/* Cursor pad (SOFA-6): next to the text box (no height taken from the trackpad, I-13); drags may leave it. */
+.caret-pad {
+  flex: 0 0 76px;
+  min-height: 44px;
+  border-radius: 12px;
+  background: var(--key);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.caret-pad.active { background: var(--accent-soft); color: #cfe0ff; box-shadow: inset 0 0 0 1px var(--accent); }
+.caret-pad.active.selecting { background: rgba(245, 185, 66, 0.16); color: #ffe2a8; box-shadow: inset 0 0 0 1px var(--warn); }
+.keys .caret-select[aria-pressed="true"] { background: var(--warn); color: #1d1d1f; }
+
 .keys {
   display: flex;
   gap: 6px;
@@ -307,6 +327,7 @@ button:active, button.active { background: var(--key-active); }
   #app.typing .buttons { display: none; }
   #app.typing .typing { flex: 1 1 45%; min-width: 0; }
   #app.typing .keys-wrap { flex: 1 1 55%; min-width: 0; }
+  #app.typing .caret-pad { flex-basis: 64px; }
   #app.typing #input { max-height: 44px; }
   #app.typing .pad-hint { display: none; }
   /* the pad is short now: buttons go in one row at the top instead of a centred column */

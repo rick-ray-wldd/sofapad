@@ -17,6 +17,8 @@ public enum ClientMessage: Equatable {
     case up(MouseButton)
     case text(id: Int, text: String)
     case key(id: Int, name: String, mods: [String], repeat: Int)
+    /// SOFA-6 cursor pad: an arrow key with Shift and/or Option only (CaretPolicy). Not acked, like a move.
+    case caret(key: String, mods: [Modifier], repeat: Int)
     case releaseAll
     case ping(ts: Double)
 
@@ -73,6 +75,17 @@ public enum ClientMessage: Equatable {
             let n = obj["n"] == nil ? 1 : try int("n")
             guard (1...200).contains(n) else { throw DecodeError.badField("n") }
             return .key(id: try int("id"), name: try str("k"), mods: mods, repeat: n)
+        case "caret":
+            let k = try str("k")
+            guard CaretPolicy.keys.contains(k) else { throw DecodeError.badField("k") }
+            var mods: [Modifier] = []
+            for raw in (obj["mods"] as? [String]) ?? [] {
+                guard let m = Modifier.parse(raw), CaretPolicy.modifiers.contains(m) else { throw DecodeError.badField("mods") }
+                if !mods.contains(m) { mods.append(m) }
+            }
+            let n = obj["n"] == nil ? 1 : try int("n")
+            guard (1...CaretPolicy.maxRepeat).contains(n) else { throw DecodeError.badField("n") }
+            return .caret(key: k, mods: mods, repeat: n)
         case "release_all": return .releaseAll
         case "ping": return .ping(ts: try num("ts"))
         default: throw DecodeError.unknownType(t)

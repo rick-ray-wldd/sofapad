@@ -2,6 +2,7 @@
 import { Link } from './connection.js';
 import { TrackpadGestures, Momentum, MoveCoalescer } from './pointer.js';
 import { LiveTyping, InputLog, ClearedTextGuard, shortcutFromInsert } from './textsync.js';
+import { CaretPad } from './caret.js';
 import { KeyRowStore, catalog } from './keyrow.js';
 import { VERSION, BUILD } from './version.js';
 import { BUILTIN_GROUPS, KEY_GROUPS, MODIFIERS, ShortcutStore, comboLabel, keyLabel, gestureShortcut, hotkeyHint, macStatusText } from './shortcuts.js';
@@ -424,6 +425,7 @@ function textFirst() {
 /** Sends a Mac shortcut (key + modifiers) as a reliable, acked message. */
 function sendCombo(s) {
   textFirst();
+  commitLive('shortcut');
   link.sendReliable({ t: 'key', k: s.key, mods: s.mods, at: Date.now() });
   haptic();
 }
@@ -433,8 +435,8 @@ const gestures = new TrackpadGestures((a) => {
     case 'move': queueMove(a.dx, a.dy); break;
     case 'scroll': queueScroll(a.dx, a.dy); break;
     case 'momentum': startMomentum(a.vx, a.vy); break;
-    case 'click': link.send({ t: 'click', b: a.button }); haptic(); break;
-    case 'down': link.send({ t: 'down', b: a.button }); break;
+    case 'click': commitLive('click'); link.send({ t: 'click', b: a.button }); haptic(); break;
+    case 'down': commitLive('down'); link.send({ t: 'down', b: a.button }); break;
     case 'up': link.send({ t: 'up', b: a.button }); break;
     case 'dragStart': pad.classList.add('dragging'); dragBadge.hidden = false; haptic(); break;
     case 'dragEnd': pad.classList.remove('dragging'); dragBadge.hidden = !dragLocked; break;
@@ -535,6 +537,7 @@ function holdButton(el, button) {
   const down = (e) => {
     e.preventDefault();
     textFirst();
+    commitLive('button');
     el.classList.add('active');
     link.send({ t: 'down', b: button });
     haptic();
@@ -592,6 +595,7 @@ function clearArmed() {
 
 function sendKey(k, mods = []) {
   textFirst();
+  commitLive('key');
   const all = Array.from(new Set([...mods, ...armedList()]));
   link.sendReliable({ t: 'key', k, mods: all, at: Date.now() });
   clearArmed();
@@ -1005,8 +1009,14 @@ const inputLog = new InputLog();
 const live = new LiveTyping({
   read: () => input.value,
   send: applyOps,
-  canSend: (force) => link.state === 'ready' && (force || link.inFlight === 0),
+  // SOFA-6: an ack that never comes must not hold the typing forever (卡住): after 3 s the next piece goes anyway
+  canSend: (force) => link.state === 'ready' && (force || link.inFlight === 0 || stalled()),
 });
+function stalled() {
+  const stuck = link.oldestPendingMs > 3000;
+  if (stuck) inputLog.add('stall', { len: link.inFlight });
+  return stuck;
+}
 
 function applyTypingSettings() {
   const live = settings.mode === 'live';
@@ -1015,7 +1025,8 @@ function applyTypingSettings() {
   input.setAttribute('autocorrect', settings.autocorrect ? 'on' : 'off');
   input.setAttribute('autocomplete', settings.autocorrect ? 'on' : 'off');
   input.setAttribute('enterkeyhint', live ? 'enter' : 'send');
-  input.placeholder = live ? '點這裡打字，選好的字會直接出現在 Mac' : '先在這裡打完整段，再按「送出」';
+  // short enough for one line next to the cursor pad (a wrapped placeholder makes the box, and the page, taller)
+  input.placeholder = live ? '點這裡打字，直接打到 Mac' : '打完整段再按「送出」';
 }
 
 function autosize() {
@@ -1034,6 +1045,7 @@ function applyOps(ops, at = Date.now()) {
     live.mirror.sent = keep;
     link.sendReliable({ t: 'key', k: shortcut.k, mods: shortcut.mods, at });
     clearArmed();
+    queueMicrotask(() => commitLive('shortcut'));   // ⌘A, ⌘V… move the Mac's cursor too (SOFA-6)
     return;
   }
   if (ops.backspaces > 0) {
@@ -1077,25 +1089,71 @@ function clearSent(sent) {
   autosize();
 }
 
+/**
+ * SOFA-6 (Ray, 2026-10-29): in live mode the box only mirrors the Mac while the Mac's text cursor is where the typing left
+ * it. A click, a key, a gesture, the cursor pad, closing the keyboard or leaving the page can move it — Ray clicks the
+ * Mac app's own send button with the trackpad instead of pressing Enter — so each of them ends the piece: what is
+ * still waiting goes to the Mac first, then the box is emptied and the next diff starts from nothing. Before, the old
+ * text stayed in the box, and the next edit in it (a tap in the middle of it, iOS's space-bar cursor, a candidate
+ * replacing a word) sent ⌫ and part of the old text again, into whatever was in front by then (跳出之前的字).
+ * Never while the input method is still composing (emptying the box under an open IME brings the marked text back):
+ * then the box is emptied when the composition ends. Text the Mac has not got (link down) stays in the box.
+ * 整段 mode: the box is a draft that has not been sent; it stays.
+ * Returns true when something was cleared.
+ */
+let commitAfterComposition = null;
+function commitLive(reason) {
+  if (settings.mode !== 'live') return false;
+  if (live.composing) { commitAfterComposition = reason; return false; }
+  checkGhost();
+  live.flush(true);
+  if (!input.value || live.dirty) return false;
+  inputLog.add('commit', { type: reason, len: input.value.length });
+  clearSent(input.value);
+  return true;
+}
+
+/**
+ * The keyboard closed (送出 button, tap elsewhere, app switch) while the input method was composing. iOS commits the
+ * marked text then, but its compositionend and input may come after the blur — or not at all, and the phone then
+ * waited for a composition end that never came (卡住). Wait for them up to 300 ms, accepting their input although
+ * the box no longer has focus; after that, take the box as it is.
+ */
+let closing = null;
+function closeComposition(fn, why) {
+  if (!live.composing) { fn(); return; }
+  if (closing) clearTimeout(closing.timer);
+  inputLog.add('comp-closing', { type: why });
+  closing = { fn, timer: setTimeout(() => finishComposition('timeout'), 300) };
+}
+function finishComposition(why) {
+  const c = closing;
+  closing = null;
+  if (c) clearTimeout(c.timer);
+  if (live.composing) {
+    inputLog.add('comp-force', { type: why, len: input.value.length });
+    live.mirror.composing = false;
+  }
+  if (c) c.fn();
+}
+
 input.addEventListener('focus', updateLayout);
 input.addEventListener('blur', () => {
   updateLayout();
   inputLog.add('blur', { len: input.value.length });
   checkGhost();
+  // Live: closing the keyboard (tapping elsewhere, switching apps) ends the piece — sent, box emptied (SOFA-6). Only
+  // once the keyboard is gone: emptying the box while iOS dictation still listened made it write its sentence back
+  // (I-21). The guard stays on after such a clear, so text iOS puts back now is not sent either.
   if (settings.mode === 'live') {
-    live.flush();
-    // Keep the box short; the Mac keeps the text. Only once the keyboard is gone: clearing the box while iOS
-    // dictation was still listening (the old 1.5 s timer) made dictation write its sentence back, and the
-    // Mac got that sentence twice (I-21).
-    if (input.value.length > 200 && !live.composing) {
-      inputLog.add('trim');
-      clearSent(input.value);
-    }
+    if (live.composing) closeComposition(() => { if (!commitLive('blur')) guard.forget(); }, 'blur');
+    else if (!commitLive('blur')) guard.forget();
+  } else if (!closing) {
+    guard.forget();   // keyboard gone: no dictation or input method session can put anything back now
   }
-  guard.forget();   // keyboard gone: no dictation or input method session can put anything back now
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && settings.mode === 'live') { checkGhost(); live.flush(); }
+  if (document.hidden && settings.mode === 'live') { checkGhost(); commitLive('hidden'); }
 });
 input.addEventListener('compositionstart', () => {
   inputLog.add('compstart', { len: input.value.length });
@@ -1103,12 +1161,18 @@ input.addEventListener('compositionstart', () => {
   if (settings.mode === 'live') live.compositionStart();
   else live.mirror.compositionStart();
 });
+let compEnding = false;
 input.addEventListener('compositionend', (e) => {
   inputLog.add('compend', { data: clip(e.data), len: input.value.length });
+  compEnding = true;
   // Let the final input event land first, then send once.
   setTimeout(() => {
+    compEnding = false;
     if (settings.mode === 'live') { live.mirror.composing = false; checkGhost(); live.compositionEnd(); }
     else { live.mirror.composing = false; checkGhost(); }
+    if (closing) finishComposition('compend');
+    // a click / key came while composing: the piece ends now that the chosen characters are on the Mac (SOFA-6)
+    if (commitAfterComposition && !live.composing) { const r = commitAfterComposition; commitAfterComposition = null; commitLive(r); }
   }, 0);
 });
 /**
@@ -1125,7 +1189,7 @@ function undoBlocked(e) {
 input.addEventListener('input', (e) => {
   autosize();
   inputLog.add('input', { type: e.inputType, data: clip(e.data), len: input.value.length, comp: e.isComposing, tail: input.value.slice(-16) });
-  if (isHistory(e) || document.activeElement !== input) {
+  if (isHistory(e) || (document.activeElement !== input && !closing)) {
     // undo/redo that could not be cancelled, or text arriving while the keyboard is closed (nobody typed it):
     // put the box back the way it was, send nothing
     if (!isHistory(e)) inputLog.add('ghost-blurred', { len: input.value.length });
@@ -1134,6 +1198,12 @@ input.addEventListener('input', (e) => {
     autosize();
     return;
   }
+  // An input that is not part of a composition, while a composition looked open and no compositionend is on its way:
+  // the compositionend was lost. Without this the phone kept waiting for it and sent nothing more (卡住, SOFA-6).
+  if (live.composing && !e.isComposing && !compEnding && !/Composition/.test(e.inputType || '')) {
+    inputLog.add('comp-heal', { type: e.inputType });
+    live.mirror.composing = false;
+  }
   if (e.isComposing || live.composing) return;
   checkGhost();
   if (settings.mode === 'live') live.input(false);
@@ -1141,8 +1211,9 @@ input.addEventListener('input', (e) => {
 function enterLive() {
   checkGhost();
   live.flush();
-  sendKey('enter');
-  clearSent(live.sent);
+  const sent = live.sent;
+  sendKey('enter');      // a key: the piece ends there (commitLive)
+  clearSent(sent);       // and the guard keeps what was sent, for text iOS puts back (I-24)
 }
 input.addEventListener('beforeinput', (e) => {
   if (isHistory(e)) { e.preventDefault(); undoBlocked(e); return; }
@@ -1180,10 +1251,79 @@ function sendBuffered() {
   haptic();
 }
 // The 送出 button also closes the keyboard first: that ends iOS dictation, so it cannot put the text back (I-24).
+// While the input method is composing, the characters picked are only in the box once it has committed them: wait for
+// that (SOFA-6). Before, the button sent the marked Zhuyin (ㄋㄧˇ) and lost the character.
 tap(sendBtn, () => {
+  const composing = live.composing;
   if (document.activeElement === input) input.blur();
-  sendBuffered();
+  if (composing) closeComposition(() => { sendBuffered(); guard.forget(); }, 'send');
+  else sendBuffered();
 });
+
+// ---------- cursor pad (SOFA-6) ----------
+// iOS's own space-bar cursor only moves the cursor inside the phone's box, which the Mac never sees: this pad moves the
+// Mac's text cursor with arrow keys instead (js/caret.js). Starting it ends the typed piece first (commitLive), like
+// any other key. Each press is one unacked `caret` message (at most 30 a second; the Mac only takes ←→↑↓ with ⇧ / ⌥).
+const caretPadEl = $('caretPad');
+const caretLabel = $('caretLabel');
+const caretSelectBtn = $('caretSelect');
+const CARET_IDLE = '◀ 游標 ▶';
+function renderCaret() {
+  const on = caretPad.active;
+  caretPadEl.classList.toggle('active', on);
+  caretPadEl.classList.toggle('selecting', caretPad.selecting);
+  caretSelectBtn.setAttribute('aria-pressed', String(caretPad.sticky));
+  caretLabel.textContent = !on ? (caretPad.sticky ? '◀ 選取 ▶' : CARET_IDLE) : caretPad.selecting ? '⇧ 選取中' : '移動中';
+}
+const caretPad = new CaretPad({
+  press: (p) => { link.send({ t: 'caret', k: p.k, mods: p.mods, n: 1 }); inputLog.add('caret', { data: (p.mods.length ? p.mods.join('+') + '+' : '') + p.k }); },
+  onMode: (on) => {
+    if (on) { textFirst(); commitLive('caret'); }
+    renderCaret();
+  },
+  onSelect: renderCaret,
+  buzz: haptic,
+});
+let caretTouch = null;   // the finger that drags
+caretPadEl.addEventListener('touchstart', (e) => {
+  e.preventDefault();   // keeps the keyboard up; no text selection or callout
+  for (const t of e.changedTouches) {
+    if (caretTouch === null) { caretTouch = t.identifier; caretPad.start(t.clientX, t.clientY); } else caretPad.secondTap();
+  }
+}, { passive: false });
+caretPadEl.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  for (const t of e.changedTouches) if (t.identifier === caretTouch) caretPad.move(t.clientX, t.clientY);
+}, { passive: false });
+const caretLift = (e) => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === caretTouch) { caretTouch = null; caretPad.end(); }
+  }
+};
+caretPadEl.addEventListener('touchend', (e) => { e.preventDefault(); caretLift(e); }, { passive: false });
+caretPadEl.addEventListener('touchcancel', caretLift);
+// A second finger anywhere on the screen while dragging: select. Its whole touch is kept from the rest of the page,
+// so it does not also click or start a gesture on the trackpad.
+const swallowed = new Set();
+document.addEventListener('touchstart', (e) => {
+  if (caretTouch === null || e.target.closest?.('#caretPad')) return;
+  e.preventDefault();
+  e.stopPropagation();
+  for (const t of e.changedTouches) swallowed.add(t.identifier);
+  caretPad.secondTap();
+}, { capture: true, passive: false });
+for (const type of ['touchmove', 'touchend', 'touchcancel']) {
+  document.addEventListener(type, (e) => {
+    const ids = [...e.changedTouches].map((t) => t.identifier);
+    if (!ids.length || !ids.every((id) => swallowed.has(id))) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (type !== 'touchmove') for (const id of ids) swallowed.delete(id);
+  }, { capture: true, passive: false });
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) { caretTouch = null; caretPad.end(); } });
+stripButton(caretSelectBtn, { onTap: () => { caretPad.setSelect(!caretPad.sticky); haptic(); renderCaret(); } });
+renderCaret();
 
 let discardArmed = 0;
 stripButton(modeBtn, { onTap: () => {

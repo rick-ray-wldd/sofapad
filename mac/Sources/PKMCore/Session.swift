@@ -119,6 +119,8 @@ public final class ControlSession {
     private var lastSecure: Bool?
     private var lastLocked: Bool?
     private var meter = LatenessMeter()   // network queue only
+    private var caretBudget = CaretBudget()   // work queue only
+    private var caretThrottled = false
 
     public init(peerIP: String, injector: InputInjector, pairing: PairingManager, dedup: DedupStore,
                 limits: Limits = Limits(), work: DispatchQueue? = nil,
@@ -165,7 +167,10 @@ public final class ControlSession {
             work.async { self.pushStatusIfChanged() }
             return
         }
-        let late = num("sent").flatMap { meter.isLate(sentWall: $0, arrived: received) ? meter.lateness(sentWall: $0, arrived: received) : nil }
+        var late = num("sent").flatMap { meter.isLate(sentWall: $0, arrived: received) ? meter.lateness(sentWall: $0, arrived: received) : nil }
+        // cursor-pad presses have a much shorter limit (SOFA-6)
+        if case .caret = message, let sent = num("sent"), let l = meter.lateness(sentWall: sent, arrived: received),
+           l > CaretPolicy.lateLimit { late = l }
         let at = num("at")
         work.async { self.perform(message, started: started, at: at, received: received, late: late) }
     }
@@ -183,6 +188,9 @@ public final class ControlSession {
             case .click, .down:
                 log?("late by \(Int(late)) ms: click not done")
                 return
+            case .caret:
+                log?("late by \(Int(late)) ms: cursor key not pressed")
+                return
             default: break   // moves, scrolls and button-up still apply (an "up" must never be lost)
             }
         }
@@ -192,7 +200,7 @@ public final class ControlSession {
                 reply(["t": "ack", "id": id, "ok": false, "err": "locked"])
                 pushStatusIfChanged()
                 return
-            case .move, .jump, .scroll, .click, .down, .up:
+            case .move, .jump, .scroll, .click, .down, .up, .caret:
                 pushStatusIfChanged()
                 return
             default: break
@@ -221,6 +229,15 @@ public final class ControlSession {
         case .releaseAll:
             heldButtons.removeAll()
             injector.releaseAll()
+        case .caret(let key, let mods, let n):
+            guard caretBudget.take(n, now: received / 1000) else {
+                if !caretThrottled { log?("cursor pad faster than \(Int(CaretPolicy.maxPerSecond))/s: extra presses dropped") }
+                caretThrottled = true
+                return
+            }
+            caretThrottled = false
+            guard let code = KeyMap.keyCode(for: key) else { return }
+            for _ in 0..<n { injector.key(KeyStroke(keyCode: code, modifiers: mods)) }
         case .text(let id, let s):
             guard s.count <= limits.maxTextChars else {
                 reply(["t": "ack", "id": id, "ok": false, "err": "too long"])

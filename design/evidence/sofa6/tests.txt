@@ -1,0 +1,24 @@
+SOFA-6 (SofaPad 4.2.0), 2026-10-29, on this tree before the commit
+
+swift test --package-path mac (DEVELOPER_DIR=Xcode)   80 tests, 0 failures (75 before + 5 new: SOFA6Tests)
+cd web && node --test test/*.test.mjs                  88 tests, 88 pass (81 before + 7 new: caret.test.mjs)
+tools/build-app.sh                                     dist/SofaPad.app 4.2.0, arm64, ad-hoc signature
+dist/SofaPad.app/Contents/MacOS/SofaPad --self-test    SELF-TEST OK (self-test.txt)
+
+Headless Chrome page against the Mac app in --dry-run (the Mac's log lists exactly what it would type):
+  node tools/sofa6-commit.mjs --label before --web <4.1 web>   16/35  (commit-before.json: old text sent again, stuck
+                                                                       composition, bopomofo sent)
+  node tools/sofa6-commit.mjs --label after                    35/35  (commit-after.json)
+  node tools/sofa6-caret.mjs                                   15/15  (caret-browser.json; 28 presses/s when asked for more)
+  node tools/pkm33-send-clear.mjs --label after                13/13
+  node tools/pkm31-dictation.mjs --label after                  7/7
+  node tools/pkm4-browser.mjs                                  10/10
+  node tools/v2-browser.mjs                                    41/41  (the trackpad keeps >= 290 px while typing)
+  node tools/pkm31-keyrow.mjs                                  14/14  (now with the fixed "⇧ 選取" key)
+The browser suites rewrite the older evidence files; this run's copies are here, the originals were restored.
+
+Real injection (tools/sofa6-textedit.mjs; untitled TextEdit window, e2e guard, Mac unlocked and idle >= 90 s, <= 2 min,
+closed without saving):  6/6 at 16:14 (textedit-real.json); 5/6 at 16:11 with a wrong expectation for ↑
+(textedit-real-run1.json, process/ISSUES.md I-44). Earlier attempts stopped by the safety checks (I-45).
+
+Not run: a real iPhone (Safari, the iOS keyboard and Zhuyin, haptics) — for Ray (see the delivery notes).

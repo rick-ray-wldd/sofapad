@@ -38,7 +38,7 @@ try {
   const padSize = () => page.evaluate(() => { const r = document.getElementById('pad').getBoundingClientRect(); return `${Math.round(r.width)}×${Math.round(r.height)}`; });
   const padBefore = await padSize();
 
-  check('預設：即時、⌘ 快捷鍵、esc…⌦，最後是 ✎ 編輯', JSON.stringify(await row()) === JSON.stringify(['即時', '⌘ 快捷鍵', 'esc', 'tab', '⌫', '⏎', '←', '↑', '↓', '→', '⌘', '⌥', '⌃', '⇧', 'space', '⌦', '✎ 編輯']), JSON.stringify(await row()));
+  check('預設：即時、⌘ 快捷鍵、⇧ 選取（4.2 游標板）、esc…⌦，最後是 ✎ 編輯', JSON.stringify(await row()) === JSON.stringify(['即時', '⌘ 快捷鍵', '⇧ 選取', 'esc', 'tab', '⌫', '⏎', '←', '↑', '↓', '→', '⌘', '⌥', '⌃', '⇧', 'space', '⌦', '✎ 編輯']), JSON.stringify(await row()));
 
   // open from ✎ at the end of the row (scroll there first, like Ray would)
   await page.evaluate(() => { const s = document.getElementById('keyStrip'); s.scrollLeft = s.scrollWidth; });
@@ -96,7 +96,7 @@ try {
   await page.click('#rowDone');
   await sleep(150);
   const edited = await row();
-  check('按鍵列照編輯的順序：⌘C 在固定鍵後面第一個，esc 不見，最後是 ⌥⌘K 和 ✎', edited[2] === '⌘C' && !edited.includes('esc') && edited.at(-2) === '⌥⌘K' && edited.at(-1) === '✎ 編輯', JSON.stringify(edited));
+  check('按鍵列照編輯的順序：⌘C 在固定鍵後面第一個，esc 不見，最後是 ⌥⌘K 和 ✎', edited[3] === '⌘C' && !edited.includes('esc') && edited.at(-2) === '⌥⌘K' && edited.at(-1) === '✎ 編輯', JSON.stringify(edited));
   await page.screenshot({ path: join(shotsDir, 'pkm31-keyrow-row-edited.png') });
 
   // use the new buttons
@@ -140,7 +140,7 @@ try {
   await page.click('#rowDone');
   await sleep(150);
   const back = await row();
-  check('恢復預設：回到 v2 的按鍵列（自訂快捷鍵本身還在）', back.slice(2, 16).join(' ') === 'esc tab ⌫ ⏎ ← ↑ ↓ → ⌘ ⌥ ⌃ ⇧ space ⌦' && await page.evaluate(() => JSON.parse(localStorage.getItem('pkm.shortcuts') || localStorage.getItem('shortcuts') || '{"items":[]}').items?.length !== 0), JSON.stringify(back));
+  check('恢復預設：回到 v2 的按鍵列（自訂快捷鍵本身還在）', back.slice(3, 17).join(' ') === 'esc tab ⌫ ⏎ ← ↑ ↓ → ⌘ ⌥ ⌃ ⇧ space ⌦' && await page.evaluate(() => JSON.parse(localStorage.getItem('pkm.shortcuts') || localStorage.getItem('shortcuts') || '{"items":[]}').items?.length !== 0), JSON.stringify(back));
   await page.setViewportSize({ width: 390, height: 844 });
   await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: INSETS.portrait });
   await sleep(300);

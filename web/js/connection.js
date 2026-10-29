@@ -137,7 +137,7 @@ export class Link {
    *  skips one that was held up in a stalled connection (D-30). */
   send(obj) {
     if (this.state !== 'ready') return;
-    this.raw(obj.t === 'click' || obj.t === 'down' ? { ...obj, sent: Date.now() } : obj);
+    this.raw(obj.t === 'click' || obj.t === 'down' || obj.t === 'caret' ? { ...obj, sent: Date.now() } : obj);
   }
 
   /**
@@ -157,6 +157,9 @@ export class Link {
 
   /** Text/keys sent and not acked yet. */
   get inFlight() { return this.pending.length; }
+
+  /** How long the oldest of them has waited for its ack, in ms (0 when none). */
+  get oldestPendingMs() { return this.pending.length ? performance.now() - this.pending[0].sentAt : 0; }
 
   pair(code) {
     this.pendingCode = code;

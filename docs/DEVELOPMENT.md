@@ -7,8 +7,8 @@
 | Path | What |
 |---|---|
 | `mac/` | Swift package. `PKMCore`: protocol, pairing, LAN server, sessions, pacing, addresses. `pkm-server`: CGEvent injection, menu bar, self-test (built into `SofaPad.app`). `pkm-probe`: window for the older end-to-end test |
-| `web/` | The phone page. `js/pointer.js` gestures, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable key row, `shortcuts.js`, `sha256.js` login proof, `version.js` |
-| `tools/` | `build-app.sh` (builds `dist/SofaPad.app`), browser tests (Playwright + headless Chrome, dry-run Mac), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
+| `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable key row, `shortcuts.js`, `sha256.js` login proof, `version.js` |
+| `tools/` | `build-app.sh` (builds `dist/SofaPad.app`), `package.sh` (`dist/release/SofaPad-<version>-macOS.zip` + SHA-256), browser tests (Playwright + headless Chrome, dry-run Mac), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
 | `design/` | `SPEC.md`, screenshots, test evidence |
 | `research/` | The research report from v1 (papers, GitHub projects, products, Apple's own features) |
 | `process/` | Development records, in Chinese (timeline, decisions, issues, research log, tool log, summaries) |
@@ -40,6 +40,10 @@ node tools/pkm31-dictation.mjs --label after       # iOS dictation replay (I-21)
 node tools/pkm33-send-clear.mjs --label after      # sent text put back by iOS is not sent again (I-24)
 node tools/pkm31-keyrow.mjs                        # key row editor
 node tools/pkm4-browser.mjs                        # 4.0: version line, undo blocked, silent connection, nothing resent
+node tools/sofa6-commit.mjs --label after          # 4.2: the box empties after a click / key / blur (Zhuyin too), the Mac's exact sequence
+node tools/sofa6-caret.mjs                         # 4.2: cursor pad (hold, drag, Shift, ⌥, 30/s, stops on lift, Mac whitelist)
+node tools/sofa6-textedit.mjs                      # 4.2: the same with real injection into a TextEdit test window (not while locked);
+                                                   # on macOS 27 it allows only the Siri overlay TextEdit shows (tewin overlays)
 tools/e2e.sh                                       # older real-injection test into a probe window
 ```
 

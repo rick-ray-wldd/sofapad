@@ -79,9 +79,12 @@ func findWebRoot(_ explicit: String?) -> URL? {
     if let res = Bundle.main.resourceURL { candidates.append(res.appendingPathComponent("web")) }
     let exe = URL(fileURLWithPath: CommandLine.arguments[0]).resolvingSymlinksInPath().deletingLastPathComponent()
     candidates.append(exe.appendingPathComponent("web"))
-    // Running from the source tree: mac/Sources/pkm-server/main.swift → <repo>/web
+    #if DEBUG
+    // Running from the source tree: mac/Sources/pkm-server/main.swift → <repo>/web. Debug builds only: #filePath is
+    // this Mac's absolute source path (with the user name), and the release app that is handed out must not carry it.
     candidates.append(URL(fileURLWithPath: #filePath).deletingLastPathComponent()
         .appendingPathComponent("../../../web").standardizedFileURL)
+    #endif
     candidates.append(URL(fileURLWithPath: fm.currentDirectoryPath).appendingPathComponent("web"))
     return candidates.first { fm.fileExists(atPath: $0.appendingPathComponent("index.html").path) }
 }

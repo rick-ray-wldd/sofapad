@@ -110,6 +110,70 @@ case "text":
     guard let a = textEdit(), let s = args.dropFirst().first, let num = Int(s) else { fail("usage: text <win>") }
     guard let t = textArea(window(a, num)) else { fail("no text area") }
     out(["ok": true, "text": attr(t, kAXValueAttribute) as? String ?? ""])
+case "sel":
+    // text and selection (SOFA-6 cursor pad: where the arrow keys left the cursor, what Shift selected)
+    guard let a = textEdit(), let s = args.dropFirst().first, let num = Int(s) else { fail("usage: sel <win>") }
+    guard let t = textArea(window(a, num)) else { fail("no text area") }
+    var range = CFRange(location: 0, length: 0)
+    if let v = attr(t, kAXSelectedTextRangeAttribute) { AXValueGetValue(v as! AXValue, .cfRange, &range) }
+    out(["ok": true, "text": attr(t, kAXValueAttribute) as? String ?? "", "loc": range.location, "len": range.length])
+case "wins":
+    // TextEdit's on-screen windows, front to back (number, layer, size): what came in front of the test window
+    guard let a = textEdit() else { out(["ok": true, "wins": []]); exit(0) }
+    let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+    let mine = list.filter { ($0[kCGWindowOwnerPID as String] as? Int) == Int(a.processIdentifier) }.map { w -> [String: Any] in
+        let b = w[kCGWindowBounds as String] as? [String: Any] ?? [:]
+        return ["num": w[kCGWindowNumber as String] as? Int ?? 0, "layer": w[kCGWindowLayer as String] as? Int ?? 0,
+                "w": b["Width"] as? Double ?? 0, "h": b["Height"] as? Double ?? 0]
+    }
+    // and every AX window of TextEdit (panels and dialogs too), with what it is
+    let ax = AXUIElementCreateApplication(a.processIdentifier)
+    let axw = (attr(ax, kAXWindowsAttribute) as? [AXUIElement] ?? []).map { w -> [String: Any] in
+        var id: CGWindowID = 0
+        _ = _AXUIElementGetWindow(w, &id)
+        return ["num": Int(id), "role": role(w), "subrole": attr(w, kAXSubroleAttribute) as? String ?? "",
+                "title": attr(w, kAXTitleAttribute) as? String ?? "",
+                "texts": children(w).compactMap { attr($0, kAXValueAttribute) as? String }.prefix(4).map { String($0.prefix(80)) }]
+    }
+    out(["ok": true, "wins": mine, "ax": axw])
+case "tree":
+    // the AX tree of one TextEdit window (any kind, e.g. a dialog): role, subrole, title, value, description
+    guard let a = textEdit(), let s = args.dropFirst().first, let num = Int(s) else { fail("usage: tree <win>") }
+    let ax = AXUIElementCreateApplication(a.processIdentifier)
+    guard let w = (attr(ax, kAXWindowsAttribute) as? [AXUIElement] ?? []).first(where: { e in
+        var id: CGWindowID = 0
+        return _AXUIElementGetWindow(e, &id) == .success && Int(id) == num
+    }) else { fail("no such window") }
+    var rows: [String] = []
+    func walk(_ e: AXUIElement, _ d: Int) {
+        let parts = [role(e), attr(e, kAXSubroleAttribute) as? String ?? "", attr(e, kAXTitleAttribute) as? String ?? "",
+                     (attr(e, kAXValueAttribute) as? String).map { String($0.prefix(120)) } ?? "",
+                     attr(e, kAXDescriptionAttribute) as? String ?? ""]
+        rows.append(String(repeating: "  ", count: d) + parts.joined(separator: " | "))
+        if d < 6 { for c in children(e) { walk(c, d + 1) } }
+    }
+    walk(w, 0)
+    out(["ok": true, "tree": rows])
+case "overlays":
+    // SOFA-6: on this Mac (macOS 27) a Siri overlay — a titleless dialog holding only a "Siri Waveform Orb" button —
+    // shows up above the documents in TextEdit's own process, a second or two after launch. List it (it is never
+    // pressed); every other window that is not one of the two documents is "unknown".
+    guard let a = textEdit() else { fail("TextEdit is not running") }
+    let docs = Set(windows(a).map(\.num))
+    var overlays: [Int] = [], unknown: [Int] = []
+    for w in attr(AXUIElementCreateApplication(a.processIdentifier), kAXWindowsAttribute) as? [AXUIElement] ?? [] {
+        var id: CGWindowID = 0
+        guard _AXUIElementGetWindow(w, &id) == .success, !docs.contains(Int(id)) else { continue }
+        func leaves(_ e: AXUIElement, _ d: Int = 0) -> [AXUIElement] {
+            let c = children(e)
+            return c.isEmpty || d > 6 ? [e] : c.flatMap { leaves($0, d + 1) }
+        }
+        let l = leaves(w)
+        let orb = l.count == 1 && role(l[0]) == kAXButtonRole as String
+            && (attr(l[0], kAXDescriptionAttribute) as? String) == "Siri Waveform Orb"
+        if orb { overlays.append(Int(id)) } else { unknown.append(Int(id)) }
+    }
+    out(["ok": true, "overlays": overlays, "unknown": unknown])
 case "front-info":
     let f = NSWorkspace.shared.frontmostApplication
     var fields: [String: Any] = ["ok": true, "bundle": f?.bundleIdentifier ?? "", "pid": Int(f?.processIdentifier ?? 0)]

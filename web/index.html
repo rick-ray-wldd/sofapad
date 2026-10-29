@@ -72,6 +72,9 @@
         <textarea id="input" aria-label="輸入框" rows="1" placeholder="點這裡用手機鍵盤打字（中文、英文都可以）"
           autocapitalize="off" autocomplete="off" spellcheck="false" enterkeyhint="enter"></textarea>
         <button id="sendBtn" class="send" hidden>送出</button>
+        <!-- Cursor pad (SOFA-6): hold, then drag, to move the Mac's text cursor with the arrow keys. In this row, so
+             it takes no height from the trackpad while typing (I-13). -->
+        <div id="caretPad" class="caret-pad" role="slider" aria-label="游標板：按住再拖曳，移動 Mac 上的文字游標"><span id="caretLabel">◀ 游標 ▶</span></div>
       </div>
 
       <!-- Key row: scrolls sideways; the fades with ‹ › show there is more (PKM-2-3, I-19). -->
@@ -79,6 +82,7 @@
       <div class="keys" id="keyStrip">
         <button id="modeBtn" class="chip mode" aria-label="輸入模式">即時</button>
         <button id="shortcutsBtn" class="more">⌘ 快捷鍵</button>
+        <button id="caretSelect" class="caret-select" aria-pressed="false" aria-label="游標板改成選取（Shift）">⇧ 選取</button>
         <!-- the rest comes from the saved key row (js/keyrow.js, PKM-3-1 ②); ✎ at the end edits it -->
       </div>
       </div>
@@ -114,7 +118,8 @@
       <label class="row"><input id="hapticsOn" type="checkbox"> 觸覺回饋</label>
       <label class="row"><input id="autocorrect" type="checkbox"> 手機自動修正與預測字（英文）</label>
       <label class="row"><input id="enterAfter" type="checkbox"> 整段模式：送出後自動按 Enter</label>
-      <p class="muted small">即時模式：一個一個打的字馬上出現在 Mac，注音／拼音選字前不會送出；聽寫和預測字會等你停頓（約 0.7 秒）再一次送出，避免 Mac 上疊字。整段模式：先在手機上打完、改好，再按「送出」。橫拿時觸控板會變成全螢幕，左邊的浮動按鈕可以叫出鍵盤和快捷鍵。</p>
+      <p class="muted small">即時模式：一個一個打的字馬上出現在 Mac，注音／拼音選字前不會送出；聽寫和預測字會等你停頓（約 0.7 秒）再一次送出，避免 Mac 上疊字。按 Enter、點觸控板、按任何按鍵或手勢、收起鍵盤，輸入框都會清空（字已經在 Mac 上），下次從空的框開始打。整段模式：先在手機上打完、改好，再按「送出」；收起鍵盤時沒送出的字會留在框裡。橫拿時觸控板會變成全螢幕，左邊的浮動按鈕可以叫出鍵盤和快捷鍵。</p>
+      <p class="muted small">游標板（輸入框右邊的「◀ 游標 ▶」）：按住約 0.3 秒，手機輕震後左右、上下拖（手指可以拖出那一格），Mac 上的文字游標就用方向鍵跟著移動；快速甩一下一次跳一個字詞（⌥←→）。按按鍵列的「⇧ 選取」，或拖的時候另一根手指點一下，就改成 Shift＋方向鍵選取文字。iPhone 鍵盤自己的「按住空白鍵移動游標」只會移動手機輸入框裡的游標，Mac 收不到，所以另外做了這個游標板。</p>
       <details class="io-log" id="inputLogBox">
         <summary>輸入紀錄（除錯用，只存在這支手機，不會上傳）</summary>
         <p class="muted small">記下手機鍵盤每次怎麼改輸入框、送了什麼到 Mac。聽寫送到 Mac 疊字時，打開這裡按「全選」，拷貝給開發者看。</p>
@@ -135,7 +140,7 @@
         <span class="spacer"></span>
         <button id="rowDone" class="chip">完成</button>
       </div>
-      <p class="muted small">按鍵列現在的樣子：按住 ≡ 上下拖曳調順序，✕ 移除。下面的清單點一下就加到最後（再點一下拿掉）。「即時」和「⌘ 快捷鍵」固定在最前面。</p>
+      <p class="muted small">按鍵列現在的樣子：按住 ≡ 上下拖曳調順序，✕ 移除。下面的清單點一下就加到最後（再點一下拿掉）。「即時」、「⌘ 快捷鍵」和游標板的「⇧ 選取」固定在最前面。</p>
       <ol id="rowCurrent" class="row-current"></ol>
       <div id="rowCatalog" class="row-catalog"></div>
       <div class="row-foot">

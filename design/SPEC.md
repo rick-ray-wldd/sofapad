@@ -217,3 +217,10 @@
 - 其他來源：任何請求都回 403 說明頁（`Refusal.page`），不建立 session；選單列顯示最近一次被拒的來源和時間；log「拒絕非區網來源 …」每個來源每分鐘一次（D-36）。
 - 換網路：`NetWatch`（NWPathMonitor＋10 秒重掃）→ log「網路變了：…」、選單、開著的掃描／配對視窗換成新網址（D-39）。
 - 新選項：`--allow-tailscale`。新設定檔：`settings.json`（`allowTailscale`）。
+
+## 4.2（SOFA-6）輸入框和游標板
+
+- 即時模式：點擊、按下、按鍵、快捷鍵、手勢、游標板、blur、visibilitychange(hidden) → `commitLive(reason)`：flush(force) → 輸入框空、`live.reset()`、`guard.cleared(text)`。組字中延到 compositionend 之後；連線斷了不清（D-41）。
+- 組字被打斷：`closeComposition(fn)` 等 0.3 秒；`comp-heal`（D-42）。流量控制：`link.oldestPendingMs > 3000` 時 canSend（D-43）。
+- 新訊息 `caret`（手機 → Mac，不 ack）：`k` ∈ left/right/up/down，`mods` ⊂ {shift, opt}，`n` 1…4，`sent`。Mac：CaretPolicy、CaretBudget（40/s）、晚到 0.5 秒不按（D-44）。
+- 新的輸入紀錄項目：commit、comp-closing、comp-force、comp-heal、stall、caret。

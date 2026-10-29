@@ -70,3 +70,16 @@ that the "允許 Tailscale 裝置" switch covers. The added lines were also chec
 addresses, `.local` names, local paths, email addresses, six-digit codes and assistant-system ids: only example values
 (`192.168.1.20`, `10.0.0.5`, `2001:db8::/32`, `Studio.local`, …). The test logs in `design/evidence/sofa5/` show this
 computer's Tailscale address as `100.x.x.x`. The four new screenshots show only example addresses.
+
+## 4.2 (2026-10-29)
+
+Before the 4.2 commit, the same search over the whole tree, with the computer's own local host name, LAN address and
+Tailscale addresses read from its interfaces at the time: none of those real values, and no new matches besides the
+made-up test values listed above (`SOFA6Tests.swift` uses `192.168.1.20` only). The added lines were checked again for
+every private IPv4 range, IPv6, `.local` names, local paths, email addresses, six-digit codes, assistant-system ids and
+names of other projects: only example values, the names of the Tailscale ranges, and the made-up test sentence of
+`tools/pkm33-send-clear.mjs` in its results file. The release zip is built from the same tree (`tools/package.sh`) and
+holds the app, the release notes, the install guide and the licence. Every file in it was searched too, including the
+strings inside the app's executable: that found one absolute source path with the user name, compiled in from
+`#filePath` since 4.0 (process/ISSUES.md I-46). Release builds no longer contain it; the search of the zip now finds
+nothing. The two new screenshots show only the test page.

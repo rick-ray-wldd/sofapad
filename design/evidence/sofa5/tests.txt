@@ -12,7 +12,9 @@ browser regressions (headless Chrome, dry-run Mac):
   node tools/pkm31-dictation.mjs --label after         7/7
   node tools/pkm33-send-clear.mjs --label after        13/13
   (the first time, run back to back right after the other suites, pkm31-dictation and pkm33-send-clear exited with an
-   error whose output was not kept; run again 2 times each, alone and back to back: all pass. Not explained.)
+   error whose output was not kept; run again 2 times each, alone and back to back: all pass. Explained the next day
+   (4.2, I-42): the loop was `for t in "x.mjs --label after"; do node tools/$t` in zsh, which does not split $t, so
+   node was asked for a file named "x.mjs --label after". Not a test failure.)
 The browser suites rewrite the PKM-4 / v2 evidence files; this run's copies are here, the originals were restored.
 
 Not run: the iOS Simulator + TextEdit bench (no change in typing or injection), anything on a real iPhone or another Mac,

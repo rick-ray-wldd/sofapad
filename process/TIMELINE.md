@@ -246,3 +246,14 @@
 | S5-M1 | 補充：手機開著 Tailscale → 加「允許 Tailscale 裝置」開關 | 約 15:58 | — |
 | S5-M2 | 程式＋單元測試（Swift 75/75、JS 81/81） | 16:05 | `swift test`、`node --test` |
 | S5-M3 | `tools/build-app.sh` → dist/SofaPad.app 4.1.0；`--self-test` OK；`--dry-run` 實機檢查；截圖 | 16:04–16:09 | design/evidence/sofa5/ |
+
+## SOFA-6（SofaPad 4.2，2026-10-29）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S6-M0 | 收到派工（輸入框殘字／卡住、游標板、4.2 打包） | 15:24 | — |
+| S6-M1 | 在 4.1 的網頁重現：15/29 項通過（舊字再送、組字卡住、送出注音符號）；加到 35 項後 4.1 是 16/35 | 15:34；15:56 | design/evidence/sofa6/commit-before.json |
+| S6-M2 | 修正後 35/35；回歸 pkm33 抓到 I-41，修好 13/13 | 15:36–15:40 | commit-after.json |
+| S6-M3 | 游標板：手機（caret.js、單元測試 7）、Mac（caret 訊息、白名單、單元測試 5）、瀏覽器 15/15 | 15:29–15:44 | caret-browser.json、SOFA6Tests |
+| S6-M4 | 真實注入：15:45 Mac 鎖定沒跑；16:00–16:11 被 Siri 浮層擋 4 次（I-45）；16:11 5/6（第 6 項預期寫錯）；16:14 6/6 | 15:45–16:14 | — |
+| S6-M5 | 4.2.0：CHANGELOG、README、INSTALL、release notes、package.sh | 15:46–15:48 | dist/release（不提交） |

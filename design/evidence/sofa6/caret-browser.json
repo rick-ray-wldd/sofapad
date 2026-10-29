@@ -1,0 +1,173 @@
+{
+ "runs": {
+  "left": {
+   "atLift": [
+    "hello world",
+    "left",
+    "left",
+    "left",
+    "left",
+    "left"
+   ],
+   "after": [],
+   "dragMs": 1542
+  },
+  "second": {
+   "atLift": [
+    "right",
+    "right",
+    "right",
+    "shift+right",
+    "shift+right",
+    "shift+right"
+   ],
+   "after": [],
+   "dragMs": 1856
+  },
+  "fast": {
+   "atLift": [
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right",
+    "right"
+   ],
+   "after": [],
+   "dragMs": 2087,
+   "rate": 29.22855773838045
+  }
+ },
+ "results": [
+  {
+   "name": "游標板在輸入框右邊",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "開始拖之前，等待中的字先送到 Mac",
+   "ok": true,
+   "detail": "[\"hello world\",\"left\",\"left\"]"
+  },
+  {
+   "name": "慢慢往左拖 70 px：← 約 5 下",
+   "ok": true,
+   "detail": "[\"hello world\",\"left\",\"left\",\"left\",\"left\",\"left\"]"
+  },
+  {
+   "name": "拖完後輸入框是空的",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "放開後不再送任何鍵",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "往下拖 70 px：↓ 2 下",
+   "ok": true,
+   "detail": "[\"down\",\"down\"]"
+  },
+  {
+   "name": "沒按住就滑過去：不送任何鍵",
+   "ok": true,
+   "detail": "{\"atLift\":[],\"after\":[],\"dragMs\":404}"
+  },
+  {
+   "name": "第二指點一下後改成 Shift＋→（選取）",
+   "ok": true,
+   "detail": "[\"right\",\"right\",\"right\",\"shift+right\",\"shift+right\",\"shift+right\"]"
+  },
+  {
+   "name": "第二指沒有在觸控板上點擊",
+   "ok": true,
+   "detail": "{\"atLift\":[\"right\",\"right\",\"right\",\"shift+right\",\"shift+right\",\"shift+right\"],\"after\":[],\"dragMs\":1856}"
+  },
+  {
+   "name": "下一次拖曳不再選取",
+   "ok": true,
+   "detail": "[\"right\",\"right\"]"
+  },
+  {
+   "name": "按「選取」：Shift＋←",
+   "ok": true,
+   "detail": "[\"true\",[\"shift+left\",\"shift+left\"]]"
+  },
+  {
+   "name": "快速甩動：⌥→（一次一個字詞）",
+   "ok": true,
+   "detail": "[\"right\",\"right\",\"opt+right\",\"right\",\"right\",\"right\",\"opt+right\",\"right\",\"right\"]"
+  },
+  {
+   "name": "拖很快也最多每秒約 30 下",
+   "ok": true,
+   "detail": "61 presses in 2087 ms = 29.2/s"
+  },
+  {
+   "name": "放開手指立刻停（之後 0.8 秒沒有鍵）",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "Mac 不接受方向鍵以外的鍵或 ⌘／⌃（游標板白名單）",
+   "ok": true,
+   "detail": "[]"
+  }
+ ]
+}
