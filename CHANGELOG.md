@@ -24,7 +24,10 @@ comes back while typing. In left-handed mode the panel is on the right.
 **New: demo page and recording script.** [`demo/playground.html`](demo/playground.html) is a page for the Mac with
 one stage per feature that ticks itself when it sees the feature work, a recording mode and a summary.
 [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) ([中文](docs/DEMO-SCRIPT.zh-TW.md)) has a 2–3 minute and a 60-second
-script.
+script. The page is in English by default; `?lang=zh` or its 中文 button switches to Chinese. On the English page the
+live-mode sentence is English, made for swipe typing (a word picked wrong is named); dictation counts in Chinese or
+English. `?video=1` is a shorter recording version: stages 1, 2, 5, 6 and 7, with only English live typing and
+dictation in stage 2.
 
 Tests: `tools/sofa8-layout.mjs` (portrait, editor, conversion from 4.2, landscape, other phone sizes),
 `tools/sofa8-playground.mjs` (every stage of the demo page from the phone page through a dry-run Mac), and the 4.2

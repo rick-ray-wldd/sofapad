@@ -9,6 +9,29 @@ This is for people who work from the sofa in Vision Pro with Mac Virtual Display
 - Home Wi-Fi only, nothing goes through a cloud, and you have to pair before you can control anything.
 - Before 4.0 this was called **Phone KeyMouse**. The older Python version (v0.2) is in [`legacy/v0.2-python/`](legacy/v0.2-python/). For the differences between the two, see [`docs/COMPARISON.md`](docs/COMPARISON.md).
 
+## Try the demo page
+
+![The demo page in recording mode: stage 1, the trackpad, with its checks ticking](design/screenshots/v4/playground-en.png)
+
+Open [`demo/playground.html`](demo/playground.html) in a browser on the Mac (it works offline and collects nothing), then play it stage by stage from the phone. Each stage ticks itself when the page sees you do it. **English by default**; `?lang=zh` at the end of the address, or the 中文 button, switches it to Chinese.
+
+1. **Trackpad**: move, click, right-click, two-finger scroll, long-press drag, drag lock.
+2. **Typing**: live mode (on the English page an English sentence you can swipe; a word picked wrong is pointed out), batch mode with Send, Zhuyin, and dictation with the keyboard's 🎤 (nothing doubled).
+3. **The box empties after you send.**
+4. **Cursor pad**: arrow keys, a word at a time, ⇧ 選取 (Select) to fix a typo.
+5. **Shortcuts**: ⌘A ⌘C ⌘V ⌘Z, and a screenshot pasted in (⌃⇧⌘4).
+6. **Zoom and desktops**: pinch, three-finger swipes, Mission Control.
+7. **The 4.3 layout**: ⏎ next to the cursor pad, editing the rows, the landscape panel.
+
+At the end, a summary of every check and when it was done. Recording mode (`?rec=1`) hides the small print for a video. For a short video there is a recording version, `?video=1`: stages 1, 2, 5, 6 and 7 only, with English swipe typing and dictation in stage 2. Scripts for a 2–3 minute and a 60-second video: [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) ([中文](docs/DEMO-SCRIPT.zh-TW.md)). The release zip has the page too (`playground.html`).
+
+## Latest version: 4.3.0
+
+- **Download**: [GitHub Releases → SofaPad 4.3.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.3.0) (`SofaPad-4.3.0-macOS.zip`, macOS 13 or later, Apple silicon). Install: [`docs/INSTALL.md`](docs/INSTALL.md).
+- **New in 4.3**: the text box takes half the width, with the cursor pad and ⏎ next to it; the text row, the key row and the landscape panel can be edited; landscape has a side panel and a full-height trackpad; the demo page.
+- **Defaults in 4.3**: no ⏎ on the key row (it's next to the cursor pad; add one in ✎ 編輯 if you want it); in portrait live mode the text box stays one line while you type, so the trackpad keeps at least 290 px; the landscape panel is on the left (on the right in left-handed mode).
+- All changes: [`CHANGELOG.md`](CHANGELOG.md). Release notes: [`docs/release/4.3.0.md`](docs/release/4.3.0.md).
+
 ---
 
 ## First-time setup (about 10 minutes)
@@ -30,7 +53,7 @@ Every step says what you'll see. Screen names follow macOS 15 / 26 / 27 (English
    - **You'll see** `Built …/dist/SofaPad.app` on the last line.
 3. In Finder, drag `dist/SofaPad.app` into the Applications folder (permissions are more reliable that way).
 
-**B. Use a `SofaPad.app` someone else built** (AirDrop, download): that works, but macOS will block it the first time you open it. Follow step 2. From a release zip (`SofaPad-<version>-macOS.zip`, Apple silicon): [`docs/INSTALL.md`](docs/INSTALL.md), with how to check its SHA-256.
+**B. Use a `SofaPad.app` someone else built** (AirDrop, download): that works, but macOS will block it the first time you open it. Follow step 2. From a release zip (`SofaPad-<version>-macOS.zip`, Apple silicon; the latest is [4.3.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.3.0)): [`docs/INSTALL.md`](docs/INSTALL.md), with how to check its SHA-256.
 
 ### 2. Open the app the first time (if Gatekeeper blocks it)
 
@@ -229,7 +252,7 @@ The version is at the top. Then: pointer speed, acceleration, scroll speed, reve
 
 ## Showing it to someone (demo page)
 
-[`demo/playground.html`](demo/playground.html) is a practice page for the Mac: open it in a browser (it works offline and collects nothing), then go through it with the phone. Each feature is one stage, and a green tick lights when the page sees it done: trackpad, typing (live, batch, Zhuyin, dictation without doubled text), the box emptying after you send, the cursor pad, shortcuts and a screenshot pasted in, zoom and desktops, and the 4.3 layout. "錄影模式" (recording mode) hides the small print for a video. A scene-by-scene script for a 2–3 minute video and a 60-second one: [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) ([中文](docs/DEMO-SCRIPT.zh-TW.md)).
+See [Try the demo page](#try-the-demo-page) at the top.
 
 ## Development
 

@@ -273,3 +273,14 @@
 | S8-M7 | 示範練習網頁、錄影腳本收到（writer 子代理），審過全部程式；「整段送出」改成半秒內 ≥ 6 字（D-51） | 12:24–12:40 | demo/playground.html |
 | S8-M8 | tools/sofa8-playground.mjs：手機網頁經 dry-run Mac 走完 7 關，30/30；兩支示範影片（screencast.mjs，系統 ffmpeg） | 12:45–13:12 | design/evidence/sofa8/playground-dryrun.json |
 | S8-M9 | 4.3.0：Swift 80/80、JS 91/91、`--self-test` OK；`tools/package.sh` → zip，逐位元組掃描 | 13:12–13:14 | design/evidence/sofa8/release-zip-scan.txt |
+
+## SOFA-9（4.3.0 定版、示範場雙語與錄影精簡版，2026-10-30）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S9-M0 | 收到派工：4.3.0 定版重新打包＋4.3 教學影片；SOFA-8 的三個問題照預設定案（D-52） | 17:05 | — |
+| S9-M1 | 定版包：release notes 加「4.3 的預設」，zip 多放示範頁和錄影腳本；乾淨工作樹、release 產物刪掉重 build | 17:06–17:12 | design/evidence/sofa9/release-zip-scan.txt |
+| S9-M2 | 全部測試：Swift 80/80、JS 91/91、self-test 33 PASS、10 個瀏覽器套件全過；舊的實機 e2e 15/16（I-50），改用「文字編輯」實機注入 6/6 | 17:09–17:40 | design/evidence/sofa9/tests.txt |
+| S9-M3 | 追加 1：示範場第 2 關英文即時（滑動輸入，逐字比對、說出哪個字錯）＋聽寫（中英都算）；實測包先換 | 17:40–17:56 | tools/sofa9-stage2.mjs |
+| S9-M4 | 追加 3／4：示範場雙語、預設英文（writer 子代理 1 個）；完整版照原樣，另有錄影精簡版（`?video=1` 或 meta）；實測包放兩個檔 | 17:58–18:20 | D-53 |
+| S9-M5 | 追加 2：README 最上面加示範場和 4.3.0 區塊；公開前檢查（docs/PUBLIC-CHECK.md「4.3」） | 18:20– | docs/PUBLIC-CHECK.md |

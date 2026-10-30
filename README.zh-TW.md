@@ -9,6 +9,29 @@
 - 只走家裡的 Wi-Fi，不經過任何雲端；要先配對才能控制。
 - 4.0 以前叫 **Phone KeyMouse**；更早的 Python 版（v0.2）在 [`legacy/v0.2-python/`](legacy/v0.2-python/)，兩版的差異見 [`docs/COMPARISON.md`](docs/COMPARISON.md)。
 
+## 先玩玩看：示範場
+
+![示範場（錄影模式）第 1 關：觸控板，做到的項目自動打勾](design/screenshots/v4/playground-zh.png)
+
+在 Mac 上用瀏覽器打開 [`demo/playground.html`](demo/playground.html)（不用連網，也不收任何資料），再用手機一關一關玩。每個功能一關，頁面看到你做到就自動打勾。**預設英文，可以切中文**：網址最後加 `?lang=zh`，或按右上角的「中文」。
+
+1. **觸控板**：移動、點擊、右鍵、兩指捲動、長按拖曳、拖曳鎖定。
+2. **打字**：即時模式、整段模式＋送出、注音、鍵盤 🎤 聽寫（不會疊字）。英文版的即時模式是一句英文，可以用滑的，滑錯的字會告訴你是哪一個。
+3. **送出後自動清空**。
+4. **游標板**：方向鍵、一次跳一個字詞、用「⇧ 選取」改錯字。
+5. **快捷鍵**：⌘A ⌘C ⌘V ⌘Z，和截圖貼上（⌃⇧⌘4）。
+6. **縮放與桌面**：捏合、三指滑、Mission Control。
+7. **4.3 新排版**：游標板旁邊的 ⏎、編輯按鍵、橫拿側欄。
+
+最後有總表，列出每一項和完成的時間。「錄影模式」（`?rec=1`）會把小字藏起來，適合錄影。錄短片用的「錄影精簡版」：網址加 `?video=1`，只有第 1、2、5、6、7 關，第 2 關是英文滑動輸入和聽寫。2–3 分鐘和 60 秒兩種錄影腳本：[`docs/DEMO-SCRIPT.zh-TW.md`](docs/DEMO-SCRIPT.zh-TW.md)（[English](docs/DEMO-SCRIPT.md)）。安裝包（zip）裡也有一份 `playground.html`。
+
+## 最新版：4.3.0
+
+- **下載**：[GitHub Releases → SofaPad 4.3.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.3.0)（`SofaPad-4.3.0-macOS.zip`，macOS 13 以上，Apple 晶片）。安裝：[`docs/INSTALL.md`](docs/INSTALL.md)。
+- **4.3 新功能**：輸入框半寬，旁邊是游標板和 ⏎；輸入列、按鍵列、橫拿側欄都可以自己排；橫拿有側欄和全高的觸控板；示範場。
+- **4.3 的預設**：按鍵列不放 ⏎（在游標板右邊；要的話到「✎ 編輯」加）；直拿、即時模式打字時輸入框一行，觸控板保持 290 px 以上；橫拿側欄在左邊（左手模式在右邊）。
+- 完整更新紀錄：[`CHANGELOG.md`](CHANGELOG.md)（英文）。發行說明：[`docs/release/4.3.0.md`](docs/release/4.3.0.md)（中英）。
+
 ---
 
 ## 第一次使用（約 10 分鐘）
@@ -30,7 +53,7 @@
    - **會看到**最後一行 `Built …/dist/SofaPad.app`。
 3. 在 Finder 把 `dist/SofaPad.app` 拖到「應用程式」資料夾（權限設定比較穩定）。
 
-**B. 用別人建好的 `SofaPad.app`**（AirDrop、下載）：可以，但第一次打開會被擋，照第 2 步做。從發行的 zip（`SofaPad-<版本>-macOS.zip`，Apple 晶片）安裝：見 [`docs/INSTALL.md`](docs/INSTALL.md)，裡面有怎麼核對 SHA-256。
+**B. 用別人建好的 `SofaPad.app`**（AirDrop、下載）：可以，但第一次打開會被擋，照第 2 步做。從發行的 zip（`SofaPad-<版本>-macOS.zip`，Apple 晶片；最新是 [4.3.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.3.0)）安裝：見 [`docs/INSTALL.md`](docs/INSTALL.md)，裡面有怎麼核對 SHA-256。
 
 ### 2. 第一次打開 App（被 Gatekeeper 擋時）
 
@@ -229,7 +252,7 @@ App 改名後，macOS 會把它當成新的 App，所以輔助使用權限要重
 
 ## 怎麼示範給別人看（練習網頁）
 
-[`demo/playground.html`](demo/playground.html) 是在 Mac 上用的練習網頁：用瀏覽器打開（不用連網，也不收任何資料），再用手機一關一關操作。每個功能一關，頁面偵測到做完就亮綠勾：觸控板、打字（即時、整段、注音、聽寫不疊字）、送出後自動清空、游標板、快捷鍵和貼上截圖、縮放和切換桌面、4.3 的新排版。「錄影模式」會把小字藏起來，適合錄影。2–3 分鐘和 60 秒兩種錄影腳本，每一幕寫好手機做什麼、Mac 看到什麼、旁白：[`docs/DEMO-SCRIPT.zh-TW.md`](docs/DEMO-SCRIPT.zh-TW.md)（[English](docs/DEMO-SCRIPT.md)）。
+見最上面的「[先玩玩看：示範場](#先玩玩看示範場)」。
 
 ## 開發
 

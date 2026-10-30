@@ -3,27 +3,51 @@
 SofaPad playground: practice and demo page. Open it on the Mac in a browser (file://, works offline) and drive it
 from the iPhone with SofaPad. One stage on screen at a time; each check ticks when the page sees the event.
 Detection uses the normal browser events that SofaPad's real macOS events produce; isTrusted is never read.
-No network, no storage. The only setting, recording mode, lives in the URL (?rec=1). #stage=N opens stage N
-(1–7, or summary).
+No network, no storage.
+
+Settings: all in the URL, plus one meta tag for the mode. The page's own buttons keep the other settings in the URL.
+  ?lang=en|zh  language: English (default) or Chinese (Traditional, Taiwan). The 中文 / EN button at the top right
+               switches in place (progress and typed text are kept; the stage 4 and stage 5 sentences change language,
+               and stage 4's box starts over unless it was already fixed) and writes lang=zh into the URL, or takes
+               lang out for English, the way the recording-mode button writes rec=1.
+  ?rec=1       recording mode.
+  mode         full (default): stages 1–7 and the summary; stage 2 has four boxes (① live, ② batch + send,
+               ③ Zhuyin, ④ dictation). video: the short recording version, stages 1, 2, 5, 6, 7 shown as 1–5 (nav,
+               recording badge, summary; totals count only these), and stage 2 has ① live and ② dictation only.
+               ?video=1 turns it on, ?video=0 forces full; otherwise <meta name="playground-mode"> in the head decides
+               (content="full" in this file; content="video" makes a copy open in video mode).
+  #stage=N     opens a stage by its internal id (1–7, or summary) in both modes. In video mode #stage=5 is the stage
+               shown as 3; stages 3 and 4 do not exist there.
+Stage 2 live box: in English (and in video mode in both languages) the target is an English sentence checked word by
+word, swipe typing allowed; on the Chinese page in full mode it is a Chinese sentence checked character by character.
 
 Test hooks
-  window.playground = { state(), go(n), reset() }
-    state() → { current, rec, elapsedMs, total: { done, all }, manual: [checkIds],
-                stages: { "1": { name, done, checks: { <checkId>: bool }, manual: [checkIds], times: { <checkId>: ms } }, … } }
-    go(n)   → 1…7 or "summary"; returns false for anything else
-    reset() → same as 「重來」, without the confirm step and the flash
+  window.playground = { state(), go(n), reset(), texts }
+    state() → { lang, mode, current, rec, elapsedMs, total: { done, all }, manual: [checkIds],
+                stages: { "1": { no, name, done, checks: { <checkId>: bool }, manual: [checkIds],
+                                 times: { <checkId>: ms } }, … } }
+              stages has the mode's stages only, by internal id; no is the number on screen, name is in the page's
+              language.
+    go(n)   → an internal stage id of the mode, or "summary"; returns false for anything else
+    reset() → same as Restart (重來), without the confirm step and the flash
+    texts   → what the page asks for in its current language and mode (read it again after switching):
+              { live, liveCheck: "words" | "chars", dictation, copy,
+                full mode only: buffer, zhuyin, chat: [first, second],
+                                typo: { sentence, wrong, fix, fixed, at } }
+              at is where wrong starts in sentence: select exactly wrong with ⇧ and type fix to get fixed.
   Check rows: id="chk-<checkId>", data-check="<checkId>", data-done="1" once done. Manual checks are buttons
   (click toggles). Sections: data-stage="1"…"7" (id stage-N) and data-stage="summary" (id stage-summary).
 
 Ids
-  page     nav, nav-1 … nav-7, nav-summary, btn-rec, btn-reset, banner, banner-text, btn-next, rec-badge,
-           key-echo, toast, flash, footer
+  page     nav, nav-<id> for the mode's stages, nav-summary, btn-lang, btn-rec, btn-reset, banner, banner-text,
+           btn-next, rec-badge, key-echo, toast, flash, footer
   stage 1  s1-move, s1-move-bar, s1-move-num, s1-click, s1-rc (right-click target), s1-rc-result, s1-menu,
            s1-menu-like, s1-menu-save, s1-menu-share, s1-list, s1-list-bar, s1-arena, s1-blue, s1-orange,
            s1-drop-blue, s1-drop-orange
-  stage 2  s2-live, s2-buffer, s2-zhuyin, s2-dictation (fields); s2-<name>-target, s2-<name>-status
+  stage 2  s2-live, s2-buffer, s2-zhuyin, s2-dictation (fields; buffer and zhuyin full mode only);
+           s2-<name>-target, s2-<name>-status, s2-dictation-no
   stage 3  s3-messages, s3-input, s3-send, s3-retry, s3-result
-  stage 4  s4-text, s4-target, s4-arrows, s4-word, s4-select, s4-fixed, s4-sel
+  stage 4  s4-fixline, s4-text, s4-target, s4-arrows, s4-word, s4-select, s4-fixed, s4-sel
   stage 5  s5-source, s5-target, s5-status, s5-shot (image paste zone), s5-shot-img, s5-shot-status
   stage 6  s6-frame, s6-art, s6-zoom, s6-away-status
   stage 7  s7-messages, s7-input
@@ -32,20 +56,21 @@ Ids
 
 Check ids (stage: checks; * = manual)
   1: move click rightclick scroll drag draglock
-  2: live buffer zhuyin dictation
-  3: sent1 sent2 clean
-  4: arrows word select fixed
+  2: live buffer zhuyin dictation (video mode: live dictation)
+  3: sent1 sent2 clean            (full mode only)
+  4: arrows word select fixed     (full mode only)
   5: selectall copy paste undo screenshot
   6: zoomin zoomout away mission*
   7: enter portrait* reorder* landscape*
 -->
-<html lang="zh-Hant-TW">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src blob: data:">
+<meta name="playground-mode" content="full">
 <link rel="icon" href="data:,">
-<title>SofaPad 示範場</title>
+<title>SofaPad Playground</title>
 <style>
 :root {
   --bg: #f3f5f8;
@@ -304,6 +329,7 @@ textarea.field { display: block; height: 96px; line-height: 1.35; resize: none; 
 .target { min-height: 2.6em; margin-bottom: 10px; font-size: 24px; font-weight: 900; line-height: 1.3; color: var(--ink); }
 .target .hit { color: var(--ok); }
 .target .hint { color: var(--muted); font-weight: 700; }
+.target .miss { color: var(--bad); text-decoration: underline wavy; text-underline-offset: 4px; }
 
 /* Stage 2 */
 .s2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
@@ -472,6 +498,12 @@ kbd {
 .schip.done { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ok); }
 .schip.manual { border-style: dashed; }
 html.rec .schip { font-size: 16px; }
+
+/* Language button; nav names hidden (except the current one) when the top bar would not fit (set by fitNav) */
+#btn-lang { min-width: 56px; padding: 0 12px; }
+.top.tight .nav-item:not(.nav-sum):not([aria-current]) .nav-name { display: none; }
+/* English page: a Chinese phone label quoted in a sentence (送出, ◀ 游標 ▶ …) does not break in the middle */
+html:lang(en) main { word-break: keep-all; }
 </style>
 </head>
 <body>
@@ -479,13 +511,14 @@ html.rec .schip { font-size: 16px; }
 <header class="top">
   <div class="brand">
     <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#2154d9"/><path d="M9 14a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v2H9z" fill="#fff" opacity=".55"/><path d="M6 16a2 2 0 0 1 4 0v2.5h12V16a2 2 0 0 1 4 0v6a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 6 22z" fill="#fff"/></svg>
-    SofaPad 示範場
+    <span data-i18n="brand">SofaPad Playground</span>
   </div>
-  <div class="rec-badge" id="rec-badge"><i></i><span id="rec-badge-text">SofaPad 示範 · 第 1 關</span></div>
-  <nav id="nav" aria-label="關卡"></nav>
+  <div class="rec-badge" id="rec-badge"><i></i><span id="rec-badge-text">SofaPad demo · Stage 1</span></div>
+  <nav id="nav" aria-label="Stages" data-i18n-attr="aria-label:navLabel"></nav>
   <div class="tools">
-    <button class="btn" id="btn-rec" type="button" tabindex="-1" aria-pressed="false">錄影模式</button>
-    <button class="btn" id="btn-reset" type="button" tabindex="-1">重來</button>
+    <button class="btn" id="btn-lang" type="button" tabindex="-1" lang="zh-Hant-TW" title="Show this page in Chinese" aria-label="Show this page in Chinese">中文</button>
+    <button class="btn" id="btn-rec" type="button" tabindex="-1" aria-pressed="false">Recording mode</button>
+    <button class="btn" id="btn-reset" type="button" tabindex="-1">Restart</button>
   </div>
 </header>
 
@@ -493,176 +526,176 @@ html.rec .schip { font-size: 16px; }
 
 <!-- Stage 1 -->
 <section class="stage" id="stage-1" data-stage="1">
-  <h1 class="headline"><span class="pre">現在示範：</span>觸控板</h1>
-  <p class="help">手機：單指滑＝移動，點一下＝點擊，兩指點一下＝右鍵，兩指上下滑＝捲動。拖曳：長按約半秒，出現「拖曳中」再滑；或按「鎖」（拖曳鎖定）→ 滑（可以分好幾次）→ 再按一次「鎖」放開。</p>
+  <h1 class="headline"><span class="pre" data-i18n="pre">Now showing: </span><span data-i18n="stage.1">Trackpad</span></h1>
+  <p class="help" data-i18n="s1.help"></p>
   <div class="body">
     <div class="s1">
       <div class="card" id="s1-move">
-        <div class="card-title">移動游標 <small>累計 600 px</small></div>
+        <div class="card-title" data-i18n-html="s1.moveTitle"></div>
         <div class="meter"><i id="s1-move-bar"></i></div>
         <div class="bignum" id="s1-move-num">0 / 600 px</div>
       </div>
       <div class="card">
-        <div class="card-title">點一下</div>
-        <button class="click-btn" id="s1-click" type="button" tabindex="-1">點我</button>
+        <div class="card-title" data-i18n="s1.clickTitle"></div>
+        <button class="click-btn" id="s1-click" type="button" tabindex="-1"></button>
       </div>
       <div class="card">
-        <div class="card-title">兩指點一下 <small>右鍵</small></div>
-        <div class="rc-target" id="s1-rc"><span id="s1-rc-result">在這裡按右鍵</span></div>
+        <div class="card-title" data-i18n-html="s1.rcTitle"></div>
+        <div class="rc-target" id="s1-rc"><span id="s1-rc-result"></span></div>
       </div>
       <div class="card">
-        <div class="card-title">兩指捲到最底 <small>游標放在清單上</small></div>
+        <div class="card-title" data-i18n-html="s1.listTitle"></div>
         <div class="meter thin"><i id="s1-list-bar"></i></div>
         <ol class="list" id="s1-list"></ol>
       </div>
       <div class="card wide">
-        <div class="card-title">拖進框裡 <small>藍色用長按拖曳，橘色用「鎖」</small></div>
+        <div class="card-title" data-i18n-html="s1.dragTitle"></div>
         <div class="arena" id="s1-arena">
-          <div class="drop blue" id="s1-drop-blue">藍色放這裡</div>
-          <div class="drop orange" id="s1-drop-orange">橘色放這裡</div>
-          <div class="block blue" id="s1-blue" data-kind="blue"><div>藍色<br><small>長按拖曳</small></div></div>
-          <div class="block orange" id="s1-orange" data-kind="orange"><div>橘色<br><small>拖曳鎖定</small></div></div>
+          <div class="drop blue" id="s1-drop-blue" data-i18n="s1.dropBlue"></div>
+          <div class="drop orange" id="s1-drop-orange" data-i18n="s1.dropOrange"></div>
+          <div class="block blue" id="s1-blue" data-kind="blue"><div data-i18n-html="s1.blue"></div></div>
+          <div class="block orange" id="s1-orange" data-kind="orange"><div data-i18n-html="s1.orange"></div></div>
         </div>
       </div>
     </div>
-    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="1"></ol></aside>
+    <aside class="checks"><h2 data-i18n="checksHead"></h2><ol data-checks="1"></ol></aside>
   </div>
   <div class="menu" id="s1-menu" role="menu" hidden>
-    <button type="button" id="s1-menu-like" role="menuitem" tabindex="-1">👍 讚</button>
-    <button type="button" id="s1-menu-save" role="menuitem" tabindex="-1">⭐ 收藏</button>
-    <button type="button" id="s1-menu-share" role="menuitem" tabindex="-1">📤 分享</button>
+    <button type="button" id="s1-menu-like" role="menuitem" tabindex="-1" data-i18n="s1.like"></button>
+    <button type="button" id="s1-menu-save" role="menuitem" tabindex="-1" data-i18n="s1.save"></button>
+    <button type="button" id="s1-menu-share" role="menuitem" tabindex="-1" data-i18n="s1.share"></button>
   </div>
 </section>
 
 <!-- Stage 2 -->
 <section class="stage" id="stage-2" data-stage="2" hidden>
-  <h1 class="headline"><span class="pre">現在示範：</span>打字</h1>
-  <p class="help">先用觸控板點進框裡。即時模式：每選好一個字就出現在 Mac 上。整段模式：點「即時」切成「整段」，打好再按「送出」。注音：選好字才會送出。聽寫：用 iPhone 鍵盤的 🎤，說完停一下。</p>
+  <h1 class="headline"><span class="pre" data-i18n="pre">Now showing: </span><span data-i18n="stage.2">Typing</span></h1>
+  <p class="help" id="s2-help" data-i18n="s2.help"></p>
   <div class="body">
     <div class="s2">
       <div class="card">
-        <div class="card-title">① 即時模式 <span class="pill">即時</span></div>
+        <div class="card-title" data-i18n-html="s2.liveTitle"></div>
         <div class="target" id="s2-live-target"></div>
         <input class="field" id="s2-live" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="status" id="s2-live-status"></div>
       </div>
-      <div class="card">
-        <div class="card-title">② 整段模式＋送出 <span class="pill">整段</span></div>
+      <div class="card" id="s2-buffer-card">
+        <div class="card-title" data-i18n-html="s2.bufferTitle"></div>
         <div class="target" id="s2-buffer-target"></div>
         <input class="field" id="s2-buffer" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="status" id="s2-buffer-status"></div>
       </div>
-      <div class="card">
-        <div class="card-title">③ 注音中文 <span class="pill">選好字才送</span></div>
-        <div class="target" id="s2-zhuyin-target"></div>
+      <div class="card" id="s2-zhuyin-card">
+        <div class="card-title" data-i18n-html="s2.zhuyinTitle"></div>
+        <div class="target" id="s2-zhuyin-target" lang="zh-Hant-TW"></div>
         <input class="field" id="s2-zhuyin" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="status" id="s2-zhuyin-status"></div>
       </div>
       <div class="card">
-        <div class="card-title">④ 鍵盤 🎤 聽寫 <span class="pill">建議說這句</span></div>
-        <div class="target" id="s2-dictation-target">今天天氣很好，我們去公園散步</div>
+        <div class="card-title"><span><span id="s2-dictation-no">④</span> <span data-i18n="s2.dictTitle"></span></span> <span class="pill" data-i18n="s2.dictPill"></span></div>
+        <div class="target" id="s2-dictation-target"></div>
         <textarea class="field" id="s2-dictation" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
         <div class="status" id="s2-dictation-status"></div>
       </div>
     </div>
-    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="2"></ol></aside>
+    <aside class="checks"><h2 data-i18n="checksHead"></h2><ol data-checks="2"></ol></aside>
   </div>
 </section>
 
 <!-- Stage 3 -->
 <section class="stage" id="stage-3" data-stage="3" hidden>
-  <h1 class="headline"><span class="pre">現在示範：</span>送出後自動清空</h1>
-  <p class="help">用手機打第一句，不要按 Enter，用觸控板點「傳送」；再打第二句，再點一次「傳送」。點了觸控板，手機的輸入框就會清空，所以第二句不會帶著第一句。</p>
+  <h1 class="headline"><span class="pre" data-i18n="pre">Now showing: </span><span data-i18n="stage.3"></span></h1>
+  <p class="help" data-i18n="s3.help"></p>
   <div class="body">
     <div class="s3">
       <div class="card chat">
-        <div class="chat-head">示範聊天室 <button class="btn small" id="s3-retry" type="button" tabindex="-1">清空重試</button></div>
+        <div class="chat-head"><span data-i18n="s3.chatHead"></span> <button class="btn small" id="s3-retry" type="button" tabindex="-1" data-i18n="s3.retry"></button></div>
         <div class="msgs" id="s3-messages"></div>
         <div class="compose">
-          <input class="field" id="s3-input" type="text" placeholder="打一句話…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          <button class="send" id="s3-send" type="button" tabindex="-1">傳送</button>
+          <input class="field" id="s3-input" type="text" data-i18n-attr="placeholder:s3.placeholder" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button class="send" id="s3-send" type="button" tabindex="-1" data-i18n="s3.send"></button>
         </div>
       </div>
       <div class="card">
         <div class="say">
-          <div class="say-line"><b>1</b><span><small>先打這句，點「傳送」</small>早安，今天開會</span></div>
-          <div class="say-line"><b>2</b><span><small>再打這句，點「傳送」</small>收到，馬上到</span></div>
+          <div class="say-line"><b>1</b><span><small data-i18n="s3.first"></small><span data-text="chat.0"></span></span></div>
+          <div class="say-line"><b>2</b><span><small data-i18n="s3.second"></small><span data-text="chat.1"></span></span></div>
         </div>
-        <p class="no-enter">不要按 Enter：用觸控板點「傳送」</p>
+        <p class="no-enter" data-i18n="s3.noEnter"></p>
         <div class="result" id="s3-result"></div>
       </div>
     </div>
-    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="3"></ol></aside>
+    <aside class="checks"><h2 data-i18n="checksHead"></h2><ol data-checks="3"></ol></aside>
   </div>
 </section>
 
 <!-- Stage 4 -->
 <section class="stage" id="stage-4" data-stage="4" hidden>
-  <h1 class="headline"><span class="pre">現在示範：</span>游標板</h1>
-  <p class="help">先用觸控板點進文字。按住「◀ 游標 ▶」約 0.3 秒（手機輕震一下）再拖，Mac 的文字游標就跟著走；快速甩一下跳一個字詞。按「⇧ 選取」再拖＝選取（或拖的時候另一根手指點一下）。選起錯字，直接打對的字。</p>
+  <h1 class="headline"><span class="pre" data-i18n="pre">Now showing: </span><span data-i18n="stage.4"></span></h1>
+  <p class="help" data-i18n="s4.help"></p>
   <div class="body">
     <div class="s4">
       <div class="card">
-        <div class="card-title">把錯字改掉</div>
-        <div class="fixline">觸<del>空</del>板<span class="arrow">→</span>觸<ins>控</ins>板</div>
-        <div class="status" id="s4-target">目標：SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸控板。</div>
+        <div class="card-title" data-i18n="s4.title"></div>
+        <div class="fixline" id="s4-fixline"></div>
+        <div class="status" id="s4-target"></div>
       </div>
       <div class="card">
-        <textarea class="field big" id="s4-text" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸空板。</textarea>
+        <textarea class="field big" id="s4-text" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
         <div class="status sel" id="s4-sel"></div>
       </div>
       <div class="chips">
         <span class="chip" id="s4-arrows"></span>
-        <span class="chip" id="s4-word">⌥ 跳一個字詞</span>
-        <span class="chip" id="s4-select">⇧ 選取</span>
-        <span class="chip" id="s4-fixed">改好了</span>
+        <span class="chip" id="s4-word" data-i18n="s4.word"></span>
+        <span class="chip" id="s4-select" data-i18n="s4.select"></span>
+        <span class="chip" id="s4-fixed" data-i18n="s4.fixed"></span>
       </div>
     </div>
-    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="4"></ol></aside>
+    <aside class="checks"><h2 data-i18n="checksHead"></h2><ol data-checks="4"></ol></aside>
   </div>
 </section>
 
 <!-- Stage 5 -->
 <section class="stage" id="stage-5" data-stage="5" hidden>
-  <h1 class="headline"><span class="pre">現在示範：</span>快捷鍵</h1>
-  <p class="help">用「⌘ 快捷鍵」面板或按鍵列：在上面那句 ⌘A 全選、⌘C 拷貝；點進下面的空格 ⌘V 貼上；再 ⌘Z 復原。截圖：⌃⇧⌘4 框一塊螢幕（存到剪貼簿），再 ⌘V。</p>
+  <h1 class="headline"><span class="pre" data-i18n="pre">Now showing: </span><span data-i18n="stage.5"></span></h1>
+  <p class="help" data-i18n="s5.help"></p>
   <div class="body">
     <div class="s5">
       <div class="stack">
         <div class="card">
-          <div class="card-title">① 全選、拷貝這一句</div>
-          <input class="field" id="s5-source" type="text" value="SofaPad 很好用" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <div class="card-title" data-i18n="s5.copyTitle"></div>
+          <input class="field" id="s5-source" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         <div class="card">
-          <div class="card-title">② 貼到這裡</div>
+          <div class="card-title" data-i18n="s5.pasteTitle"></div>
           <input class="field" id="s5-target" type="text" placeholder="⌘V" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           <div class="status" id="s5-status"></div>
         </div>
-        <div class="keys"><kbd>⌘A</kbd>→<kbd>⌘C</kbd>→ 點下面 →<kbd>⌘V</kbd>→<kbd>⌘Z</kbd></div>
+        <div class="keys" data-i18n-html="s5.keys"></div>
       </div>
       <div class="card">
-        <div class="card-title">③ 截圖貼上區</div>
+        <div class="card-title" data-i18n="s5.shotTitle"></div>
         <div class="shot" id="s5-shot">
-          <div class="shot-hint">⌃⇧⌘4 截圖到剪貼簿<br>再 ⌘V 貼進來</div>
-          <img id="s5-shot-img" alt="貼上的截圖" hidden>
+          <div class="shot-hint" data-i18n-html="s5.shotHint"></div>
+          <img id="s5-shot-img" data-i18n-attr="alt:s5.shotAlt" alt="" hidden>
           <div class="status" id="s5-shot-status"></div>
         </div>
       </div>
     </div>
-    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="5"></ol></aside>
+    <aside class="checks"><h2 data-i18n="checksHead"></h2><ol data-checks="5"></ol></aside>
   </div>
 </section>
 
 <!-- Stage 6 -->
 <section class="stage" id="stage-6" data-stage="6" hidden>
-  <h1 class="headline"><span class="pre">現在示範：</span>縮放與桌面</h1>
-  <p class="help">兩指張開＝⌘＝（放大），捏合＝⌘−（縮小）。三指往左／往右滑＝切換桌面；三指往上＝Mission Control。三指手勢的效果在 macOS 本身，不在這一頁。</p>
+  <h1 class="headline"><span class="pre" data-i18n="pre">Now showing: </span><span data-i18n="stage.6"></span></h1>
+  <p class="help" data-i18n="s6.help"></p>
   <div class="body">
     <div class="s6">
       <div class="card">
-        <div class="card-title">兩指張開、捏合 <small>⌘＝ ／ ⌘−</small></div>
+        <div class="card-title" data-i18n-html="s6.pinchTitle"></div>
         <div class="frame" id="s6-frame">
-          <svg id="s6-art" viewBox="0 0 480 300" role="img" aria-label="沙發上的手機">
+          <svg id="s6-art" viewBox="0 0 480 300" role="img" data-i18n-attr="aria-label:s6.artLabel">
             <circle cx="236" cy="170" r="130" fill="#dfe8fc"/>
             <g transform="translate(336 30)">
               <rect width="112" height="74" rx="8" fill="#1f2937"/>
@@ -701,88 +734,88 @@ html.rec .schip { font-size: 16px; }
               <rect x="319" y="189" width="6" height="5" rx="1" fill="#f5b942"/>
               <rect x="283" y="197" width="42" height="12" rx="2" fill="#cbd5e1"/>
             </g>
-            <text x="240" y="292" text-anchor="middle" font-size="13" font-weight="700" fill="#5a6476">SofaPad：iPhone 當 Mac 的鍵盤和觸控板</text>
+            <text x="240" y="292" text-anchor="middle" font-size="13" font-weight="700" fill="#5a6476" data-i18n="s6.artText"></text>
           </svg>
           <div class="zoom-badge" id="s6-zoom">100%</div>
         </div>
       </div>
       <div class="card">
         <div class="gesture">
-          <b>三指往左／往右滑</b>
-          <span>切到別的桌面，再滑回來</span>
+          <b data-i18n="s6.g1"></b>
+          <span data-i18n="s6.g1s"></span>
           <div class="status" id="s6-away-status"></div>
         </div>
         <div class="gesture">
-          <b>三指往上滑</b>
-          <span>Mission Control 出現後，三指往下滑回來，在右邊手動打勾</span>
+          <b data-i18n="s6.g2"></b>
+          <span data-i18n="s6.g2s"></span>
         </div>
         <div class="gesture">
-          <b>效果在 macOS 本身</b>
-          <span>這一頁只看得到「離開了又回來」</span>
+          <b data-i18n="s6.g3"></b>
+          <span data-i18n="s6.g3s"></span>
         </div>
       </div>
     </div>
-    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="6"></ol></aside>
+    <aside class="checks"><h2 data-i18n="checksHead"></h2><ol data-checks="6"></ol></aside>
   </div>
 </section>
 
 <!-- Stage 7 -->
 <section class="stage" id="stage-7" data-stage="7" hidden>
-  <h1 class="headline"><span class="pre">現在示範：</span>4.3 新排版</h1>
-  <p class="help">Mac 看不到手機畫面，所以排版的三項請看手機，自己用觸控板打勾。⏎ 會自動判斷：點進框裡打一行，按游標板旁邊的 ⏎。</p>
+  <h1 class="headline"><span class="pre" data-i18n="pre">Now showing: </span><span data-i18n="stage.7"></span></h1>
+  <p class="help" data-i18n="s7.help"></p>
   <div class="body">
     <div class="s7">
       <div class="card chat small">
-        <div class="chat-head">打一行，按手機上游標板旁邊的 ⏎</div>
+        <div class="chat-head" data-i18n="s7.chatHead"></div>
         <div class="msgs" id="s7-messages"></div>
         <div class="compose">
-          <input class="field" id="s7-input" type="text" placeholder="打一行，按 ⏎" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <input class="field" id="s7-input" type="text" data-i18n-attr="placeholder:s7.placeholder" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
       </div>
       <div class="card">
         <div class="mocks">
           <figure class="mock">
             <div class="phone-p" aria-hidden="true">
-              <div class="m-pad">觸控板</div>
-              <div class="m-io"><span class="m-input">輸入框</span><span class="m-caret">◀ 游標 ▶</span><span class="m-enter">⏎</span></div>
-              <div class="m-keys"><span>即時</span><span>⌘</span><span>⇧ 選取</span><span>esc</span><span>tab</span><span>⌫</span><span>←</span><span>→</span><span class="m-edit">✎</span></div>
+              <div class="m-pad" data-i18n="m.pad"></div>
+              <div class="m-io"><span class="m-input" data-i18n="m.input"></span><span class="m-caret" data-i18n="m.caret"></span><span class="m-enter">⏎</span></div>
+              <div class="m-keys"><span data-i18n="m.live"></span><span>⌘</span><span data-i18n="m.select"></span><span>esc</span><span>tab</span><span>⌫</span><span>←</span><span>→</span><span class="m-edit">✎</span></div>
             </div>
-            <figcaption>直拿：輸入框半寬<br>右半是游標板和 ⏎</figcaption>
+            <figcaption data-i18n-html="cap.portrait"></figcaption>
           </figure>
           <figure class="mock">
             <div class="editor" aria-hidden="true">
-              <div class="m-tabs"><span>輸入列</span><span class="on">按鍵列</span><span>橫拿側欄</span></div>
+              <div class="m-tabs"><span data-i18n="m.tabInput"></span><span class="on" data-i18n="m.tabKeys"></span><span data-i18n="m.tabSide"></span></div>
               <ul class="m-list">
-                <li><i>≡</i>⇧ 選取<b>✕</b></li>
+                <li><i>≡</i><span data-i18n="m.select"></span><b>✕</b></li>
                 <li><i>≡</i>esc<b>✕</b></li>
                 <li class="lift"><i>≡</i>tab<b>✕</b></li>
                 <li><i>≡</i>⌫<b>✕</b></li>
               </ul>
-              <div class="m-reset">全部恢復預設</div>
+              <div class="m-reset" data-i18n="m.reset"></div>
             </div>
-            <figcaption>✎ 編輯：按住 ≡ 拖曳排序<br>✕ 拿掉，點清單加回來</figcaption>
+            <figcaption data-i18n-html="cap.editor"></figcaption>
           </figure>
           <figure class="mock">
             <div class="phone-l" aria-hidden="true">
               <div class="m-side">
-                <div class="m-top"><span>●</span><span>⌨</span><span>鎖</span><span>⚙</span><span>‹</span></div>
-                <div class="m-io"><span class="m-input">輸入</span><span class="m-caret">◀▶</span><span class="m-enter">⏎</span></div>
+                <div class="m-top"><span>●</span><span>⌨</span><span data-i18n="m.lock"></span><span>⚙</span><span>‹</span></div>
+                <div class="m-io"><span class="m-input" data-i18n="m.inputShort"></span><span class="m-caret">◀▶</span><span class="m-enter">⏎</span></div>
                 <div class="m-grid"><span>⌘C</span><span>⌘V</span><span>⌘X</span><span>⌘Z</span><span>⌘A</span><span>⌘Tab</span><span>MC</span><span>⌃←</span><span>⌃→</span></div>
               </div>
-              <div class="m-pad">觸控板</div>
+              <div class="m-pad" data-i18n="m.pad"></div>
             </div>
-            <figcaption>橫拿：側欄（右手用在左邊）<br>另一邊是全高的觸控板</figcaption>
+            <figcaption data-i18n-html="cap.landscape"></figcaption>
           </figure>
         </div>
       </div>
     </div>
-    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="7"></ol></aside>
+    <aside class="checks"><h2 data-i18n="checksHead"></h2><ol data-checks="7"></ol></aside>
   </div>
 </section>
 
 <!-- Summary -->
 <section class="stage" id="stage-summary" data-stage="summary" hidden>
-  <h1 class="headline"><span class="pre">示範</span>總表</h1>
+  <h1 class="headline"><span class="pre" data-i18n="sumPre">Demo </span><span data-i18n="sumTitle">summary</span></h1>
   <div class="sum-top">
     <div class="sum-count" id="sum-count"></div>
     <div class="sum-elapsed" id="sum-elapsed"></div>
@@ -790,16 +823,16 @@ html.rec .schip { font-size: 16px; }
   <table class="sum-table" id="sum-table"><tbody></tbody></table>
 </section>
 
-<footer id="footer">這一頁不收集任何資料：不連網路、不存檔、不上傳，所有判斷都只在這個瀏覽器分頁裡，關掉就清空。</footer>
+<footer id="footer" data-i18n="footer"></footer>
 </main>
 
 <div class="banner" id="banner" hidden>
   <div class="banner-text" id="banner-text"></div>
-  <button class="btn-next" id="btn-next" type="button" tabindex="-1">下一關 →</button>
+  <button class="btn-next" id="btn-next" type="button" tabindex="-1"></button>
 </div>
 <div class="key-echo" id="key-echo" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" hidden></div>
-<div class="flash" id="flash" hidden>開始</div>
+<div class="flash" id="flash" hidden data-i18n="flash">Start</div>
 
 <script>
 (() => {
@@ -812,69 +845,491 @@ html.rec .schip { font-size: 16px; }
   const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim();
   const same = (a, b) => norm(a).toLowerCase() === norm(b).toLowerCase();
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-  // What each stage asks for. Check ids are unique across stages; manual ones are ticked by hand.
+  // ---- settings: the URL, and the meta tag for the mode (see the comment at the top) ----
+
+  const Q = new URLSearchParams(location.search);
+  const metaMode = (document.querySelector('meta[name="playground-mode"]') || {}).content;
+  const MODE = Q.get('video') === '1' ? 'video' : Q.get('video') === '0' ? 'full' : metaMode === 'video' ? 'video' : 'full';
+  const VIDEO = MODE === 'video';
+  let LANG = /^zh/i.test(Q.get('lang') || '') ? 'zh' : 'en';
+
+  // ---- interface text ----
+  // t(key, vars): a string with {var} slots, or a function of vars. A key ending in @video, when there is one, is used
+  // in video mode instead. ck.<checkId> is [label, short]. A key missing in Chinese falls back to English.
+
+  const I18N = {
+    en: {
+      htmlLang: 'en',
+      title: 'SofaPad Playground',
+      brand: 'SofaPad Playground',
+      navLabel: 'Stages',
+      langBtn: '中文',
+      langBtnLang: 'zh-Hant-TW',
+      langTitle: 'Show this page in Chinese',
+      rec: 'Recording mode',
+      recOn: '● Recording mode',
+      reset: 'Restart',
+      resetConfirm: 'Really restart?',
+      pre: 'Now showing: ',
+      checksHead: 'Goals for this stage',
+      navTitle: 'Stage {n}: {name}',
+      navSummary: 'Summary',
+      badge: 'SofaPad demo · Stage {n}',
+      badgeSummary: 'SofaPad demo · Summary',
+      done: '✓ Done: {name}',
+      next: 'Next stage →',
+      seeSummary: 'See summary →',
+      flash: 'Start',
+      footer: 'This page collects nothing: no network, nothing saved, nothing uploaded. Every check runs in this browser tab, and it is all gone when you close it.',
+      sumPre: 'Demo ',
+      sumTitle: 'summary',
+      sumDone: ' / {all} done',
+      sumAuto: 'auto',
+      sumManual: 'manual',
+      sumElapsed: 'Time since the start (or Restart): {t}',
+      listSep: '; ',
+      noMessages: 'No messages yet',
+
+      'stage.1': 'Trackpad', 'nav.1': 'Trackpad',
+      'stage.2': 'Typing', 'nav.2': 'Typing',
+      'stage.3': 'Box empties after sending', 'nav.3': 'Box empties',
+      'stage.4': 'Cursor pad', 'nav.4': 'Cursor pad',
+      'stage.5': 'Shortcuts', 'nav.5': 'Shortcuts',
+      'stage.6': 'Zoom and desktops', 'nav.6': 'Zoom, desktops',
+      'stage.7': 'The 4.3 layout', 'nav.7': '4.3 layout',
+      'head.7': 'Tick by hand (the Mac cannot see the phone)',
+
+      'ck.move': ['Move the pointer 600 px', 'Move'],
+      'ck.click': ['Click “Click me”', 'Click'],
+      'ck.rightclick': ['Right-click menu, then pick an item', 'Right-click menu'],
+      'ck.scroll': ['Two-finger scroll to the end of the list', 'Two-finger scroll'],
+      'ck.drag': ['Long-press drag: blue into its box', 'Long-press drag'],
+      'ck.draglock': ['Drag lock: orange into its box', 'Drag lock'],
+      'ck.live': ['Type the sentence in Live mode (swiping works)', 'Live'],
+      'ck.buffer': ['Send it in one go in Whole mode', 'Whole + Send'],
+      'ck.zhuyin': ['Type Chinese with Zhuyin', 'Zhuyin'],
+      'ck.dictation': ['🎤 Dictation, nothing doubled', 'Dictation'],
+      'ck.sent1': ['Click Send with the trackpad: first message', 'First message'],
+      'ck.sent2': ['Click Send again: second message', 'Second message'],
+      'ck.clean': ['Nothing of the first message in the second', 'No leftover'],
+      'ck.arrows': ['Move the cursor with the arrow keys (3 presses)', 'Arrow keys'],
+      'ck.word': ['Quick flick: jump a word (⌥)', 'Word jump'],
+      'ck.select': ['⇧ Select: select the typo “{wrong}”', '⇧ Select'],
+      'ck.fixed': ['Fix it to “{w}”', 'Typo fixed'],
+      'ck.selectall': ['⌘A Select all', '⌘A'],
+      'ck.copy': ['⌘C Copy', '⌘C'],
+      'ck.paste': ['⌘V Paste into the empty box below', '⌘V'],
+      'ck.undo': ['⌘Z Undo', '⌘Z'],
+      'ck.screenshot': ['⌃⇧⌘4 screenshot, then ⌘V to paste it', 'Screenshot paste'],
+      'ck.zoomin': ['Spread two fingers: zoom in (⌘=)', 'Zoom in'],
+      'ck.zoomout': ['Pinch: zoom out (⌘−)', 'Zoom out'],
+      'ck.away': ['Three-finger swipe: another desktop and back', 'Switch desktops'],
+      'ck.mission': ['Mission Control appeared (tick by hand)', 'Mission Control'],
+      'ck.enter': ['Type a line, press the ⏎ next to the cursor pad', '⏎ Send'],
+      'ck.portrait': ['Portrait: half-width text box, cursor pad and ⏎ on the right', 'Portrait layout'],
+      'ck.reorder': ['✎ Edit: drag to reorder', '✎ Reorder'],
+      'ck.landscape': ['Landscape: side panel layout', 'Landscape panel'],
+
+      's1.help': 'On the phone: slide one finger to move, tap to click, tap with two fingers to right-click, swipe two fingers up or down to scroll. To drag: hold about half a second until 拖曳中 (Dragging) shows, then slide; or press 鎖 (Lock) for drag lock, slide (in as many strokes as you like), and press 鎖 again to let go.',
+      's1.moveTitle': 'Move the pointer <small>600 px in total</small>',
+      's1.clickTitle': 'Click',
+      's1.clickMe': 'Click me',
+      's1.clicked': 'Got it ✓',
+      's1.rcTitle': 'Two-finger tap <small>right-click</small>',
+      's1.rcHere': 'Right-click here',
+      's1.picked': 'You picked “{item}” ✓',
+      's1.listTitle': 'Two-finger scroll to the bottom <small>pointer on the list</small>',
+      's1.dragTitle': 'Drag into the boxes <small>blue with a long press, orange with 鎖 (Lock)</small>',
+      's1.dropBlue': 'Blue goes here',
+      's1.dropOrange': 'Orange goes here',
+      's1.blue': 'Blue<br><small>long-press drag</small>',
+      's1.orange': 'Orange<br><small>drag lock</small>',
+      's1.like': '👍 Like',
+      's1.save': '⭐ Save',
+      's1.share': '📤 Share',
+      's1.item': 'Item {i}',
+      's1.itemLast': 'Item 40: the end 🎉',
+      's1.scrolled': '{p}% down',
+      's1.wrongBox': 'Wrong box: blue goes in the blue box, orange in the orange one',
+
+      's2.help': 'Click into a box with the trackpad first. Live mode: type with the iPhone’s English keyboard; swiping works, and each word shows up on the Mac as soon as it is typed. Whole mode: tap 即時 (Live) to switch to 整段 (Whole), type, then press 送出 (Send). Zhuyin: a character is sent only once you pick it. Dictation: press 🎤 on the iPhone keyboard and pause when you finish.',
+      's2.help@video': 'Click into a box with the trackpad first. Live mode: type with the iPhone’s English keyboard; swiping works, and each word shows up on the Mac as soon as it is typed. Dictation: press 🎤 on the iPhone keyboard and pause when you finish.',
+      's2.liveTitle': '① Live mode (English, swiping works) <span class="pill">Live</span>',
+      's2.bufferTitle': '② Whole mode + Send <span class="pill">Whole</span>',
+      's2.zhuyinTitle': '③ Chinese with Zhuyin <span class="pill">sent once picked</span>',
+      's2.dictTitle': 'Keyboard 🎤 dictation',
+      's2.dictPill': 'try saying this',
+      's2.dictHint': '(any sentence, in English or Chinese)',
+      's2.w.empty': 'Type with the iPhone’s English keyboard (swiping works); each word goes to the Mac as soon as it is typed',
+      's2.live.ok': 'Correct ✓ ({n} inputs received)',
+      's2.w.progress': '{hits} / {all} words right, keep going',
+      's2.w.extra': 'extra word “{g}”',
+      's2.w.word': 'word {n} is “{g}”, should be “{w}”',
+      's2.w.wrong': (v) => `${cap(v.list)}: ${v.fix}`,
+      's2.w.fixExtra': 'delete the extra word',
+      's2.w.fixWord': 'delete it and type it again',
+      's2.c.empty': 'Each character goes to the Mac as soon as you pick it',
+      's2.c.count': '{n} inputs received, keep going',
+      's2.buf.empty': 'Switch to 整段 (Whole), type, then press 送出 (Send)',
+      's2.buf.ok': '{n} characters arrived within half a second ✓',
+      's2.buf.slow': 'The text is right, but it seems typed one by one: clear it and send it again in Whole mode',
+      's2.buf.max': 'At most {n} characters within half a second',
+      's2.zy.bopo': 'Zhuyin symbols showed up (“{b}”): a character still being composed should not be sent',
+      's2.zy.empty': 'Type with Zhuyin; a character is sent only once you pick it',
+      's2.zy.ok': 'Correct ✓ no Zhuyin symbols showed up',
+      's2.zy.going': 'No Zhuyin symbols ✓ keep going',
+      's2.d.empty': 'Click into the box, press 🎤 on the keyboard and say a sentence',
+      's2.d.rep': 'Doubled: “{r}” appears twice',
+      's2.d.more': 'Nothing doubled ✓ say a few more words ({c})',
+      's2.d.words': '{n} / 4 words',
+      's2.d.chars': '{n} / 6 characters',
+      's2.d.ok': 'Nothing doubled ✓',
+
+      's3.help': 'Type the first message on the phone. Do not press Enter: click Send with the trackpad. Then type the second message and click Send again. The trackpad click empties the phone’s text box, so the second message does not carry the first one with it.',
+      's3.chatHead': 'Demo chat',
+      's3.retry': 'Clear and retry',
+      's3.placeholder': 'Type a message…',
+      's3.send': 'Send',
+      's3.first': 'Type this first, click Send',
+      's3.second': 'Then this, click Send',
+      's3.noEnter': 'Do not press Enter: click Send with the trackpad',
+      's3.meta': 'Message {n} · Send clicked',
+      's3.wait1': 'After the second message, this checks for leftovers',
+      's3.wait2': 'After two messages, this checks the second one for leftovers',
+      's3.clean': 'Nothing left over from the first message ✓',
+      's3.leftover': 'Leftover found (red is text from the first message): click Clear and retry and do it again',
+      's3.typeFirst': 'Type a message first, then click Send',
+      's3.noEnterToast': 'No Enter in this stage: click Send with the trackpad',
+
+      's4.help': 'Click into the text with the trackpad first. Hold ◀ 游標 ▶ (the cursor pad) for about 0.3 s (the phone buzzes), then drag: the Mac’s text cursor follows. A quick flick jumps a word. Press ⇧ 選取 (⇧ Select) and drag to select (or tap with a second finger while dragging). Select the wrong letters and type the right ones.',
+      's4.title': 'Fix the typo',
+      's4.goal': 'Goal: {s}',
+      's4.arrows': 'Arrow keys {n} / 3',
+      's4.word': '⌥ Jump a word',
+      's4.select': '⇧ Select',
+      's4.fixed': 'Fixed',
+      's4.clickFirst': 'Click into the text above with the trackpad first',
+      's4.selected': 'Selected: ',
+      's4.after': 'Cursor after “{c}”',
+      's4.start': 'Cursor at the start',
+      's4.toast': 'Click into the text above with the trackpad first, then use the cursor pad',
+
+      's5.help': 'Use the ⌘ 快捷鍵 (⌘ Shortcuts) panel or the key row. In the sentence at the top: ⌘A to select all, ⌘C to copy. Click into the empty box below: ⌘V to paste, then ⌘Z to undo. Screenshot: ⌃⇧⌘4 and frame part of the screen (it goes to the clipboard), then ⌘V.',
+      's5.copyTitle': '① Select all and copy this sentence',
+      's5.pasteTitle': '② Paste here',
+      's5.keys': '<kbd>⌘A</kbd>→<kbd>⌘C</kbd>→ click below →<kbd>⌘V</kbd>→<kbd>⌘Z</kbd>',
+      's5.shotTitle': '③ Screenshot paste area',
+      's5.shotHint': '⌃⇧⌘4: a screenshot to the clipboard<br>then ⌘V to paste it here',
+      's5.shotAlt': 'The pasted screenshot',
+      's5.pastedText': 'Pasted ✓ “{v}”',
+      's5.pasted': 'Pasted ✓',
+      's5.undone': ', then undone with ⌘Z',
+      's5.copied': 'Copied “{v}”: click here and press ⌘V',
+      's5.shot': 'Screenshot received ✓ {size}',
+
+      's6.help': 'Spread two fingers for ⌘= (zoom in), pinch for ⌘− (zoom out). Swipe three fingers left or right to switch desktops; three fingers up for Mission Control. Three-finger gestures act on macOS itself, not on this page.',
+      's6.pinchTitle': 'Spread and pinch <small>⌘= / ⌘−</small>',
+      's6.artLabel': 'A phone on a sofa',
+      's6.artText': 'SofaPad: the iPhone as the Mac’s keyboard and trackpad',
+      's6.g1': 'Three fingers left / right',
+      's6.g1s': 'Go to another desktop, then swipe back',
+      's6.g2': 'Three fingers up',
+      's6.g2s': 'Once Mission Control shows, swipe three fingers down to come back, then tick it by hand on the right',
+      's6.g3': 'It happens in macOS itself',
+      's6.g3s': 'This page only sees that you left and came back',
+      's6.away': 'Away for {s} s, then back ✓',
+      's6.waiting': 'This page is waiting for you to leave and come back',
+
+      's7.help': 'The Mac cannot see the phone’s screen, so check the three layout items on the phone and tick them yourself with the trackpad. The ⏎ item ticks itself: click into the box, type a line and press the ⏎ next to the cursor pad.',
+      's7.chatHead': 'Type a line, then press the ⏎ next to the cursor pad on the phone',
+      's7.placeholder': 'Type a line, press ⏎',
+      's7.meta': 'Sent with ⏎',
+      's7.typeFirst': 'Type a line first, then press ⏎',
+      'm.pad': 'Trackpad',
+      'm.input': 'Text box',
+      'm.caret': '◀ ▶',
+      'm.live': 'Live',
+      'm.select': '⇧ Select',
+      'm.tabInput': 'Input row',
+      'm.tabKeys': 'Key row',
+      'm.tabSide': 'Landscape',
+      'm.reset': 'Restore all defaults',
+      'm.lock': 'Lock',
+      'm.inputShort': 'Text',
+      'cap.portrait': 'Portrait: half-width text box<br>cursor pad and ⏎ on the right',
+      'cap.editor': '✎ Edit: hold ≡ and drag to reorder<br>✕ removes, tap the list to add back',
+      'cap.landscape': 'Landscape: side panel on the left<br>and a full-height trackpad',
+    },
+
+    zh: {
+      htmlLang: 'zh-Hant-TW',
+      title: 'SofaPad 示範場',
+      brand: 'SofaPad 示範場',
+      navLabel: '關卡',
+      langBtn: 'EN',
+      langBtnLang: 'en',
+      langTitle: '切換成英文',
+      rec: '錄影模式',
+      recOn: '● 錄影模式',
+      reset: '重來',
+      resetConfirm: '確定重來？',
+      pre: '現在示範：',
+      checksHead: '這一關要做到',
+      navTitle: '第 {n} 關：{name}',
+      navSummary: '總表',
+      badge: 'SofaPad 示範 · 第 {n} 關',
+      badgeSummary: 'SofaPad 示範 · 總表',
+      done: '✓ 完成：{name}',
+      next: '下一關 →',
+      seeSummary: '看總表 →',
+      flash: '開始',
+      footer: '這一頁不收集任何資料：不連網路、不存檔、不上傳，所有判斷都只在這個瀏覽器分頁裡，關掉就清空。',
+      sumPre: '示範',
+      sumTitle: '總表',
+      sumDone: ' / {all} 完成',
+      sumAuto: '自動',
+      sumManual: '手動',
+      sumElapsed: '從開始（或「重來」）到現在 {t}',
+      listSep: '；',
+      noMessages: '還沒有訊息',
+
+      'stage.1': '觸控板', 'nav.1': '觸控板',
+      'stage.2': '打字', 'nav.2': '打字',
+      'stage.3': '送出後自動清空', 'nav.3': '自動清空',
+      'stage.4': '游標板', 'nav.4': '游標板',
+      'stage.5': '快捷鍵', 'nav.5': '快捷鍵',
+      'stage.6': '縮放與桌面', 'nav.6': '縮放桌面',
+      'stage.7': '4.3 新排版', 'nav.7': '4.3 排版',
+      'head.7': '手動打勾（Mac 看不到手機畫面）',
+
+      'ck.move': ['移動游標 600 px', '移動'],
+      'ck.click': ['點一下「點我」', '點擊'],
+      'ck.rightclick': ['右鍵選單，再點一項', '右鍵選單'],
+      'ck.scroll': ['兩指捲到清單最底', '兩指捲動'],
+      'ck.drag': ['長按拖曳：藍色放進框', '長按拖曳'],
+      'ck.draglock': ['拖曳鎖定：橘色放進框', '拖曳鎖定'],
+      'ck.live': ['即時模式打對一句', '即時'],
+      'ck.live@video': ['即時模式打對一句英文（可以用滑的）', '即時（英文）'],
+      'ck.buffer': ['整段模式一次送出', '整段＋送出'],
+      'ck.zhuyin': ['注音打中文', '注音'],
+      'ck.dictation': ['🎤 聽寫，沒有疊字', '聽寫不疊字'],
+      'ck.sent1': ['用觸控板點「傳送」送出第一句', '第一句'],
+      'ck.sent2': ['再點「傳送」送出第二句', '第二句'],
+      'ck.clean': ['第二句沒有第一句的殘留', '沒有殘留'],
+      'ck.arrows': ['方向鍵移動游標（3 下）', '方向鍵'],
+      'ck.word': ['快速甩：跳一個字詞（⌥）', '跳字詞'],
+      'ck.select': ['⇧ 選取：選起錯字', '⇧ 選取'],
+      'ck.fixed': ['改成「{w}」', '改好錯字'],
+      'ck.selectall': ['⌘A 全選', '⌘A'],
+      'ck.copy': ['⌘C 拷貝', '⌘C'],
+      'ck.paste': ['⌘V 貼到下面的空格', '⌘V'],
+      'ck.undo': ['⌘Z 復原', '⌘Z'],
+      'ck.screenshot': ['⌃⇧⌘4 截圖，⌘V 貼進來', '截圖貼上'],
+      'ck.zoomin': ['兩指張開：放大（⌘＝）', '放大'],
+      'ck.zoomout': ['捏合：縮小（⌘−）', '縮小'],
+      'ck.away': ['三指左右滑：切到別的桌面再回來', '切桌面'],
+      'ck.mission': ['Mission Control 有出現（手動打勾）', 'Mission Control'],
+      'ck.enter': ['打一行，按游標板旁的 ⏎', '⏎ 送出'],
+      'ck.portrait': ['直拿：輸入框半寬，右半是游標板和 ⏎', '直拿排版'],
+      'ck.reorder': ['✎ 編輯：拖曳調整順序', '✎ 排序'],
+      'ck.landscape': ['橫拿：側欄版面', '橫拿側欄'],
+
+      's1.help': '手機：單指滑＝移動，點一下＝點擊，兩指點一下＝右鍵，兩指上下滑＝捲動。拖曳：長按約半秒，出現「拖曳中」再滑；或按「鎖」（拖曳鎖定）→ 滑（可以分好幾次）→ 再按一次「鎖」放開。',
+      's1.moveTitle': '移動游標 <small>累計 600 px</small>',
+      's1.clickTitle': '點一下',
+      's1.clickMe': '點我',
+      's1.clicked': '點到了 ✓',
+      's1.rcTitle': '兩指點一下 <small>右鍵</small>',
+      's1.rcHere': '在這裡按右鍵',
+      's1.picked': '選了「{item}」 ✓',
+      's1.listTitle': '兩指捲到最底 <small>游標放在清單上</small>',
+      's1.dragTitle': '拖進框裡 <small>藍色用長按拖曳，橘色用「鎖」</small>',
+      's1.dropBlue': '藍色放這裡',
+      's1.dropOrange': '橘色放這裡',
+      's1.blue': '藍色<br><small>長按拖曳</small>',
+      's1.orange': '橘色<br><small>拖曳鎖定</small>',
+      's1.like': '👍 讚',
+      's1.save': '⭐ 收藏',
+      's1.share': '📤 分享',
+      's1.item': '第 {i} 項',
+      's1.itemLast': '第 40 項：到底了 🎉',
+      's1.scrolled': '捲到 {p}%',
+      's1.wrongBox': '放錯框了：藍色放藍框，橘色放橘框',
+
+      's2.help': '先用觸控板點進框裡。即時模式：每選好一個字就出現在 Mac 上。整段模式：點「即時」切成「整段」，打好再按「送出」。注音：選好字才會送出。聽寫：用 iPhone 鍵盤的 🎤，說完停一下。',
+      's2.help@video': '先用觸控板點進框裡。即時模式：用 iPhone 的英文鍵盤打，可以用滑的（滑動輸入）；每打好一個字就出現在 Mac 上。聽寫：用 iPhone 鍵盤的 🎤，說完停一下。',
+      's2.liveTitle': '① 即時模式 <span class="pill">即時</span>',
+      's2.liveTitle@video': '① 即時模式（英文，可以用滑的） <span class="pill">即時</span>',
+      's2.bufferTitle': '② 整段模式＋送出 <span class="pill">整段</span>',
+      's2.zhuyinTitle': '③ 注音中文 <span class="pill">選好字才送</span>',
+      's2.dictTitle': '鍵盤 🎤 聽寫',
+      's2.dictPill': '建議說這句',
+      's2.dictHint': '（英文鍵盤時說英文也可以）',
+      's2.w.empty': '用 iPhone 英文鍵盤打（可以用滑的），每打好一個字就送到 Mac',
+      's2.live.ok': '打對了 ✓（收到 {n} 次輸入）',
+      's2.w.progress': '對了 {hits} / {all} 個字，繼續打',
+      's2.w.extra': '多了「{g}」',
+      's2.w.word': '第 {n} 個字打成「{g}」，應該是「{w}」',
+      's2.w.wrong': '{list}：{fix}',
+      's2.w.fixExtra': '刪掉多打的字',
+      's2.w.fixWord': '刪掉重打這個字',
+      's2.c.empty': '每選好一個字就送到 Mac',
+      's2.c.count': '收到 {n} 次輸入，繼續打',
+      's2.buf.empty': '切成「整段」，打好按「送出」',
+      's2.buf.ok': '半秒內送進 {n} 個字 ✓',
+      's2.buf.slow': '字對了，但像是一個一個打的：清空，用整段模式再送一次',
+      's2.buf.max': '半秒內最多送進 {n} 個字',
+      's2.zy.bopo': '看到注音符號「{b}」：還在組字的字不該送出',
+      's2.zy.empty': '用注音打，選好字才會送出',
+      's2.zy.ok': '打對了 ✓ 沒有出現注音符號',
+      's2.zy.going': '沒有出現注音符號 ✓ 繼續打',
+      's2.d.empty': '點進框裡，按鍵盤的 🎤 說一句話',
+      's2.d.rep': '疊字了：「{r}」出現兩次',
+      's2.d.more': '沒有疊字 ✓ 再多說幾個字（{c}）',
+      's2.d.words': '{n} / 4 個英文字',
+      's2.d.chars': '{n} / 6',
+      's2.d.ok': '沒有疊字 ✓',
+
+      's3.help': '用手機打第一句，不要按 Enter，用觸控板點「傳送」；再打第二句，再點一次「傳送」。點了觸控板，手機的輸入框就會清空，所以第二句不會帶著第一句。',
+      's3.chatHead': '示範聊天室',
+      's3.retry': '清空重試',
+      's3.placeholder': '打一句話…',
+      's3.send': '傳送',
+      's3.first': '先打這句，點「傳送」',
+      's3.second': '再打這句，點「傳送」',
+      's3.noEnter': '不要按 Enter：用觸控板點「傳送」',
+      's3.meta': '第 {n} 句 · 點「傳送」',
+      's3.wait1': '送出第二句後，這裡會檢查有沒有殘留',
+      's3.wait2': '送出兩句後，這裡會檢查第二句有沒有殘留',
+      's3.clean': '前一句沒有殘留 ✓',
+      's3.leftover': '有殘留（紅色是第一句的字）：按「清空重試」再來一次',
+      's3.typeFirst': '先打一句，再點「傳送」',
+      's3.noEnterToast': '這一關不用 Enter：請用觸控板點「傳送」',
+
+      's4.help': '先用觸控板點進文字。按住「◀ 游標 ▶」約 0.3 秒（手機輕震一下）再拖，Mac 的文字游標就跟著走；快速甩一下跳一個字詞。按「⇧ 選取」再拖＝選取（或拖的時候另一根手指點一下）。選起錯字，直接打對的字。',
+      's4.title': '把錯字改掉',
+      's4.goal': '目標：{s}',
+      's4.arrows': '方向鍵 {n} / 3',
+      's4.word': '⌥ 跳一個字詞',
+      's4.select': '⇧ 選取',
+      's4.fixed': '改好了',
+      's4.clickFirst': '先用觸控板點進上面的文字',
+      's4.selected': '選取中：',
+      's4.after': '游標在「{c}」後面',
+      's4.start': '游標在最前面',
+      's4.toast': '先用觸控板點進上面的文字，再用游標板',
+
+      's5.help': '用「⌘ 快捷鍵」面板或按鍵列：在上面那句 ⌘A 全選、⌘C 拷貝；點進下面的空格 ⌘V 貼上；再 ⌘Z 復原。截圖：⌃⇧⌘4 框一塊螢幕（存到剪貼簿），再 ⌘V。',
+      's5.copyTitle': '① 全選、拷貝這一句',
+      's5.pasteTitle': '② 貼到這裡',
+      's5.keys': '<kbd>⌘A</kbd>→<kbd>⌘C</kbd>→ 點下面 →<kbd>⌘V</kbd>→<kbd>⌘Z</kbd>',
+      's5.shotTitle': '③ 截圖貼上區',
+      's5.shotHint': '⌃⇧⌘4 截圖到剪貼簿<br>再 ⌘V 貼進來',
+      's5.shotAlt': '貼上的截圖',
+      's5.pastedText': '貼上了 ✓「{v}」',
+      's5.pasted': '貼上了 ✓',
+      's5.undone': '，又用 ⌘Z 復原了',
+      's5.copied': '拷貝了「{v}」，點這裡 ⌘V',
+      's5.shot': '收到截圖 ✓ {size}',
+
+      's6.help': '兩指張開＝⌘＝（放大），捏合＝⌘−（縮小）。三指往左／往右滑＝切換桌面；三指往上＝Mission Control。三指手勢的效果在 macOS 本身，不在這一頁。',
+      's6.pinchTitle': '兩指張開、捏合 <small>⌘＝ ／ ⌘−</small>',
+      's6.artLabel': '沙發上的手機',
+      's6.artText': 'SofaPad：iPhone 當 Mac 的鍵盤和觸控板',
+      's6.g1': '三指往左／往右滑',
+      's6.g1s': '切到別的桌面，再滑回來',
+      's6.g2': '三指往上滑',
+      's6.g2s': 'Mission Control 出現後，三指往下滑回來，在右邊手動打勾',
+      's6.g3': '效果在 macOS 本身',
+      's6.g3s': '這一頁只看得到「離開了又回來」',
+      's6.away': '離開了 {s} 秒，又回來了 ✓',
+      's6.waiting': '這一頁在等你離開再回來',
+
+      's7.help': 'Mac 看不到手機畫面，所以排版的三項請看手機，自己用觸控板打勾。⏎ 會自動判斷：點進框裡打一行，按游標板旁邊的 ⏎。',
+      's7.chatHead': '打一行，按手機上游標板旁邊的 ⏎',
+      's7.placeholder': '打一行，按 ⏎',
+      's7.meta': '⏎ 送出',
+      's7.typeFirst': '先打一行字，再按 ⏎',
+      'm.pad': '觸控板',
+      'm.input': '輸入框',
+      'm.caret': '◀ 游標 ▶',
+      'm.live': '即時',
+      'm.select': '⇧ 選取',
+      'm.tabInput': '輸入列',
+      'm.tabKeys': '按鍵列',
+      'm.tabSide': '橫拿側欄',
+      'm.reset': '全部恢復預設',
+      'm.lock': '鎖',
+      'm.inputShort': '輸入',
+      'cap.portrait': '直拿：輸入框半寬<br>右半是游標板和 ⏎',
+      'cap.editor': '✎ 編輯：按住 ≡ 拖曳排序<br>✕ 拿掉，點清單加回來',
+      'cap.landscape': '橫拿：側欄（右手用在左邊）<br>另一邊是全高的觸控板',
+    },
+  };
+  const fill = (s, vars) => (vars ? s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m)) : s);
+  function t(key, vars) {
+    const pick = (table) => (VIDEO && `${key}@video` in table ? table[`${key}@video`] : table[key]);
+    let v = pick(I18N[LANG]);
+    if (v === undefined) v = pick(I18N.en);
+    if (v === undefined) return key;
+    if (typeof v === 'function') return v(vars || {});
+    if (Array.isArray(v)) return v.map((s) => fill(s, vars));
+    return fill(v, vars);
+  }
+
+  // What the page asks the user to type, per language. Stage 2's live sentence is the English one whenever the check
+  // is word by word (the English page, and video mode in both languages); the Zhuyin target is Chinese in both.
+  const LIVE_EN = 'I can type from the sofa with my phone';   // common words only: every one of them can be swiped
+  const TEXTS = {
+    en: {
+      live: LIVE_EN,
+      buffer: 'Type it all, then send it at once',
+      zhuyin: '沙發上也能打中文',
+      dictation: "It is a nice day, let's go for a walk in the park",
+      chat: ['Good morning, meeting today', 'Got it, on my way'],
+      typo: { sentence: 'SofaPad turns your iPhone into a keyboard and trackpda.', wrong: 'da', fix: 'ad',
+        fixed: 'SofaPad turns your iPhone into a keyboard and trackpad.', pre: 'trackp', post: '' },
+      copy: 'SofaPad is handy',
+    },
+    zh: {
+      live: 'SofaPad 讓 iPhone 變成 Mac 的鍵盤',
+      buffer: '整段打好再一次送出',
+      zhuyin: '沙發上也能打中文',
+      dictation: '今天天氣很好，我們去公園散步',
+      chat: ['早安，今天開會', '收到，馬上到'],
+      typo: { sentence: 'SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸空板。', wrong: '空', fix: '控',
+        fixed: 'SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸控板。', pre: '觸', post: '板' },
+      copy: 'SofaPad 很好用',
+    },
+  };
+  const wordsCheck = () => VIDEO || LANG === 'en';
+  const textsFor = (lang) => ({ ...TEXTS[lang], live: VIDEO || lang === 'en' ? LIVE_EN : TEXTS[lang].live });
+  let TEXT = textsFor(LANG);
+
+  // What each stage asks for. Check ids are unique across stages; manual ones are ticked by hand. Video mode keeps
+  // the stages in VIDEO_STAGES and drops the checks marked full. Labels come from I18N (localize).
+  const VIDEO_STAGES = ['1', '2', '5', '6', '7'];
   const STAGES = [
-    { id: '1', name: '觸控板', nav: '觸控板', checks: [
-      { id: 'move', label: '移動游標 600 px', short: '移動' },
-      { id: 'click', label: '點一下「點我」', short: '點擊' },
-      { id: 'rightclick', label: '右鍵選單，再點一項', short: '右鍵選單' },
-      { id: 'scroll', label: '兩指捲到清單最底', short: '兩指捲動' },
-      { id: 'drag', label: '長按拖曳：藍色放進框', short: '長按拖曳' },
-      { id: 'draglock', label: '拖曳鎖定：橘色放進框', short: '拖曳鎖定' },
-    ] },
-    { id: '2', name: '打字', nav: '打字', checks: [
-      { id: 'live', label: '即時模式打對一句', short: '即時' },
-      { id: 'buffer', label: '整段模式一次送出', short: '整段＋送出' },
-      { id: 'zhuyin', label: '注音打中文', short: '注音' },
-      { id: 'dictation', label: '🎤 聽寫，沒有疊字', short: '聽寫不疊字' },
-    ] },
-    { id: '3', name: '送出後自動清空', nav: '自動清空', checks: [
-      { id: 'sent1', label: '用觸控板點「傳送」送出第一句', short: '第一句' },
-      { id: 'sent2', label: '再點「傳送」送出第二句', short: '第二句' },
-      { id: 'clean', label: '第二句沒有第一句的殘留', short: '沒有殘留' },
-    ] },
-    { id: '4', name: '游標板', nav: '游標板', checks: [
-      { id: 'arrows', label: '方向鍵移動游標（3 下）', short: '方向鍵' },
-      { id: 'word', label: '快速甩：跳一個字詞（⌥）', short: '跳字詞' },
-      { id: 'select', label: '⇧ 選取：選起錯字', short: '⇧ 選取' },
-      { id: 'fixed', label: '改成「觸控板」', short: '改好錯字' },
-    ] },
-    { id: '5', name: '快捷鍵', nav: '快捷鍵', checks: [
-      { id: 'selectall', label: '⌘A 全選', short: '⌘A' },
-      { id: 'copy', label: '⌘C 拷貝', short: '⌘C' },
-      { id: 'paste', label: '⌘V 貼到下面的空格', short: '⌘V' },
-      { id: 'undo', label: '⌘Z 復原', short: '⌘Z' },
-      { id: 'screenshot', label: '⌃⇧⌘4 截圖，⌘V 貼進來', short: '截圖貼上' },
-    ] },
-    { id: '6', name: '縮放與桌面', nav: '縮放桌面', checks: [
-      { id: 'zoomin', label: '兩指張開：放大（⌘＝）', short: '放大' },
-      { id: 'zoomout', label: '捏合：縮小（⌘−）', short: '縮小' },
-      { id: 'away', label: '三指左右滑：切到別的桌面再回來', short: '切桌面' },
-      { id: 'mission', label: 'Mission Control 有出現（手動打勾）', short: 'Mission Control', manual: true },
-    ] },
-    { id: '7', name: '4.3 新排版', nav: '4.3 排版', manualHead: '手動打勾（Mac 看不到手機畫面）', checks: [
-      { id: 'enter', label: '打一行，按游標板旁的 ⏎', short: '⏎ 送出' },
-      { id: 'portrait', label: '直拿：輸入框半寬，右半是游標板和 ⏎', short: '直拿排版', manual: true },
-      { id: 'reorder', label: '✎ 編輯：拖曳調整順序', short: '✎ 排序', manual: true },
-      { id: 'landscape', label: '橫拿：側欄版面', short: '橫拿側欄', manual: true },
-    ] },
-  ];
+    { id: '1', checks: [{ id: 'move' }, { id: 'click' }, { id: 'rightclick' }, { id: 'scroll' }, { id: 'drag' }, { id: 'draglock' }] },
+    { id: '2', checks: [{ id: 'live' }, { id: 'buffer', full: true }, { id: 'zhuyin', full: true }, { id: 'dictation' }] },
+    { id: '3', checks: [{ id: 'sent1' }, { id: 'sent2' }, { id: 'clean' }] },
+    { id: '4', checks: [{ id: 'arrows' }, { id: 'word' }, { id: 'select' }, { id: 'fixed' }] },
+    { id: '5', checks: [{ id: 'selectall' }, { id: 'copy' }, { id: 'paste' }, { id: 'undo' }, { id: 'screenshot' }] },
+    { id: '6', checks: [{ id: 'zoomin' }, { id: 'zoomout' }, { id: 'away' }, { id: 'mission', manual: true }] },
+    { id: '7', manualHead: true, checks: [{ id: 'enter' }, { id: 'portrait', manual: true }, { id: 'reorder', manual: true }, { id: 'landscape', manual: true }] },
+  ].filter((s) => !VIDEO || VIDEO_STAGES.includes(s.id))
+    .map((s, i) => ({ ...s, no: i + 1, checks: s.checks.filter((c) => !(VIDEO && c.full)) }));
   const STAGE_IDS = STAGES.map((s) => s.id).concat('summary');
+  const LAST = STAGES[STAGES.length - 1].id;
   const CHECK_STAGE = {};
   STAGES.forEach((s) => s.checks.forEach((c) => { CHECK_STAGE[c.id] = s.id; }));
   const MANUAL = STAGES.flatMap((s) => s.checks.filter((c) => c.manual).map((c) => c.id));
   const ALL = Object.keys(CHECK_STAGE).length;
 
-  const TEXT = {
-    live: 'SofaPad 讓 iPhone 變成 Mac 的鍵盤',
-    buffer: '整段打好再一次送出',
-    zhuyin: '沙發上也能打中文',
-    fixed: 'SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸控板。',
-    copy: 'SofaPad 很好用',
-  };
   const BOPOMOFO = /[㄀-ㄯㆠ-ㆿˇˊˋ˙]+/;
-  const CJK = /[㐀-䶿一-鿿豈-﫿\u{20000}-\u{3134F}]/gu;
+  const CJK = /[㐀-䶿一-鿿豈-﫿\u{20000}-\u{3134F}]/gu;
   const ARROWS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
 
   // S: run-wide state (check times). st: per-run scratch, rebuilt by reset().
@@ -950,11 +1405,11 @@ html.rec .schip { font-size: 16px; }
 
   let toastTimer = 0;
   function toast(msg) {
-    const t = $('#toast');
-    t.textContent = msg;
-    t.hidden = false;
+    const tst = $('#toast');
+    tst.textContent = msg;
+    tst.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.hidden = true; }, 2400);
+    toastTimer = setTimeout(() => { tst.hidden = true; }, 2400);
   }
   function span(text, cls) {
     const el = document.createElement('span');
@@ -963,7 +1418,7 @@ html.rec .schip { font-size: 16px; }
     return el;
   }
 
-  // ---- page: nav, banner, recording mode, reset ----
+  // ---- page: nav, banner, recording mode, language, reset ----
 
   function buildNav() {
     const nav = $('#nav');
@@ -974,9 +1429,7 @@ html.rec .schip { font-size: 16px; }
       b.type = 'button';
       b.tabIndex = -1;
       b.dataset.go = s.id;
-      b.title = `第 ${s.id} 關：${s.name}`;
-      b.innerHTML = `<span class="num">${s.id}<i>✓</i></span><span class="nav-name"></span>`;
-      b.querySelector('.nav-name').textContent = s.nav;
+      b.innerHTML = `<span class="num">${s.no}<i>✓</i></span><span class="nav-name"></span>`;
       nav.append(b);
     }
     const sum = document.createElement('button');
@@ -985,7 +1438,7 @@ html.rec .schip { font-size: 16px; }
     sum.type = 'button';
     sum.tabIndex = -1;
     sum.dataset.go = 'summary';
-    sum.innerHTML = '<span class="nav-name">總表</span>';
+    sum.innerHTML = '<span class="nav-name"></span>';
     nav.append(sum);
     $$('.nav-item').forEach((b) => control(b, () => go(b.dataset.go)));
   }
@@ -999,7 +1452,7 @@ html.rec .schip { font-size: 16px; }
           head = true;
           const li = document.createElement('li');
           li.className = 'ck-head';
-          li.textContent = s.manualHead;
+          li.dataset.head = s.id;
           ol.append(li);
         }
         const el = document.createElement(c.manual ? 'button' : 'div');
@@ -1013,7 +1466,6 @@ html.rec .schip { font-size: 16px; }
           control(el, () => (isDone(c.id) ? unmark(c.id) : mark(c.id)));
         }
         el.innerHTML = '<span class="tick" aria-hidden="true"></span><span class="ck-label"></span><span class="ck-note"></span>';
-        el.querySelector('.ck-label').textContent = c.label;
         const li = document.createElement('li');
         li.append(el);
         ol.append(li);
@@ -1026,8 +1478,7 @@ html.rec .schip { font-size: 16px; }
     for (const s of STAGES) {
       const tr = document.createElement('tr');
       tr.id = `sum-stage-${s.id}`;
-      tr.innerHTML = `<td><span class="num">${s.id}</span></td><td class="n"></td><td><div class="sum-chips"></div></td>`;
-      tr.cells[0].append(document.createTextNode(s.name));
+      tr.innerHTML = `<td><span class="num">${s.no}</span><span class="sum-name"></span></td><td class="n"></td><td><div class="sum-chips"></div></td>`;
       const box = tr.querySelector('.sum-chips');
       for (const c of s.checks) {
         const chip = document.createElement('span');
@@ -1039,6 +1490,25 @@ html.rec .schip { font-size: 16px; }
     }
   }
 
+  /** Puts the current language's names and labels on STAGES and on everything built from them. */
+  function localize() {
+    const ty = TEXT.typo;
+    const vars = { wrong: ty.wrong, w: ty.pre + ty.fix + ty.post };
+    for (const s of STAGES) {
+      s.name = t(`stage.${s.id}`);
+      s.nav = t(`nav.${s.id}`);
+      for (const c of s.checks) [c.label, c.short] = t(`ck.${c.id}`, vars);
+      const b = $(`#nav-${s.id}`);
+      b.title = t('navTitle', { n: s.no, name: s.name });
+      b.querySelector('.nav-name').textContent = s.nav;
+      for (const c of s.checks) $(`#chk-${c.id} .ck-label`).textContent = c.label;
+      const head = $(`[data-head="${s.id}"]`);
+      if (head) head.textContent = t(`head.${s.id}`);
+      $(`#sum-stage-${s.id} .sum-name`).textContent = s.name;
+    }
+    $('#nav-summary .nav-name').textContent = t('navSummary');
+  }
+
   const fmt = (ms) => {
     const s = Math.max(0, Math.floor(ms / 1000));
     return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
@@ -1046,7 +1516,7 @@ html.rec .schip { font-size: 16px; }
   function paintSummary() {
     const done = Object.keys(S.at).length;
     const total = document.createElement('small');
-    total.textContent = ` / ${ALL} 完成`;
+    total.textContent = t('sumDone', { all: ALL });
     $('#sum-count').replaceChildren(document.createTextNode(String(done)), total);
     for (const s of STAGES) {
       const n = s.checks.filter((c) => isDone(c.id)).length;
@@ -1061,13 +1531,13 @@ html.rec .schip { font-size: 16px; }
           document.createTextNode(c.short),
           document.createElement('small'),
         );
-        chip.lastChild.textContent = `${c.manual ? '手動' : '自動'} · ${isDone(c.id) ? fmt(S.at[c.id]) : '—'}`;
+        chip.lastChild.textContent = `${t(c.manual ? 'sumManual' : 'sumAuto')} · ${isDone(c.id) ? fmt(S.at[c.id]) : '—'}`;
       }
     }
     paintElapsed();
   }
   function paintElapsed() {
-    $('#sum-elapsed').textContent = `從開始（或「重來」）到現在 ${fmt(now() - S.t0)}`;
+    $('#sum-elapsed').textContent = t('sumElapsed', { t: fmt(now() - S.t0) });
   }
 
   function paintBanner(pop) {
@@ -1077,13 +1547,20 @@ html.rec .schip { font-size: 16px; }
     b.hidden = !show;
     document.body.classList.toggle('has-banner', show);
     if (!show) return;
-    $('#banner-text').textContent = `✓ 完成：${stageOf(sid).name}`;
-    $('#btn-next').textContent = sid === '7' ? '看總表 →' : '下一關 →';
+    $('#banner-text').textContent = t('done', { name: stageOf(sid).name });
+    $('#btn-next').textContent = t(sid === LAST ? 'seeSummary' : 'next');
     if (pop) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
   }
   function paintBadge() {
-    $('#rec-badge-text').textContent = S.current === 'summary' ? 'SofaPad 示範 · 總表' : `SofaPad 示範 · 第 ${S.current} 關`;
+    $('#rec-badge-text').textContent = S.current === 'summary' ? t('badgeSummary') : t('badge', { n: stageOf(S.current).no });
   }
+  // The nav shows every stage's name when the top bar has room, otherwise only the current one's.
+  function fitNav() {
+    const top = $('.top');
+    top.classList.remove('tight');
+    if (top.scrollWidth > top.clientWidth + 1) top.classList.add('tight');
+  }
+  window.addEventListener('resize', fitNav);
 
   function go(n) {
     let id = String(n);
@@ -1104,6 +1581,7 @@ html.rec .schip { font-size: 16px; }
     setHash(id);
     paintBanner(false);
     paintBadge();
+    fitNav();
     if (id === 'summary') paintSummary();
     window.scrollTo(0, 0);
     return true;
@@ -1119,18 +1597,75 @@ html.rec .schip { font-size: 16px; }
   }
   window.addEventListener('hashchange', () => { const h = readHash(); if (h && h !== S.current) go(h); });
 
+  /** Sets one URL parameter (or takes it out with null), keeping the others and the hash. */
+  function writeParam(name, value) {
+    try {
+      const u = new URL(location.href);
+      if (value == null) u.searchParams.delete(name); else u.searchParams.set(name, value);
+      history.replaceState(null, '', u.href);
+    } catch (_) { /* some file:// setups refuse; the page has switched anyway */ }
+  }
+
   function setRec(on, writeUrl = true) {
     S.rec = !!on;
     document.documentElement.classList.toggle('rec', S.rec);
     const b = $('#btn-rec');
     b.setAttribute('aria-pressed', String(S.rec));
-    b.textContent = S.rec ? '● 錄影模式' : '錄影模式';
-    if (!writeUrl) return;
-    try {
-      const u = new URL(location.href);
-      if (S.rec) u.searchParams.set('rec', '1'); else u.searchParams.delete('rec');
-      history.replaceState(null, '', u.href);
-    } catch (_) { /* some file:// setups refuse; the class is enough */ }
+    b.textContent = t(S.rec ? 'recOn' : 'rec');
+    if (writeUrl) writeParam('rec', S.rec ? '1' : null);
+    fitNav();
+  }
+
+  /** Re-renders the page in the other language in place: progress, the current stage and typed text stay. */
+  function setLang(lang, writeUrl = true) {
+    const prev = TEXT;
+    LANG = lang === 'zh' ? 'zh' : 'en';
+    TEXT = textsFor(LANG);
+    document.documentElement.lang = t('htmlLang');
+    document.title = t('title');
+    for (const el of $$('[data-i18n]')) el.textContent = t(el.dataset.i18n);
+    for (const el of $$('[data-i18n-html]')) el.innerHTML = t(el.dataset.i18nHtml);   // only the constant strings above
+    for (const el of $$('[data-i18n-attr]')) {
+      for (const pair of el.dataset.i18nAttr.split(';')) {
+        const [attr, key] = pair.split(':');
+        el.setAttribute(attr, t(key));
+      }
+    }
+    for (const el of $$('[data-text]')) {
+      const [k, i] = el.dataset.text.split('.');
+      el.textContent = TEXT[k][i];
+    }
+    localize();
+    $$('#s1-list li').forEach((li, i) => { li.textContent = i === 39 ? t('s1.itemLast') : t('s1.item', { i: i + 1 }); });
+    $('#s2-dictation-target').replaceChildren(document.createTextNode(`${TEXT.dictation} `), span(t('s2.dictHint'), 'hint'));
+    // Stage 4: the sentence with the typo, in this language. A box already fixed stays fixed; otherwise it starts over.
+    const ty = TEXT.typo;
+    const del = document.createElement('del');
+    del.textContent = ty.wrong;
+    const ins = document.createElement('ins');
+    ins.textContent = ty.fix;
+    $('#s4-fixline').replaceChildren(ty.pre, del, ty.post, span('→', 'arrow'), ty.pre, ins, ty.post);
+    $('#s4-target').textContent = t('s4.goal', { s: ty.fixed });
+    const ta = $('#s4-text');
+    const wasFixed = !!prev && same(ta.value, prev.typo.fixed);
+    ta.defaultValue = ty.sentence;
+    ta.value = wasFixed ? ty.fixed : ty.sentence;
+    const src = $('#s5-source');
+    src.defaultValue = TEXT.copy;
+    src.value = TEXT.copy;
+    const lb = $('#btn-lang');
+    lb.textContent = t('langBtn');
+    lb.lang = t('langBtnLang');
+    lb.title = t('langTitle');
+    lb.setAttribute('aria-label', t('langTitle'));
+    $('#btn-rec').textContent = t(S.rec ? 'recOn' : 'rec');
+    $('#btn-reset').textContent = t(resetArmed ? 'resetConfirm' : 'reset');
+    closeMenu();
+    $('#toast').hidden = true;
+    paintAll();
+    paintBadge();
+    fitNav();
+    if (writeUrl) writeParam('lang', LANG === 'zh' ? 'zh' : null);
   }
 
   function reset() {
@@ -1141,8 +1676,6 @@ html.rec .schip { font-size: 16px; }
     for (const el of $$('input.field, textarea.field')) el.value = el.defaultValue;
     for (const el of $$('.field')) el.classList.remove('ok');
     resetBlocks();
-    $('#s1-click').textContent = '點我';
-    $('#s1-click').classList.remove('hit');
     const img = $('#s5-shot-img');
     img.hidden = true;
     img.removeAttribute('src');
@@ -1164,14 +1697,14 @@ html.rec .schip { font-size: 16px; }
   function disarmReset() {
     clearTimeout(resetArmed);
     resetArmed = 0;
-    $('#btn-reset').textContent = '重來';
+    $('#btn-reset').textContent = t('reset');
     $('#btn-reset').classList.remove('confirm');
   }
-  // With progress on the page, 重來 asks once (click again within 3 s), so a stray click cannot wipe a take.
+  // With progress on the page, Restart asks once (click again within 3 s), so a stray click cannot wipe a take.
   control($('#btn-reset'), () => {
     if (Object.keys(S.at).length && !resetArmed) {
       resetArmed = setTimeout(disarmReset, 3000);
-      $('#btn-reset').textContent = '確定重來？';
+      $('#btn-reset').textContent = t('resetConfirm');
       $('#btn-reset').classList.add('confirm');
       return;
     }
@@ -1180,6 +1713,7 @@ html.rec .schip { font-size: 16px; }
     flash();
   });
   control($('#btn-rec'), () => setRec(!S.rec));
+  control($('#btn-lang'), () => setLang(LANG === 'en' ? 'zh' : 'en'));
   control($('#btn-next'), () => {
     const i = STAGE_IDS.indexOf(S.current);
     go(STAGE_IDS[Math.min(i + 1, STAGE_IDS.length - 1)]);
@@ -1215,11 +1749,7 @@ html.rec .schip { font-size: 16px; }
 
   function buildList() {
     const ol = $('#s1-list');
-    for (let i = 1; i <= 40; i++) {
-      const li = document.createElement('li');
-      li.textContent = i === 40 ? '第 40 項：到底了 🎉' : `第 ${i} 項`;
-      ol.append(li);
-    }
+    for (let i = 1; i <= 40; i++) ol.append(document.createElement('li'));   // text: setLang
   }
   function paintMove() {
     const d = Math.min(600, st.moveDist);
@@ -1234,12 +1764,14 @@ html.rec .schip { font-size: 16px; }
     const pct = max > 0 ? Math.round(clamp(el.scrollTop / max, 0, 1) * 100) : 0;
     $('#s1-list-bar').style.width = `${pct}%`;
     $('#s1-list-bar').parentElement.classList.toggle('full', isDone('scroll'));
-    note('scroll', isDone('scroll') ? '' : `捲到 ${pct}%`);
+    note('scroll', isDone('scroll') ? '' : t('s1.scrolled', { p: pct }));
   }
   function paint1() {
     paintMove();
     paintList();
-    $('#s1-rc-result').textContent = st.rcPick ? `選了「${st.rcPick}」 ✓` : '在這裡按右鍵';
+    $('#s1-click').textContent = t(isDone('click') ? 's1.clicked' : 's1.clickMe');
+    $('#s1-click').classList.toggle('hit', isDone('click'));
+    $('#s1-rc-result').textContent = st.rcPick ? t('s1.picked', { item: t(st.rcPick) }) : t('s1.rcHere');
     $('#s1-rc').classList.toggle('hit', !!st.rcPick);
     $('#s1-drop-blue').classList.toggle('filled', isDone('drag'));
     $('#s1-drop-orange').classList.toggle('filled', isDone('draglock'));
@@ -1261,9 +1793,8 @@ html.rec .schip { font-size: 16px; }
 
   $('#s1-click').addEventListener('click', (e) => {
     if (!isMouse(e)) return;
-    e.currentTarget.classList.add('hit');
-    e.currentTarget.textContent = '點到了 ✓';
     mark('click');
+    paint1();
   });
 
   $('#s1-rc').addEventListener('contextmenu', (e) => {
@@ -1280,7 +1811,7 @@ html.rec .schip { font-size: 16px; }
   for (const b of $$('#s1-menu button')) {
     b.addEventListener('click', () => {
       closeMenu();
-      st.rcPick = b.textContent;
+      st.rcPick = b.dataset.i18n;   // the item's text key, so it follows a language switch
       paint1();
       mark('rightclick');
     });
@@ -1351,7 +1882,7 @@ html.rec .schip { font-size: 16px; }
       mark(b.check);
       paint1();
     } else if (centerIn(el, $(b.other))) {
-      toast('放錯框了：藍色放藍框，橘色放橘框');
+      toast(t('s1.wrongBox'));
     }
   }
   document.addEventListener('mouseup', () => dropDrag(true));
@@ -1386,54 +1917,112 @@ html.rec .schip { font-size: 16px; }
     return best;
   }
   function paintTarget(sel, target, value) {
-    const t = chars(target);
+    const tg = chars(target);
     const v = chars(norm(value).toLowerCase());
     let k = 0;
-    while (k < t.length && k < v.length && t[k].toLowerCase() === v[k]) k++;
-    $(sel).replaceChildren(span(t.slice(0, k).join(''), 'hit'), document.createTextNode(t.slice(k).join('')));
+    while (k < tg.length && k < v.length && tg[k].toLowerCase() === v[k]) k++;
+    $(sel).replaceChildren(span(tg.slice(0, k).join(''), 'hit'), document.createTextNode(tg.slice(k).join('')));
   }
+  /** Dictation in Chinese or English (an English keyboard dictates English): enough of it, and nothing doubled.
+   *  Doubled text (I-21) repeats a whole piece: 4 characters in Chinese, 3 words in English. */
   function dictationInfo(value) {
     const flat = value.replace(/\s+/g, '');
-    return { cjk: (flat.match(CJK) || []).length, rep: longestRepeat(flat, 4) };
+    const words = value.toLowerCase().match(/[a-z'’]+/g) || [];
+    let rep = longestRepeat(flat.replace(/[a-z'’]+/gi, ''), 4);
+    for (let n = 3; !rep && n <= words.length / 2; n++) {
+      const seen = new Set();
+      for (let i = 0; i + n <= words.length && !rep; i++) {
+        const k = words.slice(i, i + n).join(' ');
+        if (seen.has(k)) rep = k; else seen.add(k);
+      }
+    }
+    const cjk = (flat.match(CJK) || []).length;
+    return { cjk, words: words.length, rep, enough: cjk >= 6 || words.length >= 4 };
   }
-  function paint2() {
+  /** Live box, word by word, the way iOS swipe typing sends it: a space after each word, a capital at the start,
+   *  maybe a period or a space at the end. Case does not matter. A word still being typed is not wrong yet. */
+  function liveWords(value) {
+    const cut = (x) => norm(x).toLowerCase().replace(/[.!?,;:]+$/, '').split(' ').filter(Boolean);
+    const want = cut(TEXT.live);
+    const got = cut(value);
+    const open = got.length && !/[\s.!?,;:]$/.test(value);   // the last word may still grow
+    const state = want.map((w, i) => {
+      if (i >= got.length) return '';
+      if (got[i] === w) return 'hit';
+      return i === got.length - 1 && open && w.startsWith(got[i]) ? '' : 'miss';
+    });
+    const wrong = [];
+    got.forEach((g, i) => {
+      if (i >= want.length) wrong.push({ extra: g });
+      else if (state[i] === 'miss') wrong.push({ n: i + 1, g, w: want[i] });
+    });
+    return { want, state, wrong, hits: state.filter((x) => x === 'hit').length,
+      ok: got.length === want.length && got.every((g, i) => g === want[i]) };
+  }
+  const liveOk = (value) => (wordsCheck() ? liveWords(value).ok : same(value, TEXT.live));
+  function paintLive() {
     const live = $('#s2-live').value;
-    paintTarget('#s2-live-target', TEXT.live, live);
-    $('#s2-live').classList.toggle('ok', same(live, TEXT.live));
-    if (!live) status('#s2-live-status', '每選好一個字就送到 Mac');
-    else if (same(live, TEXT.live)) status('#s2-live-status', `打對了 ✓（收到 ${st.liveEvents} 次輸入）`, 'ok');
-    else status('#s2-live-status', `收到 ${st.liveEvents} 次輸入，繼續打`);
-
+    if (!wordsCheck()) {   // the Chinese page in full mode: the Chinese sentence, character by character
+      paintTarget('#s2-live-target', TEXT.live, live);
+      $('#s2-live').classList.toggle('ok', same(live, TEXT.live));
+      if (!live) status('#s2-live-status', t('s2.c.empty'));
+      else if (same(live, TEXT.live)) status('#s2-live-status', t('s2.live.ok', { n: st.liveEvents }), 'ok');
+      else status('#s2-live-status', t('s2.c.count', { n: st.liveEvents }));
+      return;
+    }
+    const lw = liveWords(live);
+    $('#s2-live-target').replaceChildren(...lw.want.flatMap((w, i) => [
+      ...(i ? [document.createTextNode(' ')] : []),
+      span(i === 0 ? cap(w) : w, lw.state[i]),
+    ]));
+    $('#s2-live').classList.toggle('ok', lw.ok);
+    if (!live.trim()) status('#s2-live-status', t('s2.w.empty'));
+    else if (lw.ok) status('#s2-live-status', t('s2.live.ok', { n: st.liveEvents }), 'ok');
+    else if (lw.wrong.length) {
+      const list = lw.wrong.slice(0, 2).map((x) => (x.extra != null ? t('s2.w.extra', { g: x.extra }) : t('s2.w.word', x)));
+      status('#s2-live-status', t('s2.w.wrong', {
+        list: list.join(t('listSep')) + (lw.wrong.length > 2 ? '…' : ''),
+        fix: t(lw.wrong[0].extra != null ? 's2.w.fixExtra' : 's2.w.fixWord'),
+      }), 'bad');
+    } else status('#s2-live-status', t('s2.w.progress', { hits: lw.hits, all: lw.want.length }));
+  }
+  /** Full mode: the batch and Zhuyin boxes. */
+  function paint2full() {
     const buf = $('#s2-buffer').value;
     paintTarget('#s2-buffer-target', TEXT.buffer, buf);
     $('#s2-buffer').classList.toggle('ok', same(buf, TEXT.buffer) && st.bulk);
-    if (!buf) status('#s2-buffer-status', '切成「整段」，打好按「送出」');
-    else if (same(buf, TEXT.buffer) && st.bulk) status('#s2-buffer-status', `半秒內送進 ${st.bulkMax} 個字 ✓`, 'ok');
-    else if (same(buf, TEXT.buffer)) status('#s2-buffer-status', '字對了，但像是一個一個打的：清空，用整段模式再送一次', 'warn');
-    else status('#s2-buffer-status', `半秒內最多送進 ${st.bulkMax} 個字`);
+    if (!buf) status('#s2-buffer-status', t('s2.buf.empty'));
+    else if (same(buf, TEXT.buffer) && st.bulk) status('#s2-buffer-status', t('s2.buf.ok', { n: st.bulkMax }), 'ok');
+    else if (same(buf, TEXT.buffer)) status('#s2-buffer-status', t('s2.buf.slow'), 'warn');
+    else status('#s2-buffer-status', t('s2.buf.max', { n: st.bulkMax }));
 
     const zy = $('#s2-zhuyin').value;
     paintTarget('#s2-zhuyin-target', TEXT.zhuyin, zy);
     $('#s2-zhuyin').classList.toggle('ok', same(zy, TEXT.zhuyin));
-    if (st.bopo) status('#s2-zhuyin-status', `看到注音符號「${st.bopo}」：還在組字的字不該送出`, 'bad');
-    else if (!zy) status('#s2-zhuyin-status', '用注音打，選好字才會送出');
-    else if (same(zy, TEXT.zhuyin)) status('#s2-zhuyin-status', '打對了 ✓ 沒有出現注音符號', 'ok');
-    else status('#s2-zhuyin-status', '沒有出現注音符號 ✓ 繼續打');
-
+    if (st.bopo) status('#s2-zhuyin-status', t('s2.zy.bopo', { b: st.bopo }), 'bad');
+    else if (!zy) status('#s2-zhuyin-status', t('s2.zy.empty'));
+    else if (same(zy, TEXT.zhuyin)) status('#s2-zhuyin-status', t('s2.zy.ok'), 'ok');
+    else status('#s2-zhuyin-status', t('s2.zy.going'));
+  }
+  function paint2() {
+    paintLive();
+    if (!VIDEO) paint2full();
     const dict = $('#s2-dictation').value;
     const info = dictationInfo(dict);
-    $('#s2-dictation').classList.toggle('ok', info.cjk >= 6 && !info.rep);
-    if (!dict.trim()) status('#s2-dictation-status', '點進框裡，按鍵盤的 🎤 說一句話');
-    else if (info.rep) status('#s2-dictation-status', `疊字了：「${info.rep}」出現兩次`, 'bad');
-    else if (info.cjk < 6) status('#s2-dictation-status', `沒有疊字 ✓ 再多說幾個字（${info.cjk} / 6）`);
-    else status('#s2-dictation-status', '沒有疊字 ✓', 'ok');
+    $('#s2-dictation').classList.toggle('ok', info.enough && !info.rep);
+    if (!dict.trim()) status('#s2-dictation-status', t('s2.d.empty'));
+    else if (info.rep) status('#s2-dictation-status', t('s2.d.rep', { r: info.rep }), 'bad');
+    else if (!info.enough) {
+      const c = info.words > info.cjk ? t('s2.d.words', { n: info.words }) : t('s2.d.chars', { n: info.cjk });
+      status('#s2-dictation-status', t('s2.d.more', { c }));
+    } else status('#s2-dictation-status', t('s2.d.ok'), 'ok');
   }
 
   // Values are read on every input event: SofaPad text can arrive as typing, several characters at once, or a paste.
   $('#s2-live').addEventListener('input', (e) => {
     st.liveEvents++;
     paint2();
-    if (!e.isComposing && same(e.currentTarget.value, TEXT.live)) mark('live');
+    if (!e.isComposing && liveOk(e.currentTarget.value)) mark('live');
   });
   $('#s2-buffer').addEventListener('input', (e) => {
     const el = e.currentTarget;
@@ -1446,9 +2035,9 @@ html.rec .schip { font-size: 16px; }
       const n = Math.max(inserted(before, el.value), data);
       // The Mac types one character per key event (one paste while its own input method is on), so a sentence sent
       // with 送出 arrives as a burst: ≥ 6 characters within half a second. Typing it on the phone takes far longer.
-      const t = now();
-      st.burst = st.burst.filter((x) => t - x.t < 500);
-      if (n) st.burst.push({ t, n });
+      const tm = now();
+      st.burst = st.burst.filter((x) => tm - x.t < 500);
+      if (n) st.burst.push({ t: tm, n });
       const inBurst = st.burst.reduce((sum, x) => sum + x.n, 0);
       if (inBurst >= 6) st.bulk = true;
       st.bulkMax = Math.max(st.bulkMax, inBurst);
@@ -1470,19 +2059,42 @@ html.rec .schip { font-size: 16px; }
   $('#s2-dictation').addEventListener('input', (e) => {
     const info = dictationInfo(e.currentTarget.value);
     paint2();
-    if (info.cjk >= 6 && !info.rep) mark('dictation');
+    if (info.enough && !info.rep) mark('dictation');
   });
 
   // ---- stage 3: the box empties after a send ----
 
-  /** Which characters of `next` sit in a piece of at least `min` characters that also appears in `prev`. */
-  function leftovers(prev, next, min = 3) {
+  // Leftovers are compared word by word, whatever the language: a Chinese or Japanese character is a word by itself,
+  // any other run of letters or digits is one word; spaces and punctuation only separate. Case does not matter.
+  const CHAR_WORD = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Bopomofo}]/u;
+  const LETTER = /[\p{L}\p{N}\p{M}'’]/u;
+  function wordsOf(text) {
+    const a = chars(text);
+    const out = [];
+    for (let i = 0; i < a.length;) {
+      if (CHAR_WORD.test(a[i])) { out.push({ w: a[i], s: i, e: i + 1 }); i++; continue; }
+      if (!LETTER.test(a[i])) { i++; continue; }
+      let j = i;
+      while (j < a.length && LETTER.test(a[j]) && !CHAR_WORD.test(a[j])) j++;
+      out.push({ w: a.slice(i, j).join('').toLowerCase(), s: i, e: j });
+      i = j;
+    }
+    return out;
+  }
+  /** Which characters of `next` sit in a run of words that `prev` also has, in the same order: 3 words or more
+   *  (2 when `prev` has only 2), so an ordinary shared word or two is not a leftover. */
+  function leftovers(prev, next) {
     const a = chars(next);
     const mask = a.map(() => false);
-    for (let i = 0; i < a.length; i++) {
-      for (let j = a.length; j - i >= min; j--) {
-        if (prev.includes(a.slice(i, j).join(''))) {
-          for (let k = i; k < j; k++) mask[k] = true;
+    const p = wordsOf(prev).map((x) => x.w);
+    const n = wordsOf(next);
+    const min = Math.min(3, Math.max(2, p.length));
+    const SEP = '\u0001';
+    const hay = SEP + p.join(SEP) + SEP;
+    for (let i = 0; i < n.length; i++) {
+      for (let j = n.length; j - i >= min; j--) {
+        if (hay.includes(SEP + n.slice(i, j).map((x) => x.w).join(SEP) + SEP)) {
+          for (let k = n[i].s; k < n[j - 1].e; k++) mask[k] = true;
           break;
         }
       }
@@ -1504,11 +2116,11 @@ html.rec .schip { font-size: 16px; }
   function paint3() {
     const box = $('#s3-messages');
     box.replaceChildren();
-    if (!st.s3.length) box.append(span('還沒有訊息', 'empty'));
+    if (!st.s3.length) box.append(span(t('noMessages'), 'empty'));
     st.s3.forEach((m, i) => {
       const b = document.createElement('div');
       b.className = 'bubble';
-      b.append(span(`第 ${i + 1} 句 · 點「傳送」`, 'meta'));
+      b.append(span(t('s3.meta', { n: i + 1 }), 'meta'));
       if (m.lo) b.append(...marked(m.lo)); else b.append(document.createTextNode(m.text));
       box.append(b);
     });
@@ -1516,15 +2128,15 @@ html.rec .schip { font-size: 16px; }
     const r = $('#s3-result');
     r.className = 'result';
     if (!st.s3Leftover) {
-      r.textContent = st.s3.length ? '送出第二句後，這裡會檢查有沒有殘留' : '送出兩句後，這裡會檢查第二句有沒有殘留';
+      r.textContent = t(st.s3.length ? 's3.wait1' : 's3.wait2');
     } else if (!st.s3Leftover.any) {
       r.classList.add('ok');
-      r.textContent = '前一句沒有殘留 ✓';
+      r.textContent = t('s3.clean');
     } else {
       r.classList.add('bad');
       const q = span('', 'quote');
       q.append(...marked(st.s3Leftover));
-      r.replaceChildren(document.createTextNode('有殘留（紅色是第一句的字）：按「清空重試」再來一次'), q);
+      r.replaceChildren(document.createTextNode(t('s3.leftover')), q);
     }
   }
   $('#s3-send').addEventListener('mousedown', (e) => e.preventDefault());   // keep the caret in the box, like chat apps
@@ -1532,7 +2144,7 @@ html.rec .schip { font-size: 16px; }
     const input = $('#s3-input');
     if (!isMouse(e)) return;
     const text = input.value;
-    if (!text.trim()) { toast('先打一句，再點「傳送」'); input.focus(); return; }
+    if (!text.trim()) { toast(t('s3.typeFirst')); input.focus(); return; }
     st.s3Clicks++;
     const msg = { text, lo: null };
     if (st.s3Clicks === 2) {
@@ -1552,7 +2164,7 @@ html.rec .schip { font-size: 16px; }
   $('#s3-input').addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
     e.preventDefault();
-    toast('這一關不用 Enter：請用觸控板點「傳送」');
+    toast(t('s3.noEnterToast'));
   });
   control($('#s3-retry'), () => {
     st.s3 = [];
@@ -1567,24 +2179,24 @@ html.rec .schip { font-size: 16px; }
 
   function paint4() {
     const n = Math.min(3, st.arrows);
-    $('#s4-arrows').textContent = `方向鍵 ${n} / 3`;
+    $('#s4-arrows').textContent = t('s4.arrows', { n });
     note('arrows', isDone('arrows') ? '' : `${n} / 3`);
     for (const id of ['arrows', 'word', 'select', 'fixed']) $(`#s4-${id}`).classList.toggle('ok', isDone(id));
-    $('#s4-text').classList.toggle('ok', same($('#s4-text').value, TEXT.fixed));
+    $('#s4-text').classList.toggle('ok', same($('#s4-text').value, TEXT.typo.fixed));
     paintSel();
   }
   function paintSel() {
     const ta = $('#s4-text');
     const out = $('#s4-sel');
-    if (document.activeElement !== ta) { out.textContent = '先用觸控板點進上面的文字'; return; }
+    if (document.activeElement !== ta) { out.textContent = t('s4.clickFirst'); return; }
     const a = ta.selectionStart;
     const b = ta.selectionEnd;
     if (a !== b) {
-      out.replaceChildren(document.createTextNode('選取中：'), document.createElement('b'));
+      out.replaceChildren(document.createTextNode(t('s4.selected')), document.createElement('b'));
       out.lastChild.textContent = ta.value.slice(a, b);
     } else {
       const before = chars(ta.value.slice(0, a)).pop();
-      out.textContent = before ? `游標在「${before}」後面` : '游標在最前面';
+      out.textContent = before ? t('s4.after', { c: before }) : t('s4.start');
     }
   }
   $('#s4-text').addEventListener('keydown', (e) => {
@@ -1592,7 +2204,8 @@ html.rec .schip { font-size: 16px; }
     const ta = e.currentTarget;
     if (e.altKey) mark('word');
     if (e.shiftKey) {
-      setTimeout(() => { if (ta.selectionStart !== ta.selectionEnd) mark('select'); paint4(); }, 0);
+      // ⇧ select ticks when exactly the wrong part of this language's sentence is selected
+      setTimeout(() => { if (ta.value.slice(ta.selectionStart, ta.selectionEnd) === TEXT.typo.wrong) mark('select'); paint4(); }, 0);
     } else {
       st.arrows++;
       if (st.arrows >= 3) mark('arrows');
@@ -1600,7 +2213,7 @@ html.rec .schip { font-size: 16px; }
     setTimeout(paint4, 0);
   });
   $('#s4-text').addEventListener('input', (e) => {
-    if (same(e.currentTarget.value, TEXT.fixed)) mark('fixed');
+    if (same(e.currentTarget.value, TEXT.typo.fixed)) mark('fixed');
     paint4();
   });
   for (const type of ['focus', 'blur', 'keyup', 'mouseup', 'select']) $('#s4-text').addEventListener(type, paintSel);
@@ -1611,7 +2224,7 @@ html.rec .schip { font-size: 16px; }
   let arrowHintAt = 0;
   document.addEventListener('keydown', (e) => {
     if (S.current !== '4' || !ARROWS.has(e.key) || e.target === $('#s4-text')) return;
-    if (now() - arrowHintAt > 3000) { arrowHintAt = now(); toast('先用觸控板點進上面的文字，再用游標板'); }
+    if (now() - arrowHintAt > 3000) { arrowHintAt = now(); toast(t('s4.toast')); }
   });
 
   // ---- stage 5: shortcuts ----
@@ -1623,12 +2236,12 @@ html.rec .schip { font-size: 16px; }
   }
   function paint5() {
     const v = $('#s5-target').value;
-    if (isDone('paste') && norm(v)) status('#s5-status', `貼上了 ✓「${norm(v)}」`, 'ok');
-    else if (isDone('paste')) status('#s5-status', `貼上了 ✓${isDone('undo') ? '，又用 ⌘Z 復原了' : ''}`, 'ok');
-    else if (isDone('copy')) status('#s5-status', `拷貝了「${norm(st.copied) || '…'}」，點這裡 ⌘V`);
+    if (isDone('paste') && norm(v)) status('#s5-status', t('s5.pastedText', { v: norm(v) }), 'ok');
+    else if (isDone('paste')) status('#s5-status', t('s5.pasted') + (isDone('undo') ? t('s5.undone') : ''), 'ok');
+    else if (isDone('copy')) status('#s5-status', t('s5.copied', { v: norm(st.copied) || '…' }));
     else status('#s5-status', '');
     $('#s5-shot').classList.toggle('has', isDone('screenshot'));
-    if (isDone('screenshot')) status('#s5-shot-status', `收到截圖 ✓ ${st.shotSize}`, 'ok');
+    if (isDone('screenshot')) status('#s5-shot-status', t('s5.shot', { size: st.shotSize }), 'ok');
     else status('#s5-shot-status', '');
   }
   document.addEventListener('keydown', (e) => {
@@ -1682,7 +2295,8 @@ html.rec .schip { font-size: 16px; }
   }, true);
   function checkPaste() {
     const v = norm($('#s5-target').value);
-    if (st.pasteArmed && v && (st.pasteArmed === '*' || v.includes(st.pasteArmed) || v.includes(TEXT.copy))) mark('paste');
+    const known = Object.values(TEXTS).some((x) => v.includes(x.copy));   // either language's sentence
+    if (st.pasteArmed && v && (st.pasteArmed === '*' || v.includes(st.pasteArmed) || known)) mark('paste');
     paint5();
   }
   $('#s5-target').addEventListener('input', (e) => {
@@ -1698,8 +2312,8 @@ html.rec .schip { font-size: 16px; }
   function paint6() {
     $('#s6-art').style.transform = `scale(${st.zoom})`;
     $('#s6-zoom').textContent = `${Math.round(st.zoom * 100)}%`;
-    if (isDone('away')) status('#s6-away-status', `離開了 ${(st.awayMs / 1000).toFixed(1)} 秒，又回來了 ✓`, 'ok');
-    else status('#s6-away-status', '這一頁在等你離開再回來');
+    if (isDone('away')) status('#s6-away-status', t('s6.away', { s: (st.awayMs / 1000).toFixed(1) }), 'ok');
+    else status('#s6-away-status', t('s6.waiting'));
   }
   function zoom(dir) {
     st.zoom = clamp(st.zoom * (dir > 0 ? 1.25 : 0.8), 0.4, 3.2);
@@ -1744,11 +2358,11 @@ html.rec .schip { font-size: 16px; }
   function paint7() {
     const box = $('#s7-messages');
     box.replaceChildren();
-    if (!st.s7.length) box.append(span('還沒有訊息', 'empty'));
+    if (!st.s7.length) box.append(span(t('noMessages'), 'empty'));
     for (const text of st.s7) {
       const b = document.createElement('div');
       b.className = 'bubble';
-      b.append(span('⏎ 送出', 'meta'), document.createTextNode(text));
+      b.append(span(t('s7.meta'), 'meta'), document.createTextNode(text));
       box.append(b);
     }
     box.scrollTop = box.scrollHeight;
@@ -1758,7 +2372,7 @@ html.rec .schip { font-size: 16px; }
     e.preventDefault();
     const input = e.currentTarget;
     const text = input.value.trim();
-    if (!text) { toast('先打一行字，再按 ⏎'); return; }
+    if (!text) { toast(t('s7.typeFirst')); return; }
     st.s7.push(text);
     input.value = '';
     paint7();
@@ -1781,25 +2395,40 @@ html.rec .schip { font-size: 16px; }
         checks[c.id] = isDone(c.id);
         if (isDone(c.id)) times[c.id] = Math.round(S.at[c.id]);
       }
-      stages[s.id] = { name: s.name, done: stageDone(s.id), checks, manual: s.checks.filter((c) => c.manual).map((c) => c.id), times };
+      stages[s.id] = { no: s.no, name: s.name, done: stageDone(s.id), checks, manual: s.checks.filter((c) => c.manual).map((c) => c.id), times };
     }
     return {
-      current: S.current, rec: S.rec, elapsedMs: Math.round(now() - S.t0),
+      lang: LANG, mode: MODE, current: S.current, rec: S.rec, elapsedMs: Math.round(now() - S.t0),
       total: { done: Object.keys(S.at).length, all: ALL }, manual: MANUAL.slice(), stages,
     };
   }
+  /** The targets of the current language and mode, for tests (a fresh copy each time). */
+  function texts() {
+    const out = { live: TEXT.live, liveCheck: wordsCheck() ? 'words' : 'chars', dictation: TEXT.dictation, copy: TEXT.copy };
+    if (!VIDEO) {
+      const ty = TEXT.typo;
+      Object.assign(out, {
+        buffer: TEXT.buffer, zhuyin: TEXT.zhuyin, chat: TEXT.chat.slice(),
+        typo: { sentence: ty.sentence, wrong: ty.wrong, fix: ty.fix, fixed: ty.fixed, at: ty.sentence.lastIndexOf(ty.wrong) },
+      });
+    }
+    return out;
+  }
 
+  document.documentElement.dataset.mode = MODE;
   buildNav();
   buildChecks();
   buildSummary();
   buildList();
   resetBlocks();
-  setRec(new URLSearchParams(location.search).get('rec') === '1', false);
-  paintAll();
+  $('#s2-dictation-no').textContent = VIDEO ? '②' : '④';
+  for (const id of ['#s2-buffer-card', '#s2-zhuyin-card']) $(id).hidden = VIDEO;
+  setLang(LANG, false);
+  setRec(Q.get('rec') === '1', false);
   if (!go(readHash() || '1')) go('1');
   setInterval(() => { if (S.current === 'summary') paintElapsed(); }, 1000);
 
-  window.playground = Object.freeze({ state, go, reset });
+  window.playground = Object.freeze({ state, go, reset, get texts() { return texts(); } });
 })();
 </script>
 </body>

@@ -9,11 +9,13 @@ the same as the playground's stages:
 layout → Summary
 
 Each stage of the playground checks by itself whether you did it, and lights a green tick when you have. When a whole
-stage is done, it shows 「✓ 完成：○○」 (Done: …) and a 「下一關 →」 (Next stage) button. You click that yourself with
-the phone's trackpad; the page never moves on by itself.
+stage is done, it shows "✓ Done: …" and a "Next stage →" button. You click that yourself with the phone's trackpad;
+the page never moves on by itself.
 
-The page's text is in Traditional Chinese. This script quotes it as it appears on screen, with the English meaning in
-brackets.
+The page is in English by default. Add `?lang=zh` to the address, or click 「中文」 at the top right, for the
+Traditional Chinese page (「EN」 switches back, and progress is kept). This script quotes the English page as it
+appears on screen. The phone's SofaPad page is in Chinese: its labels are quoted as they appear, with the English
+meaning in brackets.
 
 ---
 
@@ -28,15 +30,19 @@ open demo/playground.html
 The release zip (`SofaPad-4.3.0-macOS.zip`) has a copy too: unzip it and double-click `playground.html` in the folder.
 
 - Open it in a browser on the Mac (Safari or Chrome). No network and no server needed.
-- **Recording mode**: click 「錄影模式」 (Recording mode) at the top right, or add `?rec=1` to the end of the address,
+- **Language**: English by default; `?lang=zh`, or the 「中文」 button at the top right, gives the Chinese page.
+- **Recording mode**: click "Recording mode" at the top right, or add `?rec=1` to the end of the address,
   for example `file:///…/demo/playground.html?rec=1`. Recording mode:
   - hides each stage's small how-to text and the footer;
   - makes the headline, the ticks and the "done" banner bigger;
-  - shows 「SofaPad 示範 · 第 N 關」 (SofaPad demo · stage N) at the top left.
+  - shows "SofaPad demo · Stage N" at the top left.
+- **Recording version**: `?video=1` gives a shorter run with five stages; see "Recording version" below.
+- The settings combine, for example `playground.html?lang=zh&rec=1#stage=3`, and the buttons keep the others in the
+  address.
 - **Jump to a stage**: add `#stage=3` to the address (1–7, or `#stage=summary` for the summary), or click 1–7 at the
   top.
-- 「重來」 (Restart) clears all progress and goes back to stage 1. Once there is progress you click it twice (the first
-  click turns it into 「確定重來？」, "Restart for sure?").
+- "Restart" clears all progress and goes back to stage 1. Once there is progress you click it twice (the first
+  click turns it into "Really restart?").
 - The playground collects nothing: no network, nothing saved, all gone when you close it.
 - Make the window at least 1280×800. Full screen (⌃⌘F) is best, with the browser zoom at 100% (⌘0).
 
@@ -79,8 +85,8 @@ Narration and captions should describe it this way.
 
 ### Other features to show
 
-- **Live mode**: the text appears on the Mac as you type; Zhuyin is sent only after you pick the characters; dictation
-  does not double the text.
+- **Live mode**: the text appears on the Mac as you type; the iPhone's English keyboard can swipe (slide to type);
+  Zhuyin is sent only after you pick the characters; dictation does not double the text.
 - **Whole mode + 送出 (Send)**: type and fix it on the phone first, then press 「送出」 to send it in one go.
 - **The box empties after sending** (since 4.2): when a piece ends (a trackpad click, a key, a gesture, the cursor pad,
   closing the keyboard), the text box empties, so old text is never sent again.
@@ -111,8 +117,8 @@ the most natural.
 - **Combine**: put them side by side in a video editor, for example the Mac on the left and the phone on the right.
 - **Syncing the two recordings**:
   - clap once at the start (when both recordings have sound); or
-  - at the start, click the playground's 「重來」 with the phone's trackpad: the Mac's screen goes dark for a moment and
-    shows 「開始」 (Start); at that same moment the phone's recording shows the trackpad tap.
+  - at the start, click the playground's "Restart" with the phone's trackpad: the Mac's screen goes dark for a moment
+    and shows "Start"; at that same moment the phone's recording shows the trackpad tap.
 - An iPhone screen recording does not show your fingers. For long-press, two-finger and three-finger moves, film the
   hand with a camera as well, or say what you do in the narration.
 - When you turn the phone to landscape, the phone's recording turns too; rotate it back or change the layout when
@@ -137,21 +143,21 @@ the most natural.
 - [ ] Phone and Mac both on 4.3.0 (the top line of ⚙︎ on the phone).
 - [ ] Suggested: the Mac on the English (ABC) input source; type Chinese with the phone's Zhuyin.
 - [ ] The screenshot step uses the clipboard: do not include anything private in the area you select.
-- [ ] Click 「重來」 in the playground to start at stage 1; turn on 「錄影模式」 if you want it.
+- [ ] Click "Restart" in the playground to start at stage 1; turn on "Recording mode" if you want it.
 
 ---
 
 ## Full version (about 2 min 50 s)
 
-After each stage, click 「下一關 →」 (with the phone's trackpad).
+After each stage, click "Next stage →" (with the phone's trackpad).
 
 ### Scene 0: Opening
 
 | | |
 |---|---|
 | Time | 0:00–0:08 (8 s) |
-| What the phone does | Open SofaPad from the Home Screen; green dot at the top left. Click the playground's 「重來」 with the trackpad. |
-| What the Mac shows | The screen goes dark for a moment with 「開始」 (Start), then stage 1, 「現在示範：觸控板」 (Now showing: Trackpad). |
+| What the phone does | Open SofaPad from the Home Screen; green dot at the top left. Click the playground's "Restart" with the trackpad. |
+| What the Mac shows | The screen goes dark for a moment with "Start", then stage 1, "Now showing: Trackpad". |
 | Narration | "SofaPad turns your iPhone into the Mac's keyboard and trackpad. No app to install, and it only uses your home Wi-Fi." |
 
 ### Scene 1: Trackpad
@@ -159,8 +165,8 @@ After each stage, click 「下一關 →」 (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 0:08–0:33 (25 s) |
-| What the phone does | Slide one finger; tap 「點我」 (Click me); two-finger tap on 「在這裡按右鍵」 (Right-click here), then tap 「👍 讚」 (Like); move the pointer onto the list and swipe down with two fingers to the end; long-press about half a second until 「拖曳中」 (Dragging) shows, and drag the blue block into the blue box; press 「鎖」 (Lock), drag the orange block into the orange box (in several strokes if you like), and press 「鎖」 again to let go. |
-| What the Mac shows | The bar fills to 600 px; the button turns green, 「點到了 ✓」 (Got it); a custom menu pops up; the list scrolls to 「第 40 項：到底了」 (Item 40: the end); both blocks land in their boxes. Six green ticks on the right, and 「✓ 完成：觸控板」 (Done: Trackpad) at the bottom. |
+| What the phone does | Slide one finger; tap "Click me"; two-finger tap on "Right-click here", then tap "👍 Like"; move the pointer onto the list and swipe down with two fingers to the end; long-press about half a second until 「拖曳中」 (Dragging) shows, and drag the blue block into the blue box; press 「鎖」 (Lock), drag the orange block into the orange box (in several strokes if you like), and press 「鎖」 again to let go. |
+| What the Mac shows | The bar fills to 600 px; the button turns green, "Got it ✓"; a custom menu pops up; the list scrolls to "Item 40: the end"; both blocks land in their boxes. Six green ticks on the right, and "✓ Done: Trackpad" at the bottom. |
 | Narration | "Move, click, right-click, scroll, drag: whatever the Mac's trackpad does, the phone does." |
 
 ### Scene 2: Typing
@@ -168,17 +174,20 @@ After each stage, click 「下一關 →」 (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 0:33–1:00 (27 s) |
-| What the phone does | Click box ①, and in Live mode type 「SofaPad 讓 iPhone 變成 Mac 的鍵盤」 (SofaPad turns the iPhone into the Mac's keyboard). Click box ②, switch to 「整段」 (Whole), type 「整段打好再一次送出」 (type it all, then send once) and press 「送出」 (Send). Switch back to 「即時」 (Live), click box ③ and type 「沙發上也能打中文」 (you can type Chinese from the sofa too) with Zhuyin. Click box ④, press the keyboard's 🎤 and say 「今天天氣很好，我們去公園散步」 (the weather is nice today, let's walk in the park), then pause. |
-| What the Mac shows | The target sentences turn green character by character; ② shows 「半秒內送進 9 個字 ✓」 (9 characters within half a second); ③ shows 「沒有出現注音符號」 (no Zhuyin symbols showed up); ④ shows 「沒有疊字 ✓」 (no doubled text). |
-| Narration | "Type with the phone's own keyboard: Zhuyin sends only the characters you pick, and dictation does not double up." |
+| What the phone does | Click box ①, and in Live mode type "I can type from the sofa with my phone" with the iPhone's English keyboard; you can swipe each word. Click box ②, switch to 「整段」 (Whole), type "Type it all, then send it at once" and press 「送出」 (Send). Switch back to 「即時」 (Live), click box ③ and type 「沙發上也能打中文」 (you can type Chinese from the sofa too) with Zhuyin. Click box ④, press the keyboard's 🎤 and say "It is a nice day, let's go for a walk in the park", then pause. |
+| What the Mac shows | ① turns green word by word; a word swiped wrong turns red and the page names it (for example word 3 is "tyre", should be "type"): delete it and swipe again. ② shows "… characters arrived within half a second ✓"; ③ shows "Correct ✓ no Zhuyin symbols showed up"; ④ shows "Nothing doubled ✓". |
+| Narration | "Type with the phone's own keyboard: swipe in English, Zhuyin sends only the characters you pick, and dictation does not double up." |
+
+On the Chinese page (`?lang=zh`), ① asks for 「SofaPad 讓 iPhone 變成 Mac 的鍵盤」, checked character by character,
+and ② for 「整段打好再一次送出」.
 
 ### Scene 3: The box empties after sending
 
 | | |
 |---|---|
 | Time | 1:00–1:18 (18 s) |
-| What the phone does | Click the chat's input box and type 「早安，今天開會」 (Morning, meeting today). Do not press Enter; click 「傳送」 (Send) with the trackpad. Then type 「收到，馬上到」 (Got it, on my way) and click 「傳送」 again. |
-| What the Mac shows | Two messages; the second is only 「收到，馬上到」. On the right: 「前一句沒有殘留 ✓」 (nothing left over from the first sentence). |
+| What the phone does | Click the chat's input box and type "Good morning, meeting today". Do not press Enter; click "Send" with the trackpad. Then type "Got it, on my way" and click "Send" again. |
+| What the Mac shows | Two messages; the second is only "Got it, on my way". On the right: "Nothing left over from the first message ✓". |
 | Narration | "Click Send, and the phone's text box empties, so the next sentence never carries the last one with it." |
 
 ### Scene 4: Cursor pad
@@ -186,8 +195,8 @@ After each stage, click 「下一關 →」 (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 1:18–1:38 (20 s) |
-| What the phone does | Click into the sentence with the trackpad. Hold 「◀ 游標 ▶」 about 0.3 s (short buzz), then drag left to the typo 「觸空板」; flick once to jump a word. Press 「⇧ 選取」 and drag one step to select 「空」 (or tap with a second finger while dragging). Type 「控」. |
-| What the Mac shows | The bottom right shows the keys sent: ←, ⌥←, ⇧←; below the text, 「選取中：空」 (Selected: 空); the typo becomes 「觸控板」 (trackpad), four green ticks. |
+| What the phone does | Click into the sentence "SofaPad turns your iPhone into a keyboard and trackpda." with the trackpad. Hold 「◀ 游標 ▶」 (the cursor pad) about 0.3 s (short buzz), then drag left to the typo "trackpda"; flick once to jump a word. Press 「⇧ 選取」 (⇧ Select) and drag two steps to select "da" (or tap with a second finger while dragging). Type "ad". |
+| What the Mac shows | The bottom right shows the keys sent: ←, ⌥←, ⇧←; below the text, "Selected: da"; the typo becomes "trackpad", four green ticks. The ⇧ Select tick needs exactly "da" selected. |
 | Narration | "The cursor pad moves the Mac's text cursor directly; fixing a typo needs no mouse." |
 
 ### Scene 5: Shortcuts
@@ -195,8 +204,8 @@ After each stage, click 「下一關 →」 (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 1:38–1:58 (20 s) |
-| What the phone does | Click the top sentence, 「SofaPad 很好用」 (SofaPad is handy). Open the panel with 「⌘ 快捷鍵」: ⌘A, ⌘C. Click the empty box below: ⌘V. Then ⌘Z. Then press the panel's ⌃⇧⌘4, select an area of the screen with a long-press drag, and press ⌘V. |
-| What the Mac shows | The bottom right shows ⌘A, ⌘C, ⌘V, ⌘Z; the text is pasted into the box below and undone again; the screenshot appears in 「截圖貼上區」 (screenshot paste area). |
+| What the phone does | Click the top sentence, "SofaPad is handy". Open the panel with 「⌘ 快捷鍵」 (⌘ Shortcuts): ⌘A, ⌘C. Click the empty box below: ⌘V. Then ⌘Z. Then press the panel's ⌃⇧⌘4, select an area of the screen with a long-press drag, and press ⌘V. |
+| What the Mac shows | The bottom right shows ⌘A, ⌘C, ⌘V, ⌘Z; the text is pasted into the box below and undone again; the screenshot appears in "Screenshot paste area". |
 | Narration | "Everyday shortcuts are one tap away, and a screenshot pastes straight in." |
 
 ### Scene 6: Zoom and desktops
@@ -204,8 +213,8 @@ After each stage, click 「下一關 →」 (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 1:58–2:18 (20 s) |
-| What the phone does | Spread two fingers, then pinch. Swipe three fingers left to go to another desktop, then right to come back. Swipe three fingers up for Mission Control, then down to come back. Click 「Mission Control 有出現（手動打勾）」 (Mission Control appeared (tick by hand)) with the trackpad. |
-| What the Mac shows | The sofa picture zooms in and out, and the percentage at its top right follows; the whole desktop slides away and back, and the page shows 「離開了 … 秒，又回來了 ✓」 (left for … s, came back); Mission Control opens and closes. |
+| What the phone does | Spread two fingers, then pinch. Swipe three fingers left to go to another desktop, then right to come back. Swipe three fingers up for Mission Control, then down to come back. Click "Mission Control appeared (tick by hand)" with the trackpad. |
+| What the Mac shows | The sofa picture zooms in and out, and the percentage at its top right follows; the whole desktop slides away and back, and the page shows "Away for … s, then back ✓"; Mission Control opens and closes. |
 | Narration | "Pinch to zoom, three fingers to switch desktops, Mission Control: the gestures are the same as on the Mac's trackpad." |
 
 ### Scene 7: The 4.3 layout
@@ -213,8 +222,8 @@ After each stage, click 「下一關 →」 (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 2:18–2:42 (24 s) |
-| What the phone does | Hold the phone upright, screen to the camera: the half-width text box on the left, the cursor pad and ⏎ on the right. Click the playground's box, type a line, press the ⏎ next to the cursor pad. Press 「✎ 編輯」, drag a key by its ≡ to another place, close it. Turn the phone sideways: side panel on the left, full-height trackpad on the right; press ‹ to collapse it into a full-screen trackpad, then › to open it. Finally click the playground's three manual ticks on the right with the trackpad. |
-| What the Mac shows | The line appears in the chat box and 「⏎ 送出」 (⏎ send) is ticked; the three manual items turn green and 「✓ 完成：4.3 新排版」 (Done: the 4.3 layout) appears. |
+| What the phone does | Hold the phone upright, screen to the camera: the half-width text box on the left, the cursor pad and ⏎ on the right. Click the playground's box, type a line, press the ⏎ next to the cursor pad. Press 「✎ 編輯」 (✎ Edit), drag a key by its ≡ to another place, close it. Turn the phone sideways: side panel on the left, full-height trackpad on the right; press ‹ to collapse it into a full-screen trackpad, then › to open it. Finally click the playground's three manual ticks on the right with the trackpad. |
+| What the Mac shows | The line appears in the chat box and "Type a line, press the ⏎ next to the cursor pad" is ticked; the three manual items turn green and "✓ Done: The 4.3 layout" appears. |
 | Narration | "The 4.3 layout: upright, type and move the cursor with one hand; sideways, a side panel with more shortcuts." |
 
 ### Scene 8: Summary
@@ -222,26 +231,56 @@ After each stage, click 「下一關 →」 (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 2:42–2:50 (8 s) |
-| What the phone does | Click 「看總表 →」 (See summary). |
-| What the Mac shows | A big 「30 / 30 完成」 (30 / 30 done), and the time each item was done, automatic and manual marked apart. |
+| What the phone does | Click "See summary →". |
+| What the Mac shows | A big "30 / 30 done", and the time each item was done, automatic and manual marked apart. |
 | Narration | "All done. SofaPad is open source; the link is in the description." |
+
+---
+
+## Recording version (`?video=1`)
+
+A shorter run of the playground for a short video, made for recording on Vision Pro. Turn it on with `?video=1`
+(it combines with the other settings, for example `playground.html?video=1&rec=1`), or open a copy of the page whose
+`<meta name="playground-mode">` says `video`, which opens in this version with a double-click; `?video=0` goes back
+to the full version.
+
+- Five stages, numbered 1–5 on screen (the top bar, the recording badge "SofaPad demo · Stage N" and the summary):
+  1 Trackpad → 2 Typing → 3 Shortcuts → 4 Zoom and desktops → 5 The 4.3 layout → Summary. "Box empties after sending"
+  and "Cursor pad" are left out.
+- Stage 2 has two boxes: ① Live, with "I can type from the sofa with my phone" (on the Chinese page too), and
+  ② dictation.
+- The summary counts only these stages: 21 items.
+- `#stage=` still takes the full version's numbers: `#stage=5` opens Shortcuts, shown as stage 3.
+
+Do each stage as in the full version's scene of the same name.
+
+| Time | Stage on screen | Scene to follow | What the Mac shows at the end |
+|---|---|---|---|
+| 0:00–0:08 | Opening | Scene 0 | "Start", then stage 1 |
+| 0:08–0:33 | 1 Trackpad | Scene 1 | "✓ Done: Trackpad" |
+| 0:33–0:51 | 2 Typing | Scene 2, boxes ① and ② only: swipe "I can type from the sofa with my phone", then dictate a sentence | "✓ Done: Typing" |
+| 0:51–1:11 | 3 Shortcuts | Scene 5 | "✓ Done: Shortcuts" |
+| 1:11–1:31 | 4 Zoom and desktops | Scene 6 | "✓ Done: Zoom and desktops" |
+| 1:31–1:55 | 5 The 4.3 layout | Scene 7 | "✓ Done: The 4.3 layout", then "See summary →" |
+| 1:55–2:03 | Summary | Scene 8 | "21 / 21 done" |
 
 ---
 
 ## 60-second highlights
 
-You do not need to finish every stage: jump with 1–7 at the top. You can also cut it from the full version.
+You do not need to finish every stage: jump with 1–7 at the top. You can also cut it from the full version. (The
+recording version above leaves out stages 3 and 4, which this cut uses.)
 
 | Time | What the phone does | What the Mac shows | Narration |
 |---|---|---|---|
-| 0:00–0:05 | Open SofaPad, green dot; click 「重來」 | 「開始」, stage 1 | "The iPhone becomes the Mac's keyboard and trackpad." |
-| 0:05–0:15 | Slide one finger, tap 「點我」, two-finger tap for a right click, long-press and drag the blue block into its box | Green ticks light up one by one | "Whatever the Mac's trackpad does, the phone does." |
-| 0:15–0:27 | Stage 2: type a sentence in Live mode; dictate one with 🎤 | The text appears as you type; 「沒有疊字 ✓」 | "The phone's own keyboard: Zhuyin and dictation both work." |
-| 0:27–0:35 | Stage 3: type a sentence, click 「傳送」; type another, click 「傳送」 | 「前一句沒有殘留 ✓」 | "The text box empties after sending." |
-| 0:35–0:43 | Stage 4: drag the cursor pad to the typo, 「⇧ 選取」, type 「控」 | 「觸空板」 becomes 「觸控板」 | "The cursor pad moves the Mac's text cursor directly." |
+| 0:00–0:05 | Open SofaPad, green dot; click "Restart" | "Start", stage 1 | "The iPhone becomes the Mac's keyboard and trackpad." |
+| 0:05–0:15 | Slide one finger, tap "Click me", two-finger tap for a right click, long-press and drag the blue block into its box | Green ticks light up one by one | "Whatever the Mac's trackpad does, the phone does." |
+| 0:15–0:27 | Stage 2: swipe the sentence in Live mode; dictate one with 🎤 | The text appears as you type; "Nothing doubled ✓" | "The phone's own keyboard: swiping and dictation both work." |
+| 0:27–0:35 | Stage 3: type a sentence, click "Send"; type another, click "Send" | "Nothing left over from the first message ✓" | "The text box empties after sending." |
+| 0:35–0:43 | Stage 4: drag the cursor pad to the typo, 「⇧ 選取」, type "ad" | "trackpda" becomes "trackpad" | "The cursor pad moves the Mac's text cursor directly." |
 | 0:43–0:50 | Stage 6: pinch; three fingers to another desktop and back | The picture zooms; the desktop slides away and back | "Pinch, three fingers: the same gestures." |
 | 0:50–0:57 | Show the cursor pad and ⏎ upright, then the side panel sideways | Stage 7 | "The 4.3 layout works upright and sideways." |
-| 0:57–1:00 | Click 「總表」 (Summary) | The count and the times | "SofaPad: use your Mac from the sofa." |
+| 0:57–1:00 | Click "Summary" | The count and the times | "SofaPad: use your Mac from the sofa." |
 
 ---
 
@@ -250,7 +289,7 @@ You do not need to finish every stage: jump with 1–7 at the top. You can also 
 - The three-finger swipe does nothing: make sure there is a second desktop and that the shortcuts in the checklist
   are on.
 - The browser zoomed the whole page: press ⌘0 to undo. The playground still counts the zoom in / zoom out.
-- Stuck on a stage: click a number at the top to skip it, or come back later; 「重來」 clears all progress.
-- Stage 3 shows red 「有殘留」 (left over): click 「清空重試」 (Clear and retry) to redo just that stage.
+- Stuck on a stage: click a number at the top to skip it, or come back later; "Restart" clears all progress.
+- Stage 3 shows red "Leftover found": click "Clear and retry" to redo just that stage.
 - After ⌃⇧⌘4 the pointer becomes a crosshair: select with a long-press drag; press esc to cancel.
 - Recording mode hides the small how-to text; turn recording mode off when you need it.

@@ -7,7 +7,10 @@
 //   ⌃⇧⌘4 then a drag: a screenshot of the dragged area goes to a clipboard of the bridge's own;
 //   ⌘C / ⌘V: copy and paste events on that clipboard (the real clipboard of this Mac is never touched).
 // The pointer moves are the dry-run's Mac pixels (a 2560-wide screen) halved. A cursor is drawn on the playground.
-//   node tools/sofa8-playground.mjs [--video DIR]     (--video: frames of both screens and an ffmpeg list each, see screencast.mjs)
+//   node tools/sofa8-playground.mjs [--lang en|zh] [--mode video] [--video DIR]
+//     --lang: the page's language (SOFA-9; default en, the page's default). --mode video: the short recording version
+//     (stages 1, 2, 5, 6, 7). --video: frames of both screens and an ffmpeg list each, see screencast.mjs.
+//   The targets come from window.playground.texts, so the same run works in either language.
 import { chromium } from 'playwright-core';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -17,6 +20,8 @@ import { startScreencast } from './screencast.mjs';
 
 const args = process.argv.slice(2);
 const videoDir = args.includes('--video') ? args[args.indexOf('--video') + 1] : null;
+const lang = args.includes('--lang') ? args[args.indexOf('--lang') + 1] : 'en';
+const videoMode = args.includes('--mode') && args[args.indexOf('--mode') + 1] === 'video';
 const evDir = join(ROOT, 'design/evidence/sofa8');
 const shotsDir = join(ROOT, 'design/screenshots/v4');
 mkdirSync(evDir, { recursive: true });
@@ -47,7 +52,7 @@ try {
   const mac = await macCtx.newPage();
   const phone = await phoneCtx.newPage();
   for (const [p, n] of [[mac, 'playground'], [phone, 'phone']]) p.on('pageerror', (e) => console.log(`PAGE ERROR (${n}) ${e.message}`));
-  await mac.goto(pathToFileURL(join(ROOT, 'demo/playground.html')).href + '?rec=1');
+  await mac.goto(pathToFileURL(join(ROOT, 'demo/playground.html')).href + `?rec=1&lang=${lang}${videoMode ? '&video=1' : ''}`);
   // a cursor, since a headless page has none
   await mac.evaluate(() => {
     const c = document.createElement('div');
@@ -93,6 +98,7 @@ try {
       ev('input', { inputType: 'insertCompositionText', data: chosen, isComposing: true });
       el.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: chosen }));
     };
+    window.__swipe = (w) => { el.focus(); const t = (el.value && !/\s$/.test(el.value) ? ' ' : '') + w; el.setRangeText(t, el.selectionStart, el.selectionEnd, 'end'); ev('input', { inputType: 'insertText', data: t }); };
     window.__dictate = (steps) => {
       el.focus();
       for (const [cut, add] of steps) {
@@ -349,24 +355,43 @@ try {
   await next();
 
   // ---- 2 打字 ----
+  const texts = await mac.evaluate(() => window.playground.texts);
+  out.texts = texts;
   await clickAt('#s2-live');
-  await typePhone('SofaPad 讓 iPhone 變成 Mac 的鍵盤', 60);
-  await clickAt('#s2-buffer');
-  await tapPhone('#modeBtn');                        // 即時 → 整段
-  await phone.evaluate(() => window.__type('整段打好再一次送出'));
-  await sleep(600);
-  await tapPhone('#sendBtn');
-  await sleep(400);
-  await settle();
-  await tapPhone('#modeBtn');                        // back to 即時
-  await clickAt('#s2-zhuyin');
-  for (const [marked, chosen] of [['ㄕㄚ ㄈㄚ', '沙發'], ['ㄕㄤˋ', '上'], ['ㄧㄝˇ ㄋㄥˊ', '也能'], ['ㄉㄚˇ', '打'], ['ㄓㄨㄥ ㄨㄣˊ', '中文']]) {
-    await phone.evaluate((m) => window.__composeStart(m), marked);
-    await sleep(450);
-    await phone.evaluate(([m, c]) => window.__composeEnd(m, c), [marked, chosen]);
-    await sleep(350);
+  if (texts.liveCheck === 'words') {
+    // SOFA-9: iOS swipe typing, a whole word per input, the space before each next word; the third word picked
+    // wrong first (its letters reversed), named by the page, then deleted and swiped again
+    const swipe = async (words) => { for (const w of words) { await phone.evaluate((x) => window.__swipe(x), w); await sleep(450); } await sleep(1000); await settle(); };
+    const words = texts.live.split(' ');
+    const wrong = [...words[2]].reverse().join('');
+    await swipe([...words.slice(0, 2), wrong]);
+    out.stage2 = { wrongWord: await mac.textContent('#s2-live-status') };
+    await phone.evaluate((n) => window.__dictate([[n, '']]), wrong.length + 1);
+    await sleep(1000);
+    await settle();
+    await swipe(words.slice(2));
+    out.stage2.live = await mac.textContent('#s2-live-status');
+  } else {
+    await typePhone(texts.live, 60);
   }
-  await settle();
+  if (!videoMode) {
+    await clickAt('#s2-buffer');
+    await tapPhone('#modeBtn');                      // 即時 → 整段
+    await phone.evaluate((t) => window.__type(t), texts.buffer);
+    await sleep(600);
+    await tapPhone('#sendBtn');
+    await sleep(400);
+    await settle();
+    await tapPhone('#modeBtn');                      // back to 即時
+    await clickAt('#s2-zhuyin');
+    for (const [marked, chosen] of [['ㄕㄚ ㄈㄚ', '沙發'], ['ㄕㄤˋ', '上'], ['ㄧㄝˇ ㄋㄥˊ', '也能'], ['ㄉㄚˇ', '打'], ['ㄓㄨㄥ ㄨㄣˊ', '中文']]) {
+      await phone.evaluate((m) => window.__composeStart(m), marked);
+      await sleep(450);
+      await phone.evaluate(([m, c]) => window.__composeEnd(m, c), [marked, chosen]);
+      await sleep(350);
+    }
+    await settle();
+  }
   await clickAt('#s2-dictation');
   // iOS dictation: words appear and get rewritten as it listens (the pattern behind I-21)
   for (const steps of [[[0, '今天']], [[2, ''], [0, '今天天氣']], [[0, '很好，']], [[3, ''], [0, '很好，我們去']], [[3, ''], [0, '我們去公園']], [[0, '散步']]]) {
@@ -378,11 +403,12 @@ try {
   await report('2');
   await next();
 
+  if (!videoMode) {
   // ---- 3 送出後自動清空 ----
   await clickAt('#s3-input');
-  await typePhone('早安，今天開會', 80);
+  await typePhone(texts.chat[0], 80);
   await clickAt('#s3-send');                          // a click on the Mac app's own send button: the phone box empties
-  await typePhone('收到，馬上到', 80);
+  await typePhone(texts.chat[1], 80);
   await clickAt('#s3-send');
   await report('3');
   await next();
@@ -392,7 +418,8 @@ try {
   // a flick: ⌥→, a word at a time (fast enough that CDP's own delay between events still reads as > 1.5 px/ms)
   for (let i = 0; i < 3 && !(await state()).stages['4'].checks.word; i++) await caretDrag(320, 90);
   {
-    const want = (await sel4()).v.indexOf('空') + 1;   // just after 空
+    const typo = (await mac.evaluate(() => window.playground.texts)).typo;   // read again: stage 4 may have started over
+    const want = typo.at + typo.wrong.length;        // just after the wrong part
     for (let i = 0; i < 6; i++) {
       const s = await sel4();
       const d = s.a - want;
@@ -402,16 +429,18 @@ try {
     }
   }
   await tapPhone('#caretSelect');                    // ⇧ 選取 on
-  for (let i = 0; i < 4; i++) {
+  const { wrong: bad, fix } = (await mac.evaluate(() => window.playground.texts)).typo;
+  for (let i = 0; i < 6; i++) {
     const s = await sel4();
     const n = s.b - s.a;
-    if (n === 1) break;
-    await caretDrag(n === 0 ? -18 : 14 * (n - 1) + 4, 300);
+    if (n === [...bad].length) break;
+    await caretDrag(n < [...bad].length ? -14 * ([...bad].length - n) - 4 : 14 * (n - [...bad].length) + 4, 300);
   }
   await tapPhone('#caretSelect');                    // off again
-  await typePhone('控');
+  await typePhone(fix);
   await report('4');
   await next();
+  }
 
   // ---- 5 快捷鍵 ----
   await clickAt('#s5-source');
@@ -455,7 +484,7 @@ try {
 
   // ---- 7 4.3 新排版 ----
   await clickAt('#s7-input');
-  await typePhone('4.3 的 ⏎ 在游標板右邊', 50);
+  await typePhone(lang === 'zh' ? '4.3 的 ⏎ 在游標板右邊' : 'The 4.3 Enter key is next to the cursor pad', 50);
   await tapPhone('#inputCells [data-id="k:enter"]');
   await settle();
   // the phone's own layout: the editor, a real ≡ drag (the Mac cannot see this part; ticked by hand below)
@@ -480,7 +509,7 @@ try {
   const st = await state();
   await mac.screenshot({ path: join(shotsDir, 'sofa8-playground-summary.png') });
   clearInterval(pump);
-  out = { state: st, simulated, macEvents: macLog.length, byKind: macLog.reduce((a, l) => { const k = l.split(' ')[0]; a[k] = (a[k] || 0) + 1; return a; }, {}) };
+  out = { ...out, state: st, simulated, macEvents: macLog.length, byKind: macLog.reduce((a, l) => { const k = l.split(' ')[0]; a[k] = (a[k] || 0) + 1; return a; }, {}) };
   console.log(`playground: ${st.total.done} / ${st.total.all} (${st.manual.length} of them ticked by hand on the page, as Ray would)`);
   console.log('simulated macOS parts:', simulated.length);
   if (casts) {

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Local release package (SOFA-6): builds dist/SofaPad.app, then dist/release/SofaPad-<version>-macOS.zip with the
-# release notes, the install guide, the demo page and its recording scripts, and its SHA-256. Nothing is signed with a Developer ID, notarized or uploaded.
+# release notes, the install guide, the demo page (full and recording version) and its recording scripts, and its
+# SHA-256. Nothing is signed with a Developer ID, notarized or uploaded.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
@@ -18,6 +19,11 @@ sed -e "s|](\.\./|]($REPO/|g" "$ROOT/docs/INSTALL.md" > "$OUT/$NAME/INSTALL.md"
 cp "$ROOT/LICENSE" "$OUT/$NAME/LICENSE"
 # the demo page and its recording scripts (SOFA-9): the page is one offline file, the scripts link to each other
 cp "$ROOT/demo/playground.html" "$OUT/$NAME/playground.html"
+# the short recording version (SOFA-9): the same page with its mode meta set to video, so a double-click opens it
+sed -e 's|<meta name="playground-mode" content="full">|<meta name="playground-mode" content="video">|' \
+  "$ROOT/demo/playground.html" > "$OUT/$NAME/playground-video.html"
+grep -q '<meta name="playground-mode" content="video">' "$OUT/$NAME/playground-video.html" \
+  || { echo "playground-video.html: the mode meta was not found in demo/playground.html" >&2; exit 1; }
 for f in DEMO-SCRIPT.md DEMO-SCRIPT.zh-TW.md; do
   sed -e "s|](\.\./|]($REPO/|g" "$ROOT/docs/$f" > "$OUT/$NAME/$f"
 done
