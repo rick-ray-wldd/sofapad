@@ -1,6 +1,6 @@
 #!/bin/bash
 # Local release package (SOFA-6): builds dist/SofaPad.app, then dist/release/SofaPad-<version>-macOS.zip with the
-# release notes and the install guide, and its SHA-256. Nothing is signed with a Developer ID, notarized or uploaded.
+# release notes, the install guide, the demo page and its recording scripts, and its SHA-256. Nothing is signed with a Developer ID, notarized or uploaded.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
@@ -16,6 +16,11 @@ sed -e 's|](\.\./INSTALL\.md)|](INSTALL.md)|g' -e "s|](\.\./\.\./|]($REPO/|g" \
   "$ROOT/docs/release/$VERSION.md" > "$OUT/$NAME/RELEASE-NOTES.md"
 sed -e "s|](\.\./|]($REPO/|g" "$ROOT/docs/INSTALL.md" > "$OUT/$NAME/INSTALL.md"
 cp "$ROOT/LICENSE" "$OUT/$NAME/LICENSE"
+# the demo page and its recording scripts (SOFA-9): the page is one offline file, the scripts link to each other
+cp "$ROOT/demo/playground.html" "$OUT/$NAME/playground.html"
+for f in DEMO-SCRIPT.md DEMO-SCRIPT.zh-TW.md; do
+  sed -e "s|](\.\./|]($REPO/|g" "$ROOT/docs/$f" > "$OUT/$NAME/$f"
+done
 cd "$OUT"
 if LC_ALL=C grep -r -a -l -F -e "$ROOT" -e "$HOME/" "$NAME"; then echo "a local path is in the package (above)" >&2; exit 1; fi
 ditto -c -k --sequesterRsrc --keepParent "$NAME" "$NAME-macOS.zip"

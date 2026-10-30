@@ -30,6 +30,11 @@ Tests: `tools/sofa8-layout.mjs` (portrait, editor, conversion from 4.2, landscap
 `tools/sofa8-playground.mjs` (every stage of the demo page from the phone page through a dry-run Mac), and the 4.2
 suites, with the checks about the old landscape layout and the old default key row updated.
 
+**Defaults settled after trying 4.3.0 on an iPhone:** the key row has no ⏎ of its own (it is next to the cursor pad;
+add one in "✎ 編輯" if you want it); in portrait, live mode keeps the text box to one line while typing so the trackpad
+keeps at least 290 px (batch mode still gets two lines); the landscape panel is on the left, on the right in
+left-handed mode. The release zip also has the demo page (`playground.html`) and the recording scripts.
+
 ## 4.2.0 (2026-10-29)
 
 **Fixed: old text left in the text box (live mode).** If you finished typing without pressing Enter — clicked a

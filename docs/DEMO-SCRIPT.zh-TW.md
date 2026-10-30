@@ -18,6 +18,8 @@
 open demo/playground.html
 ```
 
+安裝包（`SofaPad-4.3.0-macOS.zip`）裡也有一份：解壓縮後雙擊資料夾裡的 `playground.html`。
+
 - 用 Mac 的瀏覽器打開（Safari 或 Chrome 都可以）。不用網路，也不用開伺服器。
 - **錄影模式**：按右上角「錄影模式」，或在網址列的網址最後加上 `?rec=1`，例如 `file:///…/demo/playground.html?rec=1`。錄影模式會：
   - 藏起每關的小字說明和頁尾；

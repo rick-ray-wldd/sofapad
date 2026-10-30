@@ -25,6 +25,8 @@ In the repo's folder:
 open demo/playground.html
 ```
 
+The release zip (`SofaPad-4.3.0-macOS.zip`) has a copy too: unzip it and double-click `playground.html` in the folder.
+
 - Open it in a browser on the Mac (Safari or Chrome). No network and no server needed.
 - **Recording mode**: click 「錄影模式」 (Recording mode) at the top right, or add `?rec=1` to the end of the address,
   for example `file:///…/demo/playground.html?rec=1`. Recording mode:
