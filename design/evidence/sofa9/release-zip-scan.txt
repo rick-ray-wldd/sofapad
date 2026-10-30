@@ -1,0 +1,38 @@
+SofaPad 4.3.0 final release zip: byte-by-byte scan (SOFA-9, same method as design/evidence/sofa8/release-zip-scan.txt), 2026-10-30 18:37
+zip: SofaPad-4.3.0-macOS.zip, 407888 bytes
+SHA-256: 0f8b3817dcf4d5523e5accf5db411f0c17bd0124d1e2bd28e3ffacfce39fdab8
+built by tools/package.sh at commit c081a87 (no changes to tracked files); tools/build-app.sh: dSYM kept outside the
+app (not packaged), executable stripped, ad-hoc signed
+replaces the earlier 4.3.0 zips of SOFA-8 (73e6a91c…) and SOFA-9 (e414dffd…), neither published: same app code, new
+build time, the bilingual demo page and its recording version (playground-video.html)
+
+Unzipped into an empty folder: 24 files (14 web files), __MACOSX entries: 0
+  SofaPad-4.3.0/SofaPad.app  INSTALL.md  RELEASE-NOTES.md  LICENSE  playground.html  playground-video.html
+  DEMO-SCRIPT.md  DEMO-SCRIPT.zh-TW.md
+Every file read as raw bytes:
+
+/Users/                                                      0
+the home folder                                              0
+account name                                                 0
+full name                                                    0
+computer name, local host name, git user name                0
+this Mac's addresses (2 IPv4, 2 IPv6, read from its interfaces now)  0
+the owner's email address                                    0
+any email address                                            0
+assistant-system ids (S-…, run_, msg_, term_)                0
+dispatch files and the assistant system's own name           0
+"Orca"                                                       1  a web/js/textsync.js comment (an app name in a bug description,
+                                                             there since 4.0; left as it is, as the coordinator said in SOFA-7)
+pairing codes (配對碼：nnnnnn)                                  0
+10.0.0.0/8                                                   0
+172.16.0.0/12                                                0
+192.168.0.0/16                                               2  192.168.1.20: the self-test's example address (executable), as in 4.2
+100.64.0.0/10                                                3  the range name "100.64.0.0/10" in the menu and --help text (executable), as in 4.2
+fd7a:115c:a1e0::/48 (Tailscale IPv6)                         0
+.local names                                                 0
+
+Executable's symbol table (nm -a): debug-map entries (SO, OSO, SOL, FUN, BNSYM, ENSYM, GSYM, STSYM)   0
+codesign: Signature=adhoc, TeamIdentifier=not set
+The zip's web files are the committed ones; only js/version.js differs (its build time).
+playground.html is byte-identical to demo/playground.html; playground-video.html differs from it only in
+<meta name="playground-mode" content="video">.

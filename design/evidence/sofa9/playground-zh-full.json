@@ -1,0 +1,197 @@
+{
+ "texts": {
+  "live": "SofaPad 讓 iPhone 變成 Mac 的鍵盤",
+  "liveCheck": "chars",
+  "dictation": "今天天氣很好，我們去公園散步",
+  "copy": "SofaPad 很好用",
+  "buffer": "整段打好再一次送出",
+  "zhuyin": "沙發上也能打中文",
+  "chat": [
+   "早安，今天開會",
+   "收到，馬上到"
+  ],
+  "typo": {
+   "sentence": "SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸空板。",
+   "wrong": "空",
+   "fix": "控",
+   "fixed": "SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸控板。",
+   "at": 29
+  }
+ },
+ "state": {
+  "lang": "zh",
+  "mode": "full",
+  "current": "summary",
+  "rec": true,
+  "elapsedMs": 220571,
+  "total": {
+   "done": 30,
+   "all": 30
+  },
+  "manual": [
+   "mission",
+   "portrait",
+   "reorder",
+   "landscape"
+  ],
+  "stages": {
+   "1": {
+    "no": 1,
+    "name": "觸控板",
+    "done": true,
+    "checks": {
+     "move": true,
+     "click": true,
+     "rightclick": true,
+     "scroll": true,
+     "drag": true,
+     "draglock": true
+    },
+    "manual": [],
+    "times": {
+     "move": 6741,
+     "click": 25679,
+     "rightclick": 30642,
+     "scroll": 46337,
+     "drag": 58659,
+     "draglock": 64685
+    }
+   },
+   "2": {
+    "no": 2,
+    "name": "打字",
+    "done": true,
+    "checks": {
+     "live": true,
+     "buffer": true,
+     "zhuyin": true,
+     "dictation": true
+    },
+    "manual": [],
+    "times": {
+     "live": 78224,
+     "buffer": 84136,
+     "zhuyin": 93478,
+     "dictation": 100703
+    }
+   },
+   "3": {
+    "no": 3,
+    "name": "送出後自動清空",
+    "done": true,
+    "checks": {
+     "sent1": true,
+     "sent2": true,
+     "clean": true
+    },
+    "manual": [],
+    "times": {
+     "sent1": 117842,
+     "sent2": 119201,
+     "clean": 119201
+    }
+   },
+   "4": {
+    "no": 4,
+    "name": "游標板",
+    "done": true,
+    "checks": {
+     "arrows": true,
+     "word": true,
+     "select": true,
+     "fixed": true
+    },
+    "manual": [],
+    "times": {
+     "arrows": 133103,
+     "word": 133137,
+     "select": 136521,
+     "fixed": 137392
+    }
+   },
+   "5": {
+    "no": 5,
+    "name": "快捷鍵",
+    "done": true,
+    "checks": {
+     "selectall": true,
+     "copy": true,
+     "paste": true,
+     "undo": true,
+     "screenshot": true
+    },
+    "manual": [],
+    "times": {
+     "selectall": 152489,
+     "copy": 153019,
+     "paste": 156106,
+     "undo": 156618,
+     "screenshot": 170076
+    }
+   },
+   "6": {
+    "no": 6,
+    "name": "縮放與桌面",
+    "done": true,
+    "checks": {
+     "zoomin": true,
+     "zoomout": true,
+     "away": true,
+     "mission": true
+    },
+    "manual": [
+     "mission"
+    ],
+    "times": {
+     "zoomin": 178942,
+     "zoomout": 180291,
+     "away": 182886,
+     "mission": 190065
+    }
+   },
+   "7": {
+    "no": 7,
+    "name": "4.3 新排版",
+    "done": true,
+    "checks": {
+     "enter": true,
+     "portrait": true,
+     "reorder": true,
+     "landscape": true
+    },
+    "manual": [
+     "portrait",
+     "reorder",
+     "landscape"
+    ],
+    "times": {
+     "enter": 202437,
+     "portrait": 212001,
+     "reorder": 213326,
+     "landscape": 214642
+    }
+   }
+  }
+ },
+ "simulated": [
+  "⌘C（拷貝「SofaPad 很好用」到模擬剪貼簿）",
+  "⌘V（貼上模擬剪貼簿的「SofaPad 很好用」）",
+  "⌃⇧⌘4：拖一塊範圍截圖",
+  "截圖 257×67 存到剪貼簿",
+  "⌘V（貼上模擬剪貼簿裡的截圖）",
+  "切到右邊的桌面",
+  "回到左邊的桌面（這一頁）",
+  "Mission Control 打開",
+  "Mission Control 收起"
+ ],
+ "macEvents": 3700,
+ "byKind": {
+  "move": 3335,
+  "click": 25,
+  "scroll": 240,
+  "down": 3,
+  "up": 3,
+  "type": 62,
+  "key": 32
+ }
+}

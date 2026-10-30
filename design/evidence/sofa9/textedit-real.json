@@ -1,0 +1,95 @@
+{
+ "startedAt": "2026-10-30T09:37:31.908Z",
+ "steps": [
+  {
+   "name": "打字：「hello world」",
+   "text": "hello world",
+   "loc": 11,
+   "len": 0,
+   "ok": true
+  },
+  {
+   "name": "游標板往左 5 下，再打「X」→「hello Xworld」",
+   "text": "hello Xworld",
+   "loc": 7,
+   "len": 0,
+   "ok": true
+  },
+  {
+   "name": "選取：Shift＋← 2 下，選到「 X」",
+   "text": "hello Xworld",
+   "loc": 5,
+   "len": 2,
+   "ok": true
+  },
+  {
+   "name": "打「_」取代選取的字 →「hello_world」",
+   "text": "hello_world",
+   "loc": 6,
+   "len": 0,
+   "ok": true
+  },
+  {
+   "name": "快速甩向右：⌥→ 跳到字尾，再打「!」",
+   "text": "hello_world!",
+   "loc": 12,
+   "len": 0,
+   "ok": true
+  },
+  {
+   "name": "Enter 換行、打第二行，往上拖 1 下（游標回到第一行）再打「^」",
+   "text": "hello_w^orld!\nsecond",
+   "loc": 8,
+   "len": 0,
+   "ok": true
+  }
+ ],
+ "overlays": [
+  31792
+ ],
+ "front": {
+  "front": 31792,
+  "ms": 2007,
+  "ok": false
+ },
+ "box": "^",
+ "closed": {
+  "ok": true,
+  "windowsLeft": 0
+ },
+ "stopped": null,
+ "results": [
+  {
+   "name": "打字：「hello world」",
+   "ok": true,
+   "detail": "{\"len\":0,\"loc\":11,\"ok\":true,\"text\":\"hello world\"}"
+  },
+  {
+   "name": "游標板往左 5 下，再打「X」→「hello Xworld」",
+   "ok": true,
+   "detail": "{\"len\":0,\"loc\":7,\"ok\":true,\"text\":\"hello Xworld\"}"
+  },
+  {
+   "name": "選取：Shift＋← 2 下，選到「 X」",
+   "ok": true,
+   "detail": "{\"len\":2,\"loc\":5,\"ok\":true,\"text\":\"hello Xworld\"}"
+  },
+  {
+   "name": "打「_」取代選取的字 →「hello_world」",
+   "ok": true,
+   "detail": "{\"len\":0,\"loc\":6,\"ok\":true,\"text\":\"hello_world\"}"
+  },
+  {
+   "name": "快速甩向右：⌥→ 跳到字尾，再打「!」",
+   "ok": true,
+   "detail": "{\"len\":0,\"loc\":12,\"ok\":true,\"text\":\"hello_world!\"}"
+  },
+  {
+   "name": "Enter 換行、打第二行，往上拖 1 下（游標回到第一行）再打「^」",
+   "ok": true,
+   "detail": "{\"len\":0,\"loc\":8,\"ok\":true,\"text\":\"hello_w^orld!\\nsecond\"}"
+  }
+ ],
+ "guardDropped": false,
+ "guardLines": []
+}

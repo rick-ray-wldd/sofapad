@@ -91,3 +91,24 @@ and the assistant-system ids: none of the real values. The only private-range ma
 `192.168.1.20` and the Tailscale range name `100.64.0.0/10` in the menu text
 ([`design/evidence/sofa6/release-zip-scan.txt`](../design/evidence/sofa6/release-zip-scan.txt)). The two new
 screenshots show only the test page.
+
+## 4.3 (2026-10-30)
+
+Before the push, every line added since 4.2.0 (`origin/main..HEAD`: the 4.3 commits, the demo page, the READMEs,
+the records and the test results) was searched, with this computer's account and full name, its computer and local
+host names, the git user name and its LAN and Tailscale addresses (IPv4 and IPv6) read from its interfaces at the
+time: none of those real values. Also searched: every private IPv4 range and the whole 100.64.0.0/10, Tailscale IPv6,
+`.local` names, local paths, email addresses, six-digit numbers and pairing-code patterns, assistant-system ids and
+names, and other people's names. What it finds is only:
+
+| Where | What matches | Why it stays |
+|---|---|---|
+| `design/evidence/sofa8/release-zip-scan.txt`, `design/evidence/sofa9/release-zip-scan.txt` | the range names `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `100.64.0.0/10`, `fd7a:115c:a1e0::/48`; `192.168.1.20`; `/Users/` | the list of what the zip was searched for, with 0 or the known example hits |
+| test results in `design/evidence/sofa8/`, `design/evidence/sofa9/` | six-digit numbers | milliseconds and pixel areas, not codes |
+| `pkm33-send-clear` results | 「我在 Orca 說的私人內容…」 | the made-up test sentence, as in 4.2 |
+| README links | `rick-ray-wldd` | the repository's own address |
+
+One name was taken out before anything was pushed: a SOFA-8 test result named the assistant system's folder; the
+unpushed commit was rewritten to describe it instead. The release zip was searched byte by byte again
+([`design/evidence/sofa9/release-zip-scan.txt`](../design/evidence/sofa9/release-zip-scan.txt)): the same example
+values as 4.2 and nothing real. The new screenshots show only the demo page and the test phone page (example values).

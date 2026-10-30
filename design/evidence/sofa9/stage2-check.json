@@ -1,0 +1,232 @@
+[
+ {
+  "name": "預設英文、完整版",
+  "ok": true,
+  "detail": "en full"
+ },
+ {
+  "name": "完整版：7 關、第 2 關四格（即時、整段、注音、聽寫），共 30 項",
+  "ok": true,
+  "detail": "{\"done\":0,\"all\":30}"
+ },
+ {
+  "name": "英文版：即時是英文句、逐字比對",
+  "ok": true,
+  "detail": "I can type from the sofa with my phone"
+ },
+ {
+  "name": "滑錯字：說出第 3 個字、打成 tyre、應該是哪個字",
+  "ok": true,
+  "detail": "Word 3 is “tyre”, should be “type”: delete it and type it again"
+ },
+ {
+  "name": "滑錯字：目標句裡那個字標紅",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "滑動輸入（每個字後自動空格、句尾空格）：打勾",
+  "ok": true,
+  "detail": "Correct ✓ (49 inputs received)"
+ },
+ {
+  "name": "容忍：全部小寫、句尾句點",
+  "ok": true,
+  "detail": "Correct ✓ (39 inputs received)"
+ },
+ {
+  "name": "容忍：多個空格、中間大寫",
+  "ok": true,
+  "detail": "Correct ✓ (39 inputs received)"
+ },
+ {
+  "name": "英文聽寫：打勾",
+  "ok": true,
+  "detail": "Nothing doubled ✓"
+ },
+ {
+  "name": "英文疊字：抓得到，說出重複的那一段",
+  "ok": true,
+  "detail": "Doubled: “it is a” appears twice"
+ },
+ {
+  "name": "英文版第 1 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文拖曳中鎖鎖鎖"
+ },
+ {
+  "name": "英文版第 2 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文即時整段送出整段送出沙發上也能打中文"
+ },
+ {
+  "name": "英文版第 3 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文"
+ },
+ {
+  "name": "英文版第 4 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文游標選取"
+ },
+ {
+  "name": "英文版第 5 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文快捷鍵"
+ },
+ {
+  "name": "英文版第 6 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文"
+ },
+ {
+  "name": "英文版第 7 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文"
+ },
+ {
+  "name": "英文版第 summary 關：畫面上的中文只剩刻意保留的（≤ 40 字）",
+  "ok": true,
+  "detail": "中文"
+ },
+ {
+  "name": "?lang=zh：中文、完整版 30 項",
+  "ok": true,
+  "detail": "zh 30"
+ },
+ {
+  "name": "中文版：即時是原本的中文句、逐字元比對",
+  "ok": true,
+  "detail": "SofaPad 讓 iPhone 變成 Mac 的鍵盤"
+ },
+ {
+  "name": "中文版即時：打對了",
+  "ok": true,
+  "detail": "打對了 ✓（收到 27 次輸入）"
+ },
+ {
+  "name": "中文聽寫：打勾",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "中文版第 4 關錯字句是中文，wrong 就在 at 的位置",
+  "ok": true,
+  "detail": "{\"sentence\":\"SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸空板。\",\"wrong\":\"空\",\"fix\":\"控\",\"fixed\":\"SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸控板。\",\"at\":29}"
+ },
+ {
+  "name": "語言按鈕：換成英文、網址拿掉 lang、第 4 關錯字句換成英文",
+  "ok": true,
+  "detail": "#stage=2 {\"sentence\":\"SofaPad turns your iPhone into a keyboard and trackpda.\",\"wrong\":\"da\",\"fix\":\"ad\",\"fixed\":\"SofaPad turns your iPhone into a keyboard and trackpad.\",\"at\":52}"
+ },
+ {
+  "name": "換語言後進度還在",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "精簡版（en）：第 1、2、5、6、7 關，畫面編號 1–5",
+  "ok": true,
+  "detail": "[[\"1\",1],[\"2\",2],[\"5\",3],[\"6\",4],[\"7\",5]]"
+ },
+ {
+  "name": "精簡版（en）：第 2 關只有即時和聽寫，即時是英文句",
+  "ok": true,
+  "detail": "I can type from the sofa with my phone"
+ },
+ {
+  "name": "精簡版（en）：總數只算這 5 關（21 項）",
+  "ok": true,
+  "detail": "21"
+ },
+ {
+  "name": "精簡版（en）：整段、注音不在畫面上；聽寫標 ②",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "精簡版（en）：錄影標籤寫第 2 關",
+  "ok": true,
+  "detail": "SofaPad demo · Stage 2"
+ },
+ {
+  "name": "精簡版（en）：兩項做完，「下一關」出現",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "精簡版（en）：第 5 關（快捷鍵）畫面上是第 3 關",
+  "ok": true,
+  "detail": "SofaPad demo · Stage 3"
+ },
+ {
+  "name": "精簡版（en）：去不了第 3、4 關",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "精簡版（zh）：第 1、2、5、6、7 關，畫面編號 1–5",
+  "ok": true,
+  "detail": "[[\"1\",1],[\"2\",2],[\"5\",3],[\"6\",4],[\"7\",5]]"
+ },
+ {
+  "name": "精簡版（zh）：第 2 關只有即時和聽寫，即時是英文句",
+  "ok": true,
+  "detail": "I can type from the sofa with my phone"
+ },
+ {
+  "name": "精簡版（zh）：總數只算這 5 關（21 項）",
+  "ok": true,
+  "detail": "21"
+ },
+ {
+  "name": "精簡版（zh）：整段、注音不在畫面上；聽寫標 ②",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "精簡版（zh）：錄影標籤寫第 2 關",
+  "ok": true,
+  "detail": "SofaPad 示範 · 第 2 關"
+ },
+ {
+  "name": "精簡版（zh）：兩項做完，「下一關」出現",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "精簡版（zh）：第 5 關（快捷鍵）畫面上是第 3 關",
+  "ok": true,
+  "detail": "SofaPad 示範 · 第 3 關"
+ },
+ {
+  "name": "精簡版（zh）：去不了第 3、4 關",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "精簡版換語言：網址保留 video=1 和 rec=1",
+  "ok": true,
+  "detail": "?video=1&rec=1&lang=zh#stage=1"
+ },
+ {
+  "name": "meta 改成 video 的副本：一打開就是精簡版",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "副本加 ?video=0：回到完整版",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "README 截圖（en）：第 1 關亮了 3 個以上的勾",
+  "ok": true,
+  "detail": "3"
+ },
+ {
+  "name": "README 截圖（zh）：第 1 關亮了 3 個以上的勾",
+  "ok": true,
+  "detail": "3"
+ }
+]

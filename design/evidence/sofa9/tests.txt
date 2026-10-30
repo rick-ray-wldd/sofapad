@@ -1,0 +1,37 @@
+SOFA-9 (4.3.0 final) tests, 2026-10-30, this Mac. Browser suites: headless Chrome, dry-run Mac (nothing injected).
+Exit codes in brackets.
+
+Unit tests
+  Swift  Executed 80 tests, with 0 failures                                  [0]
+  JS     tests 91, pass 91, fail 0                                           [0]
+  dist/SofaPad.app --self-test (final build): 33 PASS, SELF-TEST OK          [0]
+
+Browser suites (the app's web page; all run after the 4.3.0 package build)
+  v2-browser         41/41                                                   [0]
+  pkm31-dictation    7/7                                                     [0]
+  pkm33-send-clear   13/13                                                   [0]
+  pkm31-keyrow       14/14                                                   [0]
+  pkm4-browser       10/10                                                   [0]
+  sofa6-commit       35/35                                                   [0]
+  sofa6-caret        15/15                                                   [0]
+  sofa8-layout       46/46                                                   [0]
+  touch-area         measurements only (portrait typing pad 370×307 with the Safari keyboard)   [0]
+
+Demo page (demo/playground.html), after the SOFA-9 changes (English by default, Chinese, recording version)
+  sofa9-stage2 (page level: both languages, both modes, swipe tolerance, wrong word named, English dictation,
+                doubling, language switch keeps progress and URL settings, the meta-tag copy)   46/46   [0]
+  sofa8-playground --lang en           (phone page → dry-run Mac → page, full)   30/30   [0]
+  sofa8-playground --lang zh           (full)                                     30/30   [0]
+  sofa8-playground --lang en --mode video (stages 1, 2, 5, 6, 7)                  21/21   [0]
+    4 of each run are the manual ticks, clicked on the page with the phone's trackpad. On the English page a swiped
+    wrong word is named: "Word 3 is “epyt”, should be “type”: delete it and type it again".
+
+Real injection on this Mac
+  sofa6-textedit (TextEdit test window): typing, cursor pad, selection replaced, ⌥ word jump, Enter   6/6   [0]
+  tools/e2e.sh (older probe window): 15/16                                                           [1]
+    The one failure is the probe's text box: this Mac's input source is an input method, so the app types by pasting
+    (⌘V, by design); the probe got every ⌘V but has no Edit menu, so nothing is pasted. Earlier attempts: no
+    tools/node_modules link (no events sent), someone using the Mac (refused, exit 6), another app's dialog took the
+    front (the e2e guard dropped the events). process/ISSUES.md I-50.
+
+Package: SofaPad-4.3.0-macOS.zip, see release-zip-scan.txt (SHA-256, byte scan).

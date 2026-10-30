@@ -1,0 +1,201 @@
+{
+ "texts": {
+  "live": "I can type from the sofa with my phone",
+  "liveCheck": "words",
+  "dictation": "It is a nice day, let's go for a walk in the park",
+  "copy": "SofaPad is handy",
+  "buffer": "Type it all, then send it at once",
+  "zhuyin": "沙發上也能打中文",
+  "chat": [
+   "Good morning, meeting today",
+   "Got it, on my way"
+  ],
+  "typo": {
+   "sentence": "SofaPad turns your iPhone into a keyboard and trackpda.",
+   "wrong": "da",
+   "fix": "ad",
+   "fixed": "SofaPad turns your iPhone into a keyboard and trackpad.",
+   "at": 52
+  }
+ },
+ "stage2": {
+  "wrongWord": "Word 3 is “epyt”, should be “type”: delete it and type it again",
+  "live": "Correct ✓ (48 inputs received)"
+ },
+ "state": {
+  "lang": "en",
+  "mode": "full",
+  "current": "summary",
+  "rec": true,
+  "elapsedMs": 226473,
+  "total": {
+   "done": 30,
+   "all": 30
+  },
+  "manual": [
+   "mission",
+   "portrait",
+   "reorder",
+   "landscape"
+  ],
+  "stages": {
+   "1": {
+    "no": 1,
+    "name": "Trackpad",
+    "done": true,
+    "checks": {
+     "move": true,
+     "click": true,
+     "rightclick": true,
+     "scroll": true,
+     "drag": true,
+     "draglock": true
+    },
+    "manual": [],
+    "times": {
+     "move": 6692,
+     "click": 25736,
+     "rightclick": 30749,
+     "scroll": 46374,
+     "drag": 58649,
+     "draglock": 64611
+    }
+   },
+   "2": {
+    "no": 2,
+    "name": "Typing",
+    "done": true,
+    "checks": {
+     "live": true,
+     "buffer": true,
+     "zhuyin": true,
+     "dictation": true
+    },
+    "manual": [],
+    "times": {
+     "live": 82837,
+     "buffer": 89103,
+     "zhuyin": 98343,
+     "dictation": 105541
+    }
+   },
+   "3": {
+    "no": 3,
+    "name": "Box empties after sending",
+    "done": true,
+    "checks": {
+     "sent1": true,
+     "sent2": true,
+     "clean": true
+    },
+    "manual": [],
+    "times": {
+     "sent1": 123158,
+     "sent2": 125432,
+     "clean": 125432
+    }
+   },
+   "4": {
+    "no": 4,
+    "name": "Cursor pad",
+    "done": true,
+    "checks": {
+     "arrows": true,
+     "word": true,
+     "select": true,
+     "fixed": true
+    },
+    "manual": [],
+    "times": {
+     "arrows": 138644,
+     "word": 138676,
+     "select": 143589,
+     "fixed": 144457
+    }
+   },
+   "5": {
+    "no": 5,
+    "name": "Shortcuts",
+    "done": true,
+    "checks": {
+     "selectall": true,
+     "copy": true,
+     "paste": true,
+     "undo": true,
+     "screenshot": true
+    },
+    "manual": [],
+    "times": {
+     "selectall": 159372,
+     "copy": 159875,
+     "paste": 163042,
+     "undo": 163576,
+     "screenshot": 177057
+    }
+   },
+   "6": {
+    "no": 6,
+    "name": "Zoom and desktops",
+    "done": true,
+    "checks": {
+     "zoomin": true,
+     "zoomout": true,
+     "away": true,
+     "mission": true
+    },
+    "manual": [
+     "mission"
+    ],
+    "times": {
+     "zoomin": 185527,
+     "zoomout": 186857,
+     "away": 189451,
+     "mission": 196537
+    }
+   },
+   "7": {
+    "no": 7,
+    "name": "The 4.3 layout",
+    "done": true,
+    "checks": {
+     "enter": true,
+     "portrait": true,
+     "reorder": true,
+     "landscape": true
+    },
+    "manual": [
+     "portrait",
+     "reorder",
+     "landscape"
+    ],
+    "times": {
+     "enter": 208856,
+     "portrait": 218461,
+     "reorder": 219928,
+     "landscape": 221260
+    }
+   }
+  }
+ },
+ "simulated": [
+  "⌘C（拷貝「SofaPad is handy」到模擬剪貼簿）",
+  "⌘V（貼上模擬剪貼簿的「SofaPad is handy」）",
+  "⌃⇧⌘4：拖一塊範圍截圖",
+  "截圖 262×67 存到剪貼簿",
+  "⌘V（貼上模擬剪貼簿裡的截圖）",
+  "切到右邊的桌面",
+  "回到左邊的桌面（這一頁）",
+  "Mission Control 打開",
+  "Mission Control 收起"
+ ],
+ "macEvents": 3660,
+ "byKind": {
+  "move": 3244,
+  "click": 25,
+  "scroll": 240,
+  "down": 3,
+  "up": 3,
+  "type": 99,
+  "key": 46
+ }
+}

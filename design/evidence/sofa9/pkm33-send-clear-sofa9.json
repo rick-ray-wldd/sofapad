@@ -1,0 +1,114 @@
+{
+ "label": "sofa9",
+ "scenarios": {
+  "S1": {
+   "name": "即時：Enter 送出 → 文字被放回（有 input 事件）→ 到 LINE 打一個字",
+   "first": [
+    "我在 Orca 說的私人內容，不要外流。"
+   ],
+   "boxAfterGhost": "",
+   "later": [
+    "L"
+   ],
+   "leaked": false
+  },
+  "S2": {
+   "name": "即時：Enter 送出 → 文字被悄悄放回（沒有事件）→ 到 LINE 打一個字",
+   "first": [
+    "我在 Orca 說的私人內容，不要外流。"
+   ],
+   "boxAfterGhost": "",
+   "later": [
+    "L"
+   ],
+   "leaked": false
+  },
+  "S3": {
+   "name": "整段：送出 → 文字被放回 → 切成即時",
+   "first": [
+    "我在 Orca 說的私人內容，不要外流。"
+   ],
+   "boxAfterGhost": "",
+   "later": [],
+   "leaked": false
+  },
+  "S4": {
+   "name": "整段：送出 → 文字被悄悄放回 → 到 LINE 打新訊息再按送出",
+   "first": [
+    "我在 Orca 說的私人內容，不要外流。"
+   ],
+   "boxAfterGhost": "",
+   "later": [
+    "LINE"
+   ],
+   "leaked": false
+  }
+ },
+ "results": [
+  {
+   "name": "S1 第一次送出：私人內容送到 Orca 一次",
+   "ok": true,
+   "detail": "[\"我在 Orca 說的私人內容，不要外流。\"]"
+  },
+  {
+   "name": "S1 現在：之後不會再送出私人內容",
+   "ok": true,
+   "detail": "[\"L\"]"
+  },
+  {
+   "name": "S2 第一次送出：私人內容送到 Orca 一次",
+   "ok": true,
+   "detail": "[\"我在 Orca 說的私人內容，不要外流。\"]"
+  },
+  {
+   "name": "S2 現在：之後不會再送出私人內容",
+   "ok": true,
+   "detail": "[\"L\"]"
+  },
+  {
+   "name": "S3 第一次送出：私人內容送到 Orca 一次",
+   "ok": true,
+   "detail": "[\"我在 Orca 說的私人內容，不要外流。\"]"
+  },
+  {
+   "name": "S3 現在：之後不會再送出私人內容",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "S4 第一次送出：私人內容送到 Orca 一次",
+   "ok": true,
+   "detail": "[\"我在 Orca 說的私人內容，不要外流。\"]"
+  },
+  {
+   "name": "S4 現在：之後不會再送出私人內容",
+   "ok": true,
+   "detail": "[\"LINE\"]"
+  },
+  {
+   "name": "S1 現在：送到 LINE 的只有新打的字",
+   "ok": true,
+   "detail": "[\"L\"]"
+  },
+  {
+   "name": "S4 現在：送到 LINE 的只有新訊息",
+   "ok": true,
+   "detail": "[\"LINE\"]"
+  },
+  {
+   "name": "S1 現在：放回來的字當下就從輸入框拿掉",
+   "ok": true,
+   "detail": "\"\""
+  },
+  {
+   "name": "S2、S4 現在：悄悄放回來的字，不到 1 秒也從輸入框拿掉",
+   "ok": true,
+   "detail": "[\"\",\"\"]"
+  },
+  {
+   "name": "短回覆「好的」再打一次照樣送出（不會被誤擋）",
+   "ok": true,
+   "detail": "[\"好的\"]"
+  }
+ ]
+}

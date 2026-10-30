@@ -1,0 +1,150 @@
+{
+ "texts": {
+  "live": "I can type from the sofa with my phone",
+  "liveCheck": "words",
+  "dictation": "It is a nice day, let's go for a walk in the park",
+  "copy": "SofaPad is handy"
+ },
+ "stage2": {
+  "wrongWord": "Word 3 is “epyt”, should be “type”: delete it and type it again",
+  "live": "Correct ✓ (48 inputs received)"
+ },
+ "state": {
+  "lang": "en",
+  "mode": "video",
+  "current": "summary",
+  "rec": true,
+  "elapsedMs": 172731,
+  "total": {
+   "done": 21,
+   "all": 21
+  },
+  "manual": [
+   "mission",
+   "portrait",
+   "reorder",
+   "landscape"
+  ],
+  "stages": {
+   "1": {
+    "no": 1,
+    "name": "Trackpad",
+    "done": true,
+    "checks": {
+     "move": true,
+     "click": true,
+     "rightclick": true,
+     "scroll": true,
+     "drag": true,
+     "draglock": true
+    },
+    "manual": [],
+    "times": {
+     "move": 6846,
+     "click": 25835,
+     "rightclick": 30870,
+     "scroll": 46512,
+     "drag": 58783,
+     "draglock": 64815
+    }
+   },
+   "2": {
+    "no": 2,
+    "name": "Typing",
+    "done": true,
+    "checks": {
+     "live": true,
+     "dictation": true
+    },
+    "manual": [],
+    "times": {
+     "live": 83126,
+     "dictation": 90816
+    }
+   },
+   "5": {
+    "no": 3,
+    "name": "Shortcuts",
+    "done": true,
+    "checks": {
+     "selectall": true,
+     "copy": true,
+     "paste": true,
+     "undo": true,
+     "screenshot": true
+    },
+    "manual": [],
+    "times": {
+     "selectall": 105272,
+     "copy": 105809,
+     "paste": 108990,
+     "undo": 109518,
+     "screenshot": 123022
+    }
+   },
+   "6": {
+    "no": 4,
+    "name": "Zoom and desktops",
+    "done": true,
+    "checks": {
+     "zoomin": true,
+     "zoomout": true,
+     "away": true,
+     "mission": true
+    },
+    "manual": [
+     "mission"
+    ],
+    "times": {
+     "zoomin": 131725,
+     "zoomout": 133059,
+     "away": 135689,
+     "mission": 142824
+    }
+   },
+   "7": {
+    "no": 5,
+    "name": "The 4.3 layout",
+    "done": true,
+    "checks": {
+     "enter": true,
+     "portrait": true,
+     "reorder": true,
+     "landscape": true
+    },
+    "manual": [
+     "portrait",
+     "reorder",
+     "landscape"
+    ],
+    "times": {
+     "enter": 155288,
+     "portrait": 164820,
+     "reorder": 166221,
+     "landscape": 167538
+    }
+   }
+  }
+ },
+ "simulated": [
+  "⌘C（拷貝「SofaPad is handy」到模擬剪貼簿）",
+  "⌘V（貼上模擬剪貼簿的「SofaPad is handy」）",
+  "⌃⇧⌘4：拖一塊範圍截圖",
+  "截圖 255×66 存到剪貼簿",
+  "⌘V（貼上模擬剪貼簿裡的截圖）",
+  "切到右邊的桌面",
+  "回到左邊的桌面（這一頁）",
+  "Mission Control 打開",
+  "Mission Control 收起"
+ ],
+ "macEvents": 2844,
+ "byKind": {
+  "move": 2507,
+  "click": 17,
+  "scroll": 239,
+  "down": 3,
+  "up": 3,
+  "type": 47,
+  "key": 28
+ }
+}
