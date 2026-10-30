@@ -1,0 +1,79 @@
+S1 即時：按 Enter，然後在別的視窗打字
+    box after: "" | Mac: ["第一句話寫給A","⏎"]
+    then box: "新" | Mac: ["新"]
+PASS S1 Enter：輸入框清空
+PASS S1 Enter：Mac 收到第一句一次、再按 Enter
+PASS S1 之後只送新字
+S2 即時：不按 Enter，用觸控板點 Mac 上的「傳送」，然後游標放在輸入框開頭打字
+    box after: "" | Mac: ["第一句話寫給A","click"]
+    then box: "新" | Mac: ["新"]
+PASS S2 點擊：Mac 先收到第一句、再點擊
+PASS S2 點擊後輸入框清空
+PASS S2 之後只送新字，舊字沒有再送、沒有 ⌫
+S3 即時：點到別處（收起鍵盤），回來在中間打字
+    box after: "" | Mac: ["第一句話寫給A"]
+    then box: "新" | Mac: ["新"]
+PASS S3 收起鍵盤：Mac 收到第一句一次
+PASS S3 收起鍵盤後輸入框清空
+PASS S3 之後只送新字
+S4 即時：切到別的 App 再回來
+    box after: "" | Mac: ["第一句話寫給A"]
+    then box: "新" | Mac: ["新"]
+PASS S4 切 App：Mac 收到第一句一次
+PASS S4 切 App 回來輸入框是空的
+PASS S4 之後只送新字
+S5 即時：注音選字到一半就點觸控板（compositionend 晚到），之後打字
+    box after: "" | Mac: ["第一句話寫給A","click","你"]
+    then box: "新" | Mac: ["新"]
+PASS S5 組字中點擊：注音符號不送到 Mac
+PASS S5 第一句一次；選好的「你」送一次
+PASS S5 選完字後輸入框清空
+PASS S5 之後只送新字
+S6 即時：注音組字中收起鍵盤，iOS 沒送 compositionend（卡住）
+    box after: "" | Mac: ["第一句話寫給A","你"]
+    then box: "新" | Mac: ["新"]
+PASS S6 沒有 compositionend：「你」照樣送出
+PASS S6 之後的字沒有卡住
+PASS S6 舊字沒有再送、沒有 ⌫
+S7 即時：按鍵列的方向鍵（Mac 游標移走了），然後打字
+    box after: "" | Mac: ["第一句話寫給A","key123[]"]
+    then box: "新" | Mac: ["新"]
+PASS S7 按鍵：Mac 先收到第一句
+PASS S7 按鍵後輸入框清空
+PASS S7 之後只送新字
+S8 即時：注音選字中點觸控板，事件是 Chrome 的順序（input 再 compositionend）
+    box after: "" | Mac: ["第一句話寫給A","click","你"]
+    then box: "新" | Mac: ["新"]
+PASS S8 第一句一次、「你」一次、沒有注音符號
+PASS S8 選完字後輸入框清空，之後只送新字
+S9 即時：注音組字中收起鍵盤，compositionend 在 blur 之後 0.1 秒才到
+    box after: "" | Mac: ["第一句話寫給A","你"]
+    then box: "新" | Mac: ["新"]
+PASS S9 晚到的「你」照樣送一次（blur 後的 input 沒被丟掉）
+PASS S9 輸入框清空，之後只送新字
+S10 即時：收起鍵盤清空後，iOS 不發事件把字放回框裡，回來再打字
+    box after: "" | Mac: ["第一句話寫給A"]
+    then box: "新" | Mac: ["新"]
+PASS S10 放回來的舊字沒有送出
+B1 整段：注音選字中按畫面上的「送出」（compositionend 在按鈕之後才到）
+    box after: "" | Mac: ["第一句話寫給A你"]
+    then box: "" | Mac: ["新"]
+PASS B1 送出的是整句（含選好的「你」），沒有注音符號
+PASS B1 送出後輸入框清空（「你」沒有留在框裡）
+PASS B1 下一次只送新字
+B4 整段：注音選字中按「送出」，事件是 Chrome 的順序
+    box after: "" | Mac: ["第一句話寫給A你"]
+    then box: "" | Mac: ["新"]
+PASS B4 送出整句含「你」一次，框清空，下一次只送新字
+B2 整段：按鍵盤的「傳送」鍵（Enter），然後再打一段
+    box after: "" | Mac: ["第一句話寫給A"]
+    then box: "" | Mac: ["新"]
+PASS B2 Enter 送出整句一次並清空
+PASS B2 下一次只送新字
+B3 整段：打完沒送就收起鍵盤（草稿）
+    box after: "第一句話寫給A" | Mac: []
+    then box: "" | Mac: ["第一句話寫給A"]
+PASS B3 收起鍵盤不送出、草稿留著
+PASS B3 之後按「送出」才送一次
+35/35 PASS
+exit 0

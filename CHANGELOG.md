@@ -2,6 +2,34 @@
 
 [README](README.md) · [繁體中文 README](README.zh-TW.md) · Development records (Chinese): [`process/`](process/)
 
+## 4.3.0 (2026-10-30)
+
+**New layout in portrait: the text box takes half the width.** The other half has the cursor pad "◀ 游標 ▶" (wider
+than in 4.2, and nearer the middle, so it can be dragged further to the right) and ⏎ to its right. ⏎ sends what is
+still waiting, then presses Enter, and the keyboard stays up.
+
+**Everything next to the text box and on the key row can be edited.** "✎ 編輯" has three tabs: the text row (next to
+the box, up to 6 cells), the key row, and the landscape panel. Drag ≡ to reorder, ✕ to remove, tap the list to add.
+"⇧ 選取" is an ordinary key now: move it or take it out (a second finger tapping during a cursor drag still selects).
+The cursor pad is a cell too, so it can go to the key row. "全部恢復預設" restores all three rows. A key row customized
+in 4.2 is kept as it was, with ⇧ 選取 in front where 4.2 had it fixed; 4.2's own saved row is left untouched.
+
+**New in landscape: trackpad and side panel.** The trackpad keeps the full height on one side (at least as wide as in
+portrait); the side panel has the status, keyboard, drag-lock and settings buttons, the text box with the cursor pad and
+⏎, and a grid of keys: the key row plus landscape-only shortcuts (⌘C ⌘V ⌘X ⌘Z ⇧⌘Z ⌘A ⌘Tab, Mission Control, the
+desktop to the left / right, screenshot to the clipboard, ⌘S). While typing, the trackpad keeps all the height above
+the keyboard (190 px with a 200 px keyboard, 128 px in 4.2). "‹" closes the panel for 4.2's full-screen trackpad; it
+comes back while typing. In left-handed mode the panel is on the right.
+
+**New: demo page and recording script.** [`demo/playground.html`](demo/playground.html) is a page for the Mac with
+one stage per feature that ticks itself when it sees the feature work, a recording mode and a summary.
+[`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) ([中文](docs/DEMO-SCRIPT.zh-TW.md)) has a 2–3 minute and a 60-second
+script.
+
+Tests: `tools/sofa8-layout.mjs` (portrait, editor, conversion from 4.2, landscape, other phone sizes),
+`tools/sofa8-playground.mjs` (every stage of the demo page from the phone page through a dry-run Mac), and the 4.2
+suites, with the checks about the old landscape layout and the old default key row updated.
+
 ## 4.2.0 (2026-10-29)
 
 **Fixed: old text left in the text box (live mode).** If you finished typing without pressing Enter — clicked a

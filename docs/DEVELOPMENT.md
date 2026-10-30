@@ -7,8 +7,9 @@
 | Path | What |
 |---|---|
 | `mac/` | Swift package. `PKMCore`: protocol, pairing, LAN server, sessions, pacing, addresses. `pkm-server`: CGEvent injection, menu bar, self-test (built into `SofaPad.app`). `pkm-probe`: window for the older end-to-end test |
-| `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable key row, `shortcuts.js`, `sha256.js` login proof, `version.js` |
+| `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable rows (text row, key row, landscape panel; 4.2's key row converted), `shortcuts.js`, `sha256.js` login proof, `version.js` |
 | `tools/` | `build-app.sh` (builds `dist/SofaPad.app`, stripped, with its dSYM next to it in `dist/`), `package.sh` (`dist/release/SofaPad-<version>-macOS.zip` + SHA-256), browser tests (Playwright + headless Chrome, dry-run Mac), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
+| `demo/` | `playground.html`: the demo / practice page for the Mac (one stage per feature, ticks itself; see `docs/DEMO-SCRIPT.md`) |
 | `design/` | `SPEC.md`, screenshots, test evidence |
 | `research/` | The research report from v1 (papers, GitHub projects, products, Apple's own features) |
 | `process/` | Development records, in Chinese (timeline, decisions, issues, research log, tool log, summaries) |
@@ -44,6 +45,8 @@ node tools/sofa6-commit.mjs --label after          # 4.2: the box empties after 
 node tools/sofa6-caret.mjs                         # 4.2: cursor pad (hold, drag, Shift, ⌥, 30/s, stops on lift, Mac whitelist)
 node tools/sofa6-textedit.mjs                      # 4.2: the same with real injection into a TextEdit test window (not while locked);
                                                    # on macOS 27 it allows only the Siri overlay TextEdit shows (tewin overlays)
+node tools/sofa8-layout.mjs [--video DIR]          # 4.3: half-width box + cursor pad + ⏎, the row editor, 4.2 row converted, landscape panel, sizes
+node tools/sofa8-playground.mjs [--video DIR]      # 4.3: every stage of demo/playground.html from the phone page, through a dry-run Mac
 tools/e2e.sh                                       # older real-injection test into a probe window
 ```
 

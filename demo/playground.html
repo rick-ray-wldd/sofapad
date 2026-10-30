@@ -1,0 +1,1806 @@
+<!doctype html>
+<!--
+SofaPad playground: practice and demo page. Open it on the Mac in a browser (file://, works offline) and drive it
+from the iPhone with SofaPad. One stage on screen at a time; each check ticks when the page sees the event.
+Detection uses the normal browser events that SofaPad's real macOS events produce; isTrusted is never read.
+No network, no storage. The only setting, recording mode, lives in the URL (?rec=1). #stage=N opens stage N
+(1–7, or summary).
+
+Test hooks
+  window.playground = { state(), go(n), reset() }
+    state() → { current, rec, elapsedMs, total: { done, all }, manual: [checkIds],
+                stages: { "1": { name, done, checks: { <checkId>: bool }, manual: [checkIds], times: { <checkId>: ms } }, … } }
+    go(n)   → 1…7 or "summary"; returns false for anything else
+    reset() → same as 「重來」, without the confirm step and the flash
+  Check rows: id="chk-<checkId>", data-check="<checkId>", data-done="1" once done. Manual checks are buttons
+  (click toggles). Sections: data-stage="1"…"7" (id stage-N) and data-stage="summary" (id stage-summary).
+
+Ids
+  page     nav, nav-1 … nav-7, nav-summary, btn-rec, btn-reset, banner, banner-text, btn-next, rec-badge,
+           key-echo, toast, flash, footer
+  stage 1  s1-move, s1-move-bar, s1-move-num, s1-click, s1-rc (right-click target), s1-rc-result, s1-menu,
+           s1-menu-like, s1-menu-save, s1-menu-share, s1-list, s1-list-bar, s1-arena, s1-blue, s1-orange,
+           s1-drop-blue, s1-drop-orange
+  stage 2  s2-live, s2-buffer, s2-zhuyin, s2-dictation (fields); s2-<name>-target, s2-<name>-status
+  stage 3  s3-messages, s3-input, s3-send, s3-retry, s3-result
+  stage 4  s4-text, s4-target, s4-arrows, s4-word, s4-select, s4-fixed, s4-sel
+  stage 5  s5-source, s5-target, s5-status, s5-shot (image paste zone), s5-shot-img, s5-shot-status
+  stage 6  s6-frame, s6-art, s6-zoom, s6-away-status
+  stage 7  s7-messages, s7-input
+  manual   chk-mission, chk-portrait, chk-reorder, chk-landscape
+  summary  sum-count, sum-elapsed, sum-table, sum-<checkId>
+
+Check ids (stage: checks; * = manual)
+  1: move click rightclick scroll drag draglock
+  2: live buffer zhuyin dictation
+  3: sent1 sent2 clean
+  4: arrows word select fixed
+  5: selectall copy paste undo screenshot
+  6: zoomin zoomout away mission*
+  7: enter portrait* reorder* landscape*
+-->
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src blob: data:">
+<link rel="icon" href="data:,">
+<title>SofaPad 示範場</title>
+<style>
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --sunk: #eef1f5;
+  --ink: #0d1424;
+  --ink-2: #2c3647;
+  --muted: #5a6476;
+  --line: #d5dbe4;
+  --line-2: #b6bfcc;
+  --accent: #2154d9;
+  --accent-dark: #173fa8;
+  --accent-soft: #e7eefe;
+  --ok: #11803f;
+  --ok-fill: #17a554;
+  --ok-line: #9fdcb5;
+  --ok-soft: #e2f6e9;
+  --bad: #c92a2a;
+  --bad-soft: #fde6e6;
+  --warn: #8f5200;
+  --warn-soft: #fff1d6;
+  --blue: #2f6bff;
+  --orange: #ee7414;
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(13, 20, 36, .06), 0 4px 16px rgba(13, 20, 36, .06);
+  --h1: 40px;
+  --tick: 40px;
+  --ck: 18px;
+  --banner: 40px;
+  color-scheme: light;
+}
+html.rec { --h1: 64px; --tick: 48px; --ck: 21px; --banner: 56px; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body {
+  font: 17px/1.45 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+[hidden] { display: none !important; }
+
+/* Top bar */
+.top {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 18px;
+  height: 64px; padding: 0 24px;
+  background: rgba(255, 255, 255, .95); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; white-space: nowrap; }
+.brand svg { width: 30px; height: 30px; flex: none; }
+.rec-badge {
+  display: none; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 999px;
+  background: var(--ink); color: #fff; font-size: 15px; font-weight: 700; white-space: nowrap;
+}
+.rec-badge i { width: 10px; height: 10px; border-radius: 50%; background: #ff4d4d; animation: blink 1.6s infinite; }
+html.rec .brand { display: none; }
+html.rec .rec-badge { display: inline-flex; }
+@keyframes blink { 50% { opacity: .35; } }
+
+nav { display: flex; gap: 4px; margin: 0 auto; }
+.nav-item {
+  display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px 0 7px;
+  border: 0; border-radius: 999px; background: transparent; color: var(--ink-2);
+  font-size: 15px; font-weight: 700; white-space: nowrap;
+}
+.nav-item:hover { background: var(--sunk); }
+.nav-item[aria-current] { background: var(--ink); color: #fff; }
+.nav-item .num {
+  position: relative; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--sunk); color: var(--ink-2); font-size: 14px; font-weight: 800;
+}
+.nav-item[aria-current] .num { background: rgba(255, 255, 255, .2); color: #fff; }
+.nav-item.done .num { background: var(--ok-fill); color: #fff; }
+.nav-item .num i {
+  display: none; position: absolute; right: -6px; top: -6px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; color: var(--ok); box-shadow: 0 0 0 2px var(--ok-fill);
+  font: normal 900 11px/16px sans-serif; text-align: center;
+}
+.nav-item.done .num i { display: block; }
+.nav-sum { padding: 0 14px; }
+@media (max-width: 1240px) {
+  .nav-item:not(.nav-sum):not([aria-current]) .nav-name { display: none; }
+}
+
+.tools { display: flex; gap: 8px; }
+.btn {
+  height: 40px; padding: 0 16px; border-radius: 10px; border: 1.5px solid var(--line-2);
+  background: var(--surface); font-size: 15px; font-weight: 700; white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink-2); }
+#btn-rec[aria-pressed="true"] { background: var(--bad); border-color: var(--bad); color: #fff; }
+#btn-reset.confirm { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
+
+/* Stage frame */
+main { max-width: 1280px; margin: 0 auto; padding: 18px 32px 24px; }
+body.has-banner main { padding-bottom: 150px; }
+.headline { margin: 0 0 6px; font-size: var(--h1); line-height: 1.15; font-weight: 800; letter-spacing: -.01em; }
+.headline .pre { color: var(--muted); font-weight: 700; }
+html.rec .headline { margin-bottom: 18px; }
+.help { margin: 0 0 16px; max-width: 1000px; color: var(--muted); font-size: 16px; }
+html.rec .help, html.rec footer { display: none; }
+.body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+html.rec .body { grid-template-columns: minmax(0, 1fr) 340px; }
+
+.card {
+  min-width: 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); box-shadow: var(--shadow);
+}
+.card-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-bottom: 10px; font-size: 16px; font-weight: 800; color: var(--ink-2);
+}
+.card-title small { font-size: 13px; font-weight: 600; color: var(--muted); }
+.status { min-height: 1.45em; margin-top: 8px; font-size: 16px; font-weight: 700; color: var(--muted); }
+.status.ok { color: var(--ok); }
+.status.bad { color: var(--bad); }
+.status.warn { color: var(--warn); }
+html.rec .status { font-size: 18px; }
+
+/* Checklist */
+.checks { position: sticky; top: 80px; }
+.checks h2 { margin: 0 0 10px; font-size: 15px; font-weight: 800; color: var(--muted); letter-spacing: .02em; }
+.checks ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.check {
+  display: grid; grid-template-columns: var(--tick) minmax(0, 1fr); align-items: center; column-gap: 12px;
+  width: 100%; padding: 8px 12px 8px 8px; border: 1.5px solid var(--line); border-radius: 14px;
+  background: var(--surface); color: var(--ink-2); text-align: left;
+  font-size: var(--ck); font-weight: 700; line-height: 1.3;
+  transition: background .2s, border-color .2s;
+}
+.check .tick {
+  grid-row: span 2; display: grid; place-items: center; width: var(--tick); height: var(--tick);
+  border: 3px solid var(--line-2); border-radius: 50%; background: #fff;
+  color: transparent; font-size: calc(var(--tick) * .58); font-weight: 900; line-height: 1;
+}
+.check .tick::after { content: "✓"; }
+.check .ck-note { font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.check .ck-note:empty { display: none; }
+.check[data-done="1"] { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ink); }
+.check[data-done="1"] .tick { border-color: var(--ok-fill); background: var(--ok-fill); color: #fff; animation: pop .35s ease-out; }
+.check.manual { border-style: dashed; cursor: pointer; }
+.check.manual:hover { border-color: var(--ink-2); }
+.check.manual[data-done="1"] { border-style: solid; }
+.ck-head { margin-top: 6px; font-size: 14px; font-weight: 800; color: var(--warn); }
+@keyframes pop { 0% { transform: scale(.55); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+/* Success banner */
+.banner {
+  position: fixed; left: 50%; bottom: 20px; z-index: 30; transform: translateX(-50%);
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  width: min(880px, calc(100% - 32px)); padding: 16px 16px 16px 28px; border-radius: 20px;
+  background: var(--ok-fill); color: #fff; box-shadow: 0 12px 40px rgba(17, 128, 63, .35);
+  animation: rise .35s ease-out;
+}
+html.rec .banner { width: min(1040px, calc(100% - 32px)); }
+.banner.pop { animation: rise .35s ease-out, bump .6s .1s ease-out; }
+.banner-text { font-size: var(--banner); font-weight: 900; line-height: 1.1; }
+.btn-next {
+  flex: none; padding: 16px 28px; border: 0; border-radius: 14px; background: #fff; color: var(--ok);
+  font-size: 28px; font-weight: 900; box-shadow: 0 4px 0 rgba(0, 0, 0, .15);
+}
+html.rec .btn-next { padding: 20px 34px; font-size: 34px; }
+@keyframes rise { from { transform: translate(-50%, 30px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+@keyframes bump { 40% { transform: translate(-50%, 0) scale(1.04); } }
+
+.key-echo {
+  position: fixed; right: 20px; bottom: 20px; z-index: 31; min-width: 64px; padding: 10px 18px; border-radius: 14px;
+  background: var(--ink); color: #fff; font-size: 28px; font-weight: 800; line-height: 1.1; text-align: center;
+  opacity: 0; transform: translateY(8px); transition: opacity .15s, transform .15s; pointer-events: none;
+}
+.key-echo.show { opacity: .94; transform: none; }
+body.has-banner .key-echo { bottom: 150px; }
+html.rec .key-echo { font-size: 36px; }
+.toast {
+  position: fixed; bottom: 24px; left: 50%; z-index: 40; transform: translateX(-50%);
+  padding: 10px 18px; border-radius: 12px; background: var(--ink); color: #fff;
+  font-size: 17px; font-weight: 700; box-shadow: var(--shadow);
+}
+.flash {
+  position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: var(--ink); color: #fff;
+  font-size: 120px; font-weight: 900; pointer-events: none; animation: flash .8s ease-out forwards;
+}
+body.has-banner .toast { bottom: 150px; }
+@keyframes flash { 0%, 65% { opacity: 1; } 100% { opacity: 0; } }
+
+footer { margin-top: 22px; color: var(--muted); font-size: 14px; }
+
+/* Stage 1 */
+.s1 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.s1 .wide { grid-column: span 2; }
+.meter { height: 16px; overflow: hidden; border-radius: 999px; background: var(--sunk); }
+.meter > i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--accent); }
+.meter.full > i { background: var(--ok-fill); }
+.meter.thin { height: 8px; margin-bottom: 10px; }
+.bignum { margin: 14px 0 0; font-size: 32px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.click-btn {
+  width: 100%; height: 96px; border: 0; border-radius: 18px; background: var(--accent); color: #fff;
+  font-size: 36px; font-weight: 900; box-shadow: 0 6px 0 var(--accent-dark); transition: transform .06s;
+}
+.click-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--accent-dark); }
+.click-btn.hit { background: var(--ok-fill); box-shadow: 0 6px 0 #0e6f37; }
+.rc-target {
+  display: grid; place-items: center; height: 96px; border: 3px dashed var(--line-2); border-radius: 18px;
+  background: var(--sunk); font-size: 22px; font-weight: 800; text-align: center; user-select: none;
+}
+.rc-target.hit { border-color: var(--ok-fill); background: var(--ok-soft); color: var(--ok); }
+.menu {
+  position: fixed; z-index: 45; min-width: 210px; padding: 6px; border: 1px solid var(--line); border-radius: 12px;
+  background: #fff; box-shadow: 0 16px 40px rgba(13, 20, 36, .22);
+}
+.menu button {
+  display: block; width: 100%; padding: 10px 14px; border: 0; border-radius: 8px; background: none;
+  font-size: 18px; font-weight: 700; text-align: left;
+}
+.menu button:hover { background: var(--accent); color: #fff; }
+.list {
+  height: 214px; margin: 0; padding: 4px 0; overflow-y: auto; overscroll-behavior: contain; list-style: none;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--sunk);
+}
+.list li { padding: 7px 14px; border-bottom: 1px solid var(--line); font-size: 17px; font-weight: 600; }
+.list li:last-child { border-bottom: 0; color: var(--ok); font-weight: 900; }
+.arena {
+  position: relative; height: 230px; overflow: hidden; border-radius: 12px; user-select: none;
+  background: var(--sunk) radial-gradient(circle, #d3d9e3 1.2px, transparent 1.4px) 0 0 / 18px 18px;
+}
+.block {
+  position: absolute; display: grid; place-items: center; width: 132px; height: 72px; border-radius: 14px;
+  color: #fff; font-size: 18px; font-weight: 900; line-height: 1.15; text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .18); cursor: grab; user-select: none;
+}
+.block small { font-size: 13px; font-weight: 700; opacity: .9; }
+.block.blue { background: var(--blue); }
+.block.orange { background: var(--orange); }
+.block.blue.placed { left: auto !important; right: 45px; top: 26px !important; }
+.block.orange.placed { left: auto !important; right: 45px; top: auto !important; bottom: 26px; }
+.block.dragging { z-index: 2; cursor: grabbing; transform: scale(1.06); box-shadow: 0 14px 28px rgba(0, 0, 0, .28); }
+.drop {
+  position: absolute; right: 16px; display: grid; place-items: center; width: 190px; height: 96px;
+  border: 3px dashed; border-radius: 16px; font-size: 16px; font-weight: 800; text-align: center;
+}
+.drop.blue { top: 14px; border-color: var(--blue); color: var(--blue); background: rgba(47, 107, 255, .06); }
+.drop.orange { bottom: 14px; border-color: var(--orange); color: #b85400; background: rgba(238, 116, 20, .07); }
+.drop.over { background: rgba(23, 165, 84, .12); }
+.drop.filled { border-style: solid; }
+
+/* Fields */
+.field {
+  width: 100%; padding: 10px 14px; border: 2px solid var(--line-2); border-radius: 12px; outline: none;
+  background: #fff; color: var(--ink); font: inherit; font-size: 24px; font-weight: 600;
+}
+.field:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.field.ok { border-color: var(--ok-fill); }
+textarea.field { display: block; height: 96px; line-height: 1.35; resize: none; }
+.target { min-height: 2.6em; margin-bottom: 10px; font-size: 24px; font-weight: 900; line-height: 1.3; color: var(--ink); }
+.target .hit { color: var(--ok); }
+.target .hint { color: var(--muted); font-weight: 700; }
+
+/* Stage 2 */
+.s2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.s2 .target { min-height: 1.3em; font-size: 22px; }
+.s2 .field { font-size: 21px; }
+.s2 textarea.field { height: 84px; }
+.pill { padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 800; }
+
+/* Stage 3 and 7 chat */
+.s3 { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; }
+.chat { display: flex; flex-direction: column; height: 440px; padding: 0; overflow: hidden; }
+.chat-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--line); font-size: 16px; font-weight: 800;
+}
+.btn.small { height: 34px; padding: 0 12px; font-size: 14px; }
+.msgs { display: flex; flex: 1; flex-direction: column; gap: 10px; padding: 16px; overflow-y: auto; background: #f7f9fc; }
+.msgs .empty { margin: auto; color: var(--muted); font-size: 16px; font-weight: 600; }
+.bubble {
+  align-self: flex-end; max-width: 82%; padding: 9px 14px; border-radius: 18px 18px 4px 18px;
+  background: var(--accent); color: #fff; font-size: 22px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere;
+}
+.bubble .meta { display: block; font-size: 12px; font-weight: 600; opacity: .8; }
+.bubble mark { padding: 0 2px; border-radius: 4px; background: #ffd5d5; color: var(--bad); }
+.compose { display: flex; gap: 10px; padding: 12px; border-top: 1px solid var(--line); background: #fff; }
+.compose .field { flex: 1; min-width: 0; }
+.send {
+  flex: none; padding: 0 24px; border: 0; border-radius: 12px; background: var(--accent); color: #fff;
+  font-size: 22px; font-weight: 900; box-shadow: 0 4px 0 var(--accent-dark);
+}
+.send:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-dark); }
+.say { display: grid; gap: 14px; }
+.say-line { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 12px; }
+.say-line b {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ink);
+  color: #fff; font-size: 20px;
+}
+.say-line span { font-size: 28px; font-weight: 900; }
+.say-line small { display: block; font-size: 14px; font-weight: 700; color: var(--muted); }
+.no-enter {
+  margin: 16px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--warn-soft); color: var(--warn);
+  font-size: 18px; font-weight: 800;
+}
+.result { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--sunk); color: var(--muted); font-size: 18px; font-weight: 800; }
+.result.ok { background: var(--ok-soft); color: var(--ok); font-size: 26px; }
+.result.bad { background: var(--bad-soft); color: var(--bad); }
+.result .quote { display: block; margin-top: 6px; color: var(--ink); font-size: 22px; }
+.result mark { padding: 0 2px; border-radius: 4px; background: var(--bad); color: #fff; }
+
+/* Stage 4 */
+.s4 { display: grid; gap: 16px; }
+.fixline { font-size: 30px; font-weight: 900; line-height: 1.35; }
+.fixline del { padding: 0 3px; border-radius: 6px; background: var(--bad-soft); color: var(--bad); text-decoration: line-through 3px; }
+.fixline ins { padding: 0 3px; border-radius: 6px; background: var(--ok-soft); color: var(--ok); text-decoration: none; }
+.fixline .arrow { margin: 0 10px; color: var(--muted); }
+.field.big { height: auto; padding: 14px 18px; font-size: 34px; line-height: 1.4; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { padding: 8px 14px; border-radius: 999px; background: var(--sunk); color: var(--ink-2); font-size: 18px; font-weight: 800; }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.sel { font-size: 22px; font-weight: 800; color: var(--ink-2); }
+.sel b { padding: 0 6px; border-radius: 6px; background: #cfe0ff; color: var(--accent-dark); }
+
+/* Stage 5 */
+.s5 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.stack { display: grid; gap: 16px; align-content: start; }
+.keys { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: var(--muted); }
+kbd {
+  display: inline-block; min-width: 46px; padding: 6px 10px; border: 1.5px solid var(--line-2); border-bottom-width: 4px;
+  border-radius: 10px; background: #fff; color: var(--ink); font: 800 20px/1 -apple-system, BlinkMacSystemFont, sans-serif;
+  text-align: center;
+}
+.shot {
+  display: grid; place-items: center; gap: 10px; min-height: 330px; padding: 16px; border: 3px dashed var(--line-2);
+  border-radius: 16px; background: var(--sunk); text-align: center;
+}
+.shot.has { border-color: var(--ok-fill); border-style: solid; background: var(--ok-soft); }
+.shot-hint { font-size: 24px; font-weight: 900; line-height: 1.35; }
+.shot img { max-width: 100%; max-height: 220px; border-radius: 8px; background: #fff; box-shadow: var(--shadow); }
+
+/* Stage 6 */
+.s6 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; }
+.frame {
+  position: relative; height: 380px; overflow: hidden; border-radius: 12px;
+  background: linear-gradient(#f7f9ff, #e8eefa);
+}
+.frame svg { display: block; width: 100%; height: 100%; transform-origin: 50% 55%; transition: transform .18s ease-out; }
+.zoom-badge {
+  position: absolute; top: 12px; right: 12px; padding: 6px 14px; border-radius: 999px; background: var(--ink);
+  color: #fff; font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums;
+}
+.gesture { display: grid; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.gesture:last-child { border-bottom: 0; }
+.gesture b { font-size: 24px; font-weight: 900; }
+.gesture span { font-size: 16px; font-weight: 700; color: var(--muted); }
+
+/* Stage 7 */
+.s7 { display: grid; gap: 16px; }
+.chat.small { height: 214px; }
+.chat.small .msgs { padding: 10px 14px; }
+.chat.small .bubble { font-size: 18px; }
+.mocks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.mock { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 0; }
+.mock figcaption { font-size: 15px; font-weight: 800; line-height: 1.35; color: var(--ink-2); text-align: center; }
+.phone-p {
+  display: flex; flex-direction: column; gap: 5px; width: 144px; height: 232px; padding: 10px 7px;
+  border-radius: 22px; background: #111827;
+}
+.m-pad { display: grid; flex: 1; place-items: center; border-radius: 10px; background: #263042; color: #8fa0bd; font-size: 12px; font-weight: 800; }
+.m-io { display: flex; gap: 3px; height: 26px; }
+.m-io span { display: grid; place-items: center; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; }
+.m-input { flex: 0 0 48%; background: #fff; color: #64748b; }
+.m-caret { flex: 1; min-width: 0; overflow: hidden; background: #3b4a63; color: #e2e8f0; }
+.m-enter { flex: 0 0 18px; background: var(--accent); color: #fff; }
+.m-keys { display: flex; flex-wrap: wrap; gap: 3px; }
+.m-keys span { padding: 3px 4px; border-radius: 5px; background: #2b3546; color: #e2e8f0; font-size: 9px; font-weight: 800; }
+.m-keys .m-edit { background: #f5b942; color: #111; }
+.editor {
+  display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 210px; height: 232px; padding: 10px;
+  border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: var(--shadow);
+}
+.m-tabs { display: flex; padding: 2px; border-radius: 8px; background: var(--sunk); }
+.m-tabs span { flex: 1; padding: 4px 0; border-radius: 6px; color: var(--muted); font-size: 11px; font-weight: 800; text-align: center; }
+.m-tabs .on { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+.m-list { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.m-list li { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: 13px; font-weight: 800; }
+.m-list i { color: var(--muted); font-style: normal; }
+.m-list b { margin-left: auto; color: var(--bad); font-size: 12px; }
+.m-list .lift { border-color: var(--accent); box-shadow: 0 6px 14px rgba(13, 20, 36, .18); transform: translateX(10px) rotate(-2deg); }
+.m-reset { align-self: flex-start; margin-top: auto; color: var(--accent); font-size: 12px; font-weight: 800; }
+.phone-l {
+  display: flex; gap: 6px; width: 100%; max-width: 252px; aspect-ratio: 2 / 1; padding: 7px 10px;
+  border-radius: 22px; background: #111827;
+}
+.m-side { display: flex; flex: 0 0 48%; flex-direction: column; gap: 4px; min-width: 0; }
+.m-top { display: flex; justify-content: space-between; padding: 0 2px; color: #cbd5e1; font-size: 9px; font-weight: 800; }
+.m-top span:first-child { color: var(--ok-fill); }
+.m-side .m-io { height: 20px; }
+.m-side .m-enter { flex-basis: 14px; }
+.m-grid { display: grid; flex: 1; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.m-grid span { display: grid; place-items: center; border-radius: 5px; background: #2b3546; color: #e2e8f0; font-size: 8px; font-weight: 800; }
+.phone-l .m-pad { flex: 1; }
+
+/* Summary */
+.sum-top { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 28px; margin: 6px 0 14px; }
+.sum-count { font-size: 76px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+.sum-count small { font-size: 34px; color: var(--muted); }
+.sum-elapsed { font-size: 18px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sum-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+.sum-table td { padding: 10px 14px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #fff; vertical-align: middle; }
+.sum-table td:first-child { width: 210px; border-left: 1px solid var(--line); border-radius: 14px 0 0 14px; font-size: 18px; font-weight: 800; white-space: nowrap; }
+.sum-table td:last-child { border-right: 1px solid var(--line); border-radius: 0 14px 14px 0; }
+.sum-table td.n { width: 76px; font-size: 18px; font-weight: 900; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sum-table tr.done td { border-color: var(--ok-line); }
+.sum-table tr.done td.n { color: var(--ok); }
+.sum-table .num {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; margin-right: 10px; border-radius: 50%;
+  background: var(--sunk); font-size: 15px;
+}
+.sum-table tr.done .num { background: var(--ok-fill); color: #fff; }
+.sum-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.schip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1.5px solid var(--line); border-radius: 999px;
+  color: var(--muted); font-size: 14px; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.schip small { font-size: 12px; font-weight: 700; opacity: .85; }
+.schip.done { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ok); }
+.schip.manual { border-style: dashed; }
+html.rec .schip { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#2154d9"/><path d="M9 14a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v2H9z" fill="#fff" opacity=".55"/><path d="M6 16a2 2 0 0 1 4 0v2.5h12V16a2 2 0 0 1 4 0v6a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 6 22z" fill="#fff"/></svg>
+    SofaPad 示範場
+  </div>
+  <div class="rec-badge" id="rec-badge"><i></i><span id="rec-badge-text">SofaPad 示範 · 第 1 關</span></div>
+  <nav id="nav" aria-label="關卡"></nav>
+  <div class="tools">
+    <button class="btn" id="btn-rec" type="button" tabindex="-1" aria-pressed="false">錄影模式</button>
+    <button class="btn" id="btn-reset" type="button" tabindex="-1">重來</button>
+  </div>
+</header>
+
+<main>
+
+<!-- Stage 1 -->
+<section class="stage" id="stage-1" data-stage="1">
+  <h1 class="headline"><span class="pre">現在示範：</span>觸控板</h1>
+  <p class="help">手機：單指滑＝移動，點一下＝點擊，兩指點一下＝右鍵，兩指上下滑＝捲動。拖曳：長按約半秒，出現「拖曳中」再滑；或按「鎖」（拖曳鎖定）→ 滑（可以分好幾次）→ 再按一次「鎖」放開。</p>
+  <div class="body">
+    <div class="s1">
+      <div class="card" id="s1-move">
+        <div class="card-title">移動游標 <small>累計 600 px</small></div>
+        <div class="meter"><i id="s1-move-bar"></i></div>
+        <div class="bignum" id="s1-move-num">0 / 600 px</div>
+      </div>
+      <div class="card">
+        <div class="card-title">點一下</div>
+        <button class="click-btn" id="s1-click" type="button" tabindex="-1">點我</button>
+      </div>
+      <div class="card">
+        <div class="card-title">兩指點一下 <small>右鍵</small></div>
+        <div class="rc-target" id="s1-rc"><span id="s1-rc-result">在這裡按右鍵</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">兩指捲到最底 <small>游標放在清單上</small></div>
+        <div class="meter thin"><i id="s1-list-bar"></i></div>
+        <ol class="list" id="s1-list"></ol>
+      </div>
+      <div class="card wide">
+        <div class="card-title">拖進框裡 <small>藍色用長按拖曳，橘色用「鎖」</small></div>
+        <div class="arena" id="s1-arena">
+          <div class="drop blue" id="s1-drop-blue">藍色放這裡</div>
+          <div class="drop orange" id="s1-drop-orange">橘色放這裡</div>
+          <div class="block blue" id="s1-blue" data-kind="blue"><div>藍色<br><small>長按拖曳</small></div></div>
+          <div class="block orange" id="s1-orange" data-kind="orange"><div>橘色<br><small>拖曳鎖定</small></div></div>
+        </div>
+      </div>
+    </div>
+    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="1"></ol></aside>
+  </div>
+  <div class="menu" id="s1-menu" role="menu" hidden>
+    <button type="button" id="s1-menu-like" role="menuitem" tabindex="-1">👍 讚</button>
+    <button type="button" id="s1-menu-save" role="menuitem" tabindex="-1">⭐ 收藏</button>
+    <button type="button" id="s1-menu-share" role="menuitem" tabindex="-1">📤 分享</button>
+  </div>
+</section>
+
+<!-- Stage 2 -->
+<section class="stage" id="stage-2" data-stage="2" hidden>
+  <h1 class="headline"><span class="pre">現在示範：</span>打字</h1>
+  <p class="help">先用觸控板點進框裡。即時模式：每選好一個字就出現在 Mac 上。整段模式：點「即時」切成「整段」，打好再按「送出」。注音：選好字才會送出。聽寫：用 iPhone 鍵盤的 🎤，說完停一下。</p>
+  <div class="body">
+    <div class="s2">
+      <div class="card">
+        <div class="card-title">① 即時模式 <span class="pill">即時</span></div>
+        <div class="target" id="s2-live-target"></div>
+        <input class="field" id="s2-live" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="status" id="s2-live-status"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">② 整段模式＋送出 <span class="pill">整段</span></div>
+        <div class="target" id="s2-buffer-target"></div>
+        <input class="field" id="s2-buffer" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="status" id="s2-buffer-status"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">③ 注音中文 <span class="pill">選好字才送</span></div>
+        <div class="target" id="s2-zhuyin-target"></div>
+        <input class="field" id="s2-zhuyin" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="status" id="s2-zhuyin-status"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">④ 鍵盤 🎤 聽寫 <span class="pill">建議說這句</span></div>
+        <div class="target" id="s2-dictation-target">今天天氣很好，我們去公園散步</div>
+        <textarea class="field" id="s2-dictation" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+        <div class="status" id="s2-dictation-status"></div>
+      </div>
+    </div>
+    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="2"></ol></aside>
+  </div>
+</section>
+
+<!-- Stage 3 -->
+<section class="stage" id="stage-3" data-stage="3" hidden>
+  <h1 class="headline"><span class="pre">現在示範：</span>送出後自動清空</h1>
+  <p class="help">用手機打第一句，不要按 Enter，用觸控板點「傳送」；再打第二句，再點一次「傳送」。點了觸控板，手機的輸入框就會清空，所以第二句不會帶著第一句。</p>
+  <div class="body">
+    <div class="s3">
+      <div class="card chat">
+        <div class="chat-head">示範聊天室 <button class="btn small" id="s3-retry" type="button" tabindex="-1">清空重試</button></div>
+        <div class="msgs" id="s3-messages"></div>
+        <div class="compose">
+          <input class="field" id="s3-input" type="text" placeholder="打一句話…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button class="send" id="s3-send" type="button" tabindex="-1">傳送</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="say">
+          <div class="say-line"><b>1</b><span><small>先打這句，點「傳送」</small>早安，今天開會</span></div>
+          <div class="say-line"><b>2</b><span><small>再打這句，點「傳送」</small>收到，馬上到</span></div>
+        </div>
+        <p class="no-enter">不要按 Enter：用觸控板點「傳送」</p>
+        <div class="result" id="s3-result"></div>
+      </div>
+    </div>
+    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="3"></ol></aside>
+  </div>
+</section>
+
+<!-- Stage 4 -->
+<section class="stage" id="stage-4" data-stage="4" hidden>
+  <h1 class="headline"><span class="pre">現在示範：</span>游標板</h1>
+  <p class="help">先用觸控板點進文字。按住「◀ 游標 ▶」約 0.3 秒（手機輕震一下）再拖，Mac 的文字游標就跟著走；快速甩一下跳一個字詞。按「⇧ 選取」再拖＝選取（或拖的時候另一根手指點一下）。選起錯字，直接打對的字。</p>
+  <div class="body">
+    <div class="s4">
+      <div class="card">
+        <div class="card-title">把錯字改掉</div>
+        <div class="fixline">觸<del>空</del>板<span class="arrow">→</span>觸<ins>控</ins>板</div>
+        <div class="status" id="s4-target">目標：SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸控板。</div>
+      </div>
+      <div class="card">
+        <textarea class="field big" id="s4-text" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸空板。</textarea>
+        <div class="status sel" id="s4-sel"></div>
+      </div>
+      <div class="chips">
+        <span class="chip" id="s4-arrows"></span>
+        <span class="chip" id="s4-word">⌥ 跳一個字詞</span>
+        <span class="chip" id="s4-select">⇧ 選取</span>
+        <span class="chip" id="s4-fixed">改好了</span>
+      </div>
+    </div>
+    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="4"></ol></aside>
+  </div>
+</section>
+
+<!-- Stage 5 -->
+<section class="stage" id="stage-5" data-stage="5" hidden>
+  <h1 class="headline"><span class="pre">現在示範：</span>快捷鍵</h1>
+  <p class="help">用「⌘ 快捷鍵」面板或按鍵列：在上面那句 ⌘A 全選、⌘C 拷貝；點進下面的空格 ⌘V 貼上；再 ⌘Z 復原。截圖：⌃⇧⌘4 框一塊螢幕（存到剪貼簿），再 ⌘V。</p>
+  <div class="body">
+    <div class="s5">
+      <div class="stack">
+        <div class="card">
+          <div class="card-title">① 全選、拷貝這一句</div>
+          <input class="field" id="s5-source" type="text" value="SofaPad 很好用" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="card">
+          <div class="card-title">② 貼到這裡</div>
+          <input class="field" id="s5-target" type="text" placeholder="⌘V" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <div class="status" id="s5-status"></div>
+        </div>
+        <div class="keys"><kbd>⌘A</kbd>→<kbd>⌘C</kbd>→ 點下面 →<kbd>⌘V</kbd>→<kbd>⌘Z</kbd></div>
+      </div>
+      <div class="card">
+        <div class="card-title">③ 截圖貼上區</div>
+        <div class="shot" id="s5-shot">
+          <div class="shot-hint">⌃⇧⌘4 截圖到剪貼簿<br>再 ⌘V 貼進來</div>
+          <img id="s5-shot-img" alt="貼上的截圖" hidden>
+          <div class="status" id="s5-shot-status"></div>
+        </div>
+      </div>
+    </div>
+    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="5"></ol></aside>
+  </div>
+</section>
+
+<!-- Stage 6 -->
+<section class="stage" id="stage-6" data-stage="6" hidden>
+  <h1 class="headline"><span class="pre">現在示範：</span>縮放與桌面</h1>
+  <p class="help">兩指張開＝⌘＝（放大），捏合＝⌘−（縮小）。三指往左／往右滑＝切換桌面；三指往上＝Mission Control。三指手勢的效果在 macOS 本身，不在這一頁。</p>
+  <div class="body">
+    <div class="s6">
+      <div class="card">
+        <div class="card-title">兩指張開、捏合 <small>⌘＝ ／ ⌘−</small></div>
+        <div class="frame" id="s6-frame">
+          <svg id="s6-art" viewBox="0 0 480 300" role="img" aria-label="沙發上的手機">
+            <circle cx="236" cy="170" r="130" fill="#dfe8fc"/>
+            <g transform="translate(336 30)">
+              <rect width="112" height="74" rx="8" fill="#1f2937"/>
+              <rect x="6" y="6" width="100" height="60" rx="4" fill="#f8fafc"/>
+              <rect x="12" y="13" width="44" height="6" rx="3" fill="#c7d2fe"/>
+              <rect x="12" y="25" width="72" height="5" rx="2.5" fill="#e2e8f0"/>
+              <rect x="12" y="35" width="58" height="5" rx="2.5" fill="#e2e8f0"/>
+              <rect x="12" y="45" width="66" height="5" rx="2.5" fill="#e2e8f0"/>
+              <path d="M80 30v19l5-5 4 8.5 3.2-1.5-4-8.4h7z" fill="#0f172a" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/>
+              <rect x="48" y="74" width="16" height="12" fill="#9ca3af"/>
+              <rect x="34" y="86" width="44" height="5" rx="2.5" fill="#9ca3af"/>
+            </g>
+            <path d="M318 112 Q 336 62 362 120" fill="none" stroke="#2154d9" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
+            <rect x="86" y="118" width="308" height="94" rx="30" fill="#2b9d8f"/>
+            <rect x="112" y="136" width="74" height="50" rx="16" fill="#f4a261" transform="rotate(-9 149 161)"/>
+            <rect x="56" y="150" width="66" height="100" rx="28" fill="#22857a"/>
+            <rect x="358" y="150" width="66" height="100" rx="28" fill="#22857a"/>
+            <rect x="106" y="178" width="136" height="50" rx="16" fill="#3cb4a5"/>
+            <rect x="238" y="178" width="136" height="50" rx="16" fill="#3cb4a5"/>
+            <rect x="68" y="216" width="344" height="38" rx="14" fill="#22857a"/>
+            <rect x="96" y="252" width="14" height="20" rx="4" fill="#6b4f3a"/>
+            <rect x="370" y="252" width="14" height="20" rx="4" fill="#6b4f3a"/>
+            <g transform="rotate(-12 302 168)">
+              <rect x="276" y="116" width="56" height="104" rx="11" fill="#111827"/>
+              <rect x="280" y="122" width="48" height="92" rx="7" fill="#eef4ff"/>
+              <rect x="283" y="126" width="42" height="46" rx="4" fill="#d6e3fd"/>
+              <circle cx="304" cy="148" r="5" fill="#2154d9" opacity=".65"/>
+              <circle cx="304" cy="148" r="9" fill="none" stroke="#2154d9" stroke-width="1.2" opacity=".35"/>
+              <rect x="283" y="176" width="21" height="9" rx="2" fill="#fff" stroke="#c7d2fe"/>
+              <rect x="306" y="176" width="12" height="9" rx="2" fill="#a5b4fc"/>
+              <rect x="319.5" y="176" width="5.5" height="9" rx="1.5" fill="#2154d9"/>
+              <rect x="283" y="189" width="7" height="5" rx="1" fill="#94a3b8"/>
+              <rect x="292" y="189" width="7" height="5" rx="1" fill="#94a3b8"/>
+              <rect x="301" y="189" width="7" height="5" rx="1" fill="#94a3b8"/>
+              <rect x="310" y="189" width="7" height="5" rx="1" fill="#94a3b8"/>
+              <rect x="319" y="189" width="6" height="5" rx="1" fill="#f5b942"/>
+              <rect x="283" y="197" width="42" height="12" rx="2" fill="#cbd5e1"/>
+            </g>
+            <text x="240" y="292" text-anchor="middle" font-size="13" font-weight="700" fill="#5a6476">SofaPad：iPhone 當 Mac 的鍵盤和觸控板</text>
+          </svg>
+          <div class="zoom-badge" id="s6-zoom">100%</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="gesture">
+          <b>三指往左／往右滑</b>
+          <span>切到別的桌面，再滑回來</span>
+          <div class="status" id="s6-away-status"></div>
+        </div>
+        <div class="gesture">
+          <b>三指往上滑</b>
+          <span>Mission Control 出現後，三指往下滑回來，在右邊手動打勾</span>
+        </div>
+        <div class="gesture">
+          <b>效果在 macOS 本身</b>
+          <span>這一頁只看得到「離開了又回來」</span>
+        </div>
+      </div>
+    </div>
+    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="6"></ol></aside>
+  </div>
+</section>
+
+<!-- Stage 7 -->
+<section class="stage" id="stage-7" data-stage="7" hidden>
+  <h1 class="headline"><span class="pre">現在示範：</span>4.3 新排版</h1>
+  <p class="help">Mac 看不到手機畫面，所以排版的三項請看手機，自己用觸控板打勾。⏎ 會自動判斷：點進框裡打一行，按游標板旁邊的 ⏎。</p>
+  <div class="body">
+    <div class="s7">
+      <div class="card chat small">
+        <div class="chat-head">打一行，按手機上游標板旁邊的 ⏎</div>
+        <div class="msgs" id="s7-messages"></div>
+        <div class="compose">
+          <input class="field" id="s7-input" type="text" placeholder="打一行，按 ⏎" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+      </div>
+      <div class="card">
+        <div class="mocks">
+          <figure class="mock">
+            <div class="phone-p" aria-hidden="true">
+              <div class="m-pad">觸控板</div>
+              <div class="m-io"><span class="m-input">輸入框</span><span class="m-caret">◀ 游標 ▶</span><span class="m-enter">⏎</span></div>
+              <div class="m-keys"><span>即時</span><span>⌘</span><span>⇧ 選取</span><span>esc</span><span>tab</span><span>⌫</span><span>←</span><span>→</span><span class="m-edit">✎</span></div>
+            </div>
+            <figcaption>直拿：輸入框半寬<br>右半是游標板和 ⏎</figcaption>
+          </figure>
+          <figure class="mock">
+            <div class="editor" aria-hidden="true">
+              <div class="m-tabs"><span>輸入列</span><span class="on">按鍵列</span><span>橫拿側欄</span></div>
+              <ul class="m-list">
+                <li><i>≡</i>⇧ 選取<b>✕</b></li>
+                <li><i>≡</i>esc<b>✕</b></li>
+                <li class="lift"><i>≡</i>tab<b>✕</b></li>
+                <li><i>≡</i>⌫<b>✕</b></li>
+              </ul>
+              <div class="m-reset">全部恢復預設</div>
+            </div>
+            <figcaption>✎ 編輯：按住 ≡ 拖曳排序<br>✕ 拿掉，點清單加回來</figcaption>
+          </figure>
+          <figure class="mock">
+            <div class="phone-l" aria-hidden="true">
+              <div class="m-side">
+                <div class="m-top"><span>●</span><span>⌨</span><span>鎖</span><span>⚙</span><span>‹</span></div>
+                <div class="m-io"><span class="m-input">輸入</span><span class="m-caret">◀▶</span><span class="m-enter">⏎</span></div>
+                <div class="m-grid"><span>⌘C</span><span>⌘V</span><span>⌘X</span><span>⌘Z</span><span>⌘A</span><span>⌘Tab</span><span>MC</span><span>⌃←</span><span>⌃→</span></div>
+              </div>
+              <div class="m-pad">觸控板</div>
+            </div>
+            <figcaption>橫拿：側欄（右手用在左邊）<br>另一邊是全高的觸控板</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+    <aside class="checks"><h2>這一關要做到</h2><ol data-checks="7"></ol></aside>
+  </div>
+</section>
+
+<!-- Summary -->
+<section class="stage" id="stage-summary" data-stage="summary" hidden>
+  <h1 class="headline"><span class="pre">示範</span>總表</h1>
+  <div class="sum-top">
+    <div class="sum-count" id="sum-count"></div>
+    <div class="sum-elapsed" id="sum-elapsed"></div>
+  </div>
+  <table class="sum-table" id="sum-table"><tbody></tbody></table>
+</section>
+
+<footer id="footer">這一頁不收集任何資料：不連網路、不存檔、不上傳，所有判斷都只在這個瀏覽器分頁裡，關掉就清空。</footer>
+</main>
+
+<div class="banner" id="banner" hidden>
+  <div class="banner-text" id="banner-text"></div>
+  <button class="btn-next" id="btn-next" type="button" tabindex="-1">下一關 →</button>
+</div>
+<div class="key-echo" id="key-echo" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+<div class="flash" id="flash" hidden>開始</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const now = () => performance.now();
+  const chars = (s) => Array.from(s || '');
+  const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+  const same = (a, b) => norm(a).toLowerCase() === norm(b).toLowerCase();
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // What each stage asks for. Check ids are unique across stages; manual ones are ticked by hand.
+  const STAGES = [
+    { id: '1', name: '觸控板', nav: '觸控板', checks: [
+      { id: 'move', label: '移動游標 600 px', short: '移動' },
+      { id: 'click', label: '點一下「點我」', short: '點擊' },
+      { id: 'rightclick', label: '右鍵選單，再點一項', short: '右鍵選單' },
+      { id: 'scroll', label: '兩指捲到清單最底', short: '兩指捲動' },
+      { id: 'drag', label: '長按拖曳：藍色放進框', short: '長按拖曳' },
+      { id: 'draglock', label: '拖曳鎖定：橘色放進框', short: '拖曳鎖定' },
+    ] },
+    { id: '2', name: '打字', nav: '打字', checks: [
+      { id: 'live', label: '即時模式打對一句', short: '即時' },
+      { id: 'buffer', label: '整段模式一次送出', short: '整段＋送出' },
+      { id: 'zhuyin', label: '注音打中文', short: '注音' },
+      { id: 'dictation', label: '🎤 聽寫，沒有疊字', short: '聽寫不疊字' },
+    ] },
+    { id: '3', name: '送出後自動清空', nav: '自動清空', checks: [
+      { id: 'sent1', label: '用觸控板點「傳送」送出第一句', short: '第一句' },
+      { id: 'sent2', label: '再點「傳送」送出第二句', short: '第二句' },
+      { id: 'clean', label: '第二句沒有第一句的殘留', short: '沒有殘留' },
+    ] },
+    { id: '4', name: '游標板', nav: '游標板', checks: [
+      { id: 'arrows', label: '方向鍵移動游標（3 下）', short: '方向鍵' },
+      { id: 'word', label: '快速甩：跳一個字詞（⌥）', short: '跳字詞' },
+      { id: 'select', label: '⇧ 選取：選起錯字', short: '⇧ 選取' },
+      { id: 'fixed', label: '改成「觸控板」', short: '改好錯字' },
+    ] },
+    { id: '5', name: '快捷鍵', nav: '快捷鍵', checks: [
+      { id: 'selectall', label: '⌘A 全選', short: '⌘A' },
+      { id: 'copy', label: '⌘C 拷貝', short: '⌘C' },
+      { id: 'paste', label: '⌘V 貼到下面的空格', short: '⌘V' },
+      { id: 'undo', label: '⌘Z 復原', short: '⌘Z' },
+      { id: 'screenshot', label: '⌃⇧⌘4 截圖，⌘V 貼進來', short: '截圖貼上' },
+    ] },
+    { id: '6', name: '縮放與桌面', nav: '縮放桌面', checks: [
+      { id: 'zoomin', label: '兩指張開：放大（⌘＝）', short: '放大' },
+      { id: 'zoomout', label: '捏合：縮小（⌘−）', short: '縮小' },
+      { id: 'away', label: '三指左右滑：切到別的桌面再回來', short: '切桌面' },
+      { id: 'mission', label: 'Mission Control 有出現（手動打勾）', short: 'Mission Control', manual: true },
+    ] },
+    { id: '7', name: '4.3 新排版', nav: '4.3 排版', manualHead: '手動打勾（Mac 看不到手機畫面）', checks: [
+      { id: 'enter', label: '打一行，按游標板旁的 ⏎', short: '⏎ 送出' },
+      { id: 'portrait', label: '直拿：輸入框半寬，右半是游標板和 ⏎', short: '直拿排版', manual: true },
+      { id: 'reorder', label: '✎ 編輯：拖曳調整順序', short: '✎ 排序', manual: true },
+      { id: 'landscape', label: '橫拿：側欄版面', short: '橫拿側欄', manual: true },
+    ] },
+  ];
+  const STAGE_IDS = STAGES.map((s) => s.id).concat('summary');
+  const CHECK_STAGE = {};
+  STAGES.forEach((s) => s.checks.forEach((c) => { CHECK_STAGE[c.id] = s.id; }));
+  const MANUAL = STAGES.flatMap((s) => s.checks.filter((c) => c.manual).map((c) => c.id));
+  const ALL = Object.keys(CHECK_STAGE).length;
+
+  const TEXT = {
+    live: 'SofaPad 讓 iPhone 變成 Mac 的鍵盤',
+    buffer: '整段打好再一次送出',
+    zhuyin: '沙發上也能打中文',
+    fixed: 'SofaPad 讓 iPhone 變成 Mac 的鍵盤和觸控板。',
+    copy: 'SofaPad 很好用',
+  };
+  const BOPOMOFO = /[㄀-ㄯㆠ-ㆿˇˊˋ˙]+/;
+  const CJK = /[㐀-䶿一-鿿豈-﫿\u{20000}-\u{3134F}]/gu;
+  const ARROWS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
+
+  // S: run-wide state (check times). st: per-run scratch, rebuilt by reset().
+  const S = { t0: now(), current: '1', rec: false, at: {} };
+  let st = fresh();
+  function fresh() {
+    return {
+      moveDist: 0, last: null, drag: null, rcPick: '',
+      liveEvents: 0, prev: {}, bulk: false, bulkMax: 0, burst: [], bopo: '',
+      s3: [], s3Clicks: 0, s3Leftover: null,
+      arrows: 0,
+      copied: '', pasteArmed: '', shotUrl: '', shotSize: '',
+      zoom: 1, wheelAcc: 0, dpr: window.devicePixelRatio || 1, awayAt: 0, awayMs: 0,
+      s7: [],
+    };
+  }
+  const lastDown = { t: -1e9, target: null };
+
+  // ---- checks ----
+
+  const isDone = (id) => S.at[id] != null;
+  const stageOf = (sid) => STAGES.find((s) => s.id === sid);
+  const stageDone = (sid) => !!stageOf(sid) && stageOf(sid).checks.every((c) => isDone(c.id));
+
+  function mark(id) {
+    if (isDone(id) || !(id in CHECK_STAGE)) return;
+    const sid = CHECK_STAGE[id];
+    const before = stageDone(sid);
+    S.at[id] = now() - S.t0;
+    paintCheck(id);
+    paintProgress(sid, !before && stageDone(sid));
+  }
+  function unmark(id) {
+    if (!isDone(id)) return;
+    delete S.at[id];
+    paintCheck(id);
+    paintProgress(CHECK_STAGE[id], false);
+  }
+  function paintCheck(id) {
+    const el = $(`[data-check="${id}"]`);
+    if (!el) return;
+    if (isDone(id)) el.setAttribute('data-done', '1'); else el.removeAttribute('data-done');
+    if (el.tagName === 'BUTTON') el.setAttribute('aria-pressed', String(isDone(id)));
+  }
+  function note(id, text) {
+    const el = $(`#chk-${id} .ck-note`);
+    if (el && el.textContent !== text) el.textContent = text;
+  }
+  function status(sel, text, tone = '') {
+    const el = $(sel);
+    el.textContent = text;
+    el.classList.toggle('ok', tone === 'ok');
+    el.classList.toggle('bad', tone === 'bad');
+    el.classList.toggle('warn', tone === 'warn');
+  }
+  function paintProgress(sid, justDone) {
+    $(`#nav-${sid}`).classList.toggle('done', stageDone(sid));
+    paintBanner(justDone);
+    paintSummary();
+  }
+
+  // A real click from SofaPad has detail ≥ 1. A button "clicked" by Enter or Space has detail 0 and no mousedown.
+  document.addEventListener('mousedown', (e) => { lastDown.t = now(); lastDown.target = e.target; }, true);
+  function isMouse(e) {
+    if (e.detail > 0) return true;
+    return now() - lastDown.t < 1500 && lastDown.target instanceof Node && e.currentTarget.contains(lastDown.target);
+  }
+  // Page controls: mouse only, and they never take the focus away from a text field.
+  function control(el, fn) {
+    el.addEventListener('mousedown', (e) => e.preventDefault());
+    el.addEventListener('click', (e) => { if (isMouse(e)) fn(e); });
+  }
+
+  let toastTimer = 0;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 2400);
+  }
+  function span(text, cls) {
+    const el = document.createElement('span');
+    if (cls) el.className = cls;
+    el.textContent = text;
+    return el;
+  }
+
+  // ---- page: nav, banner, recording mode, reset ----
+
+  function buildNav() {
+    const nav = $('#nav');
+    for (const s of STAGES) {
+      const b = document.createElement('button');
+      b.className = 'nav-item';
+      b.id = `nav-${s.id}`;
+      b.type = 'button';
+      b.tabIndex = -1;
+      b.dataset.go = s.id;
+      b.title = `第 ${s.id} 關：${s.name}`;
+      b.innerHTML = `<span class="num">${s.id}<i>✓</i></span><span class="nav-name"></span>`;
+      b.querySelector('.nav-name').textContent = s.nav;
+      nav.append(b);
+    }
+    const sum = document.createElement('button');
+    sum.className = 'nav-item nav-sum';
+    sum.id = 'nav-summary';
+    sum.type = 'button';
+    sum.tabIndex = -1;
+    sum.dataset.go = 'summary';
+    sum.innerHTML = '<span class="nav-name">總表</span>';
+    nav.append(sum);
+    $$('.nav-item').forEach((b) => control(b, () => go(b.dataset.go)));
+  }
+
+  function buildChecks() {
+    for (const s of STAGES) {
+      const ol = $(`[data-checks="${s.id}"]`);
+      let head = false;
+      for (const c of s.checks) {
+        if (c.manual && s.manualHead && !head) {
+          head = true;
+          const li = document.createElement('li');
+          li.className = 'ck-head';
+          li.textContent = s.manualHead;
+          ol.append(li);
+        }
+        const el = document.createElement(c.manual ? 'button' : 'div');
+        el.className = c.manual ? 'check manual' : 'check';
+        el.id = `chk-${c.id}`;
+        el.dataset.check = c.id;
+        if (c.manual) {
+          el.type = 'button';
+          el.tabIndex = -1;
+          el.setAttribute('aria-pressed', 'false');
+          control(el, () => (isDone(c.id) ? unmark(c.id) : mark(c.id)));
+        }
+        el.innerHTML = '<span class="tick" aria-hidden="true"></span><span class="ck-label"></span><span class="ck-note"></span>';
+        el.querySelector('.ck-label').textContent = c.label;
+        const li = document.createElement('li');
+        li.append(el);
+        ol.append(li);
+      }
+    }
+  }
+
+  function buildSummary() {
+    const body = $('#sum-table tbody');
+    for (const s of STAGES) {
+      const tr = document.createElement('tr');
+      tr.id = `sum-stage-${s.id}`;
+      tr.innerHTML = `<td><span class="num">${s.id}</span></td><td class="n"></td><td><div class="sum-chips"></div></td>`;
+      tr.cells[0].append(document.createTextNode(s.name));
+      const box = tr.querySelector('.sum-chips');
+      for (const c of s.checks) {
+        const chip = document.createElement('span');
+        chip.className = c.manual ? 'schip manual' : 'schip';
+        chip.id = `sum-${c.id}`;
+        box.append(chip);
+      }
+      body.append(tr);
+    }
+  }
+
+  const fmt = (ms) => {
+    const s = Math.max(0, Math.floor(ms / 1000));
+    return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  };
+  function paintSummary() {
+    const done = Object.keys(S.at).length;
+    const total = document.createElement('small');
+    total.textContent = ` / ${ALL} 完成`;
+    $('#sum-count').replaceChildren(document.createTextNode(String(done)), total);
+    for (const s of STAGES) {
+      const n = s.checks.filter((c) => isDone(c.id)).length;
+      const tr = $(`#sum-stage-${s.id}`);
+      tr.classList.toggle('done', n === s.checks.length);
+      tr.cells[1].textContent = `${n} / ${s.checks.length}`;
+      for (const c of s.checks) {
+        const chip = $(`#sum-${c.id}`);
+        chip.classList.toggle('done', isDone(c.id));
+        chip.replaceChildren(
+          span(isDone(c.id) ? '✓' : '○'),
+          document.createTextNode(c.short),
+          document.createElement('small'),
+        );
+        chip.lastChild.textContent = `${c.manual ? '手動' : '自動'} · ${isDone(c.id) ? fmt(S.at[c.id]) : '—'}`;
+      }
+    }
+    paintElapsed();
+  }
+  function paintElapsed() {
+    $('#sum-elapsed').textContent = `從開始（或「重來」）到現在 ${fmt(now() - S.t0)}`;
+  }
+
+  function paintBanner(pop) {
+    const sid = S.current;
+    const show = sid !== 'summary' && stageDone(sid);
+    const b = $('#banner');
+    b.hidden = !show;
+    document.body.classList.toggle('has-banner', show);
+    if (!show) return;
+    $('#banner-text').textContent = `✓ 完成：${stageOf(sid).name}`;
+    $('#btn-next').textContent = sid === '7' ? '看總表 →' : '下一關 →';
+    if (pop) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+  }
+  function paintBadge() {
+    $('#rec-badge-text').textContent = S.current === 'summary' ? 'SofaPad 示範 · 總表' : `SofaPad 示範 · 第 ${S.current} 關`;
+  }
+
+  function go(n) {
+    let id = String(n);
+    if (id === '8' || id === '總表') id = 'summary';
+    if (!STAGE_IDS.includes(id)) return false;
+    closeMenu();
+    dropDrag(false);
+    $('#toast').hidden = true;
+    S.current = id;
+    for (const sec of $$('.stage')) sec.hidden = sec.dataset.stage !== id;
+    const a = document.activeElement;
+    if (a && a !== document.body && a.closest('.stage[hidden]')) a.blur();
+    for (const b of $$('.nav-item')) {
+      if (b.dataset.go === id) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    }
+    st.last = null;
+    st.awayAt = 0;
+    setHash(id);
+    paintBanner(false);
+    paintBadge();
+    if (id === 'summary') paintSummary();
+    window.scrollTo(0, 0);
+    return true;
+  }
+  function readHash() {
+    const m = /(?:^#|&)stage=([^&]+)/.exec(location.hash);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function setHash(id) {
+    const h = `#stage=${id}`;
+    if (location.hash === h) return;
+    try { history.replaceState(null, '', h); } catch (_) { location.hash = h; }
+  }
+  window.addEventListener('hashchange', () => { const h = readHash(); if (h && h !== S.current) go(h); });
+
+  function setRec(on, writeUrl = true) {
+    S.rec = !!on;
+    document.documentElement.classList.toggle('rec', S.rec);
+    const b = $('#btn-rec');
+    b.setAttribute('aria-pressed', String(S.rec));
+    b.textContent = S.rec ? '● 錄影模式' : '錄影模式';
+    if (!writeUrl) return;
+    try {
+      const u = new URL(location.href);
+      if (S.rec) u.searchParams.set('rec', '1'); else u.searchParams.delete('rec');
+      history.replaceState(null, '', u.href);
+    } catch (_) { /* some file:// setups refuse; the class is enough */ }
+  }
+
+  function reset() {
+    S.t0 = now();
+    S.at = {};
+    if (st.shotUrl) URL.revokeObjectURL(st.shotUrl);
+    st = fresh();
+    for (const el of $$('input.field, textarea.field')) el.value = el.defaultValue;
+    for (const el of $$('.field')) el.classList.remove('ok');
+    resetBlocks();
+    $('#s1-click').textContent = '點我';
+    $('#s1-click').classList.remove('hit');
+    const img = $('#s5-shot-img');
+    img.hidden = true;
+    img.removeAttribute('src');
+    Object.keys(CHECK_STAGE).forEach(paintCheck);
+    STAGES.forEach((s) => $(`#nav-${s.id}`).classList.remove('done'));
+    go('1');
+    $('#s1-list').scrollTop = 0;   // only works once the list is shown again
+    paintAll();
+  }
+  function flash() {
+    const f = $('#flash');
+    f.hidden = false;
+    f.style.animation = 'none';
+    void f.offsetWidth;
+    f.style.animation = '';
+    setTimeout(() => { f.hidden = true; }, 820);
+  }
+  let resetArmed = 0;
+  function disarmReset() {
+    clearTimeout(resetArmed);
+    resetArmed = 0;
+    $('#btn-reset').textContent = '重來';
+    $('#btn-reset').classList.remove('confirm');
+  }
+  // With progress on the page, 重來 asks once (click again within 3 s), so a stray click cannot wipe a take.
+  control($('#btn-reset'), () => {
+    if (Object.keys(S.at).length && !resetArmed) {
+      resetArmed = setTimeout(disarmReset, 3000);
+      $('#btn-reset').textContent = '確定重來？';
+      $('#btn-reset').classList.add('confirm');
+      return;
+    }
+    disarmReset();
+    reset();
+    flash();
+  });
+  control($('#btn-rec'), () => setRec(!S.rec));
+  control($('#btn-next'), () => {
+    const i = STAGE_IDS.indexOf(S.current);
+    go(STAGE_IDS[Math.min(i + 1, STAGE_IDS.length - 1)]);
+  });
+
+  // Key echo: shows named keys and shortcuts in the corner (stages 4–7), so a video shows what the phone sent.
+  const KEYNAME = {
+    ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓', Enter: '⏎', Backspace: '⌫', Delete: '⌦',
+    Escape: 'esc', Tab: 'tab', ' ': 'space', Home: 'home', End: 'end', PageUp: 'pgup', PageDown: 'pgdn',
+  };
+  const CODENAME = { Equal: '=', Minus: '−', BracketLeft: '[', BracketRight: ']', Comma: ',', Period: '.', Slash: '/' };
+  function keyLabel(e) {
+    const c = e.code || '';
+    if (/^Key[A-Z]$/.test(c)) return c.slice(3);
+    if (/^Digit\d$/.test(c)) return c.slice(5);
+    return CODENAME[c] || (e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  }
+  let echoTimer = 0;
+  document.addEventListener('keydown', (e) => {
+    if (!['4', '5', '6', '7'].includes(S.current)) return;
+    if (e.isComposing || e.keyCode === 229 || ['Shift', 'Meta', 'Control', 'Alt', 'CapsLock', 'Fn'].includes(e.key)) return;
+    const named = KEYNAME[e.key];
+    if (!named && !(e.metaKey || e.ctrlKey || e.altKey)) return;   // plain typing is not echoed
+    const mods = (e.ctrlKey ? '⌃' : '') + (e.altKey ? '⌥' : '') + (e.shiftKey ? '⇧' : '') + (e.metaKey ? '⌘' : '');
+    const el = $('#key-echo');
+    el.textContent = mods + (named || keyLabel(e));
+    el.classList.add('show');
+    clearTimeout(echoTimer);
+    echoTimer = setTimeout(() => el.classList.remove('show'), 1200);
+  }, true);
+
+  // ---- stage 1: trackpad ----
+
+  function buildList() {
+    const ol = $('#s1-list');
+    for (let i = 1; i <= 40; i++) {
+      const li = document.createElement('li');
+      li.textContent = i === 40 ? '第 40 項：到底了 🎉' : `第 ${i} 項`;
+      ol.append(li);
+    }
+  }
+  function paintMove() {
+    const d = Math.min(600, st.moveDist);
+    $('#s1-move-bar').style.width = `${d / 6}%`;
+    $('#s1-move-bar').parentElement.classList.toggle('full', d >= 600);
+    $('#s1-move-num').textContent = `${Math.round(d)} / 600 px`;
+    note('move', `${Math.round(d)} / 600 px`);
+  }
+  function paintList() {
+    const el = $('#s1-list');
+    const max = el.scrollHeight - el.clientHeight;
+    const pct = max > 0 ? Math.round(clamp(el.scrollTop / max, 0, 1) * 100) : 0;
+    $('#s1-list-bar').style.width = `${pct}%`;
+    $('#s1-list-bar').parentElement.classList.toggle('full', isDone('scroll'));
+    note('scroll', isDone('scroll') ? '' : `捲到 ${pct}%`);
+  }
+  function paint1() {
+    paintMove();
+    paintList();
+    $('#s1-rc-result').textContent = st.rcPick ? `選了「${st.rcPick}」 ✓` : '在這裡按右鍵';
+    $('#s1-rc').classList.toggle('hit', !!st.rcPick);
+    $('#s1-drop-blue').classList.toggle('filled', isDone('drag'));
+    $('#s1-drop-orange').classList.toggle('filled', isDone('draglock'));
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    if (st.drag) moveDrag(e);
+    if (S.current !== '1') return;
+    const p = { x: e.clientX, y: e.clientY };
+    if (st.last) {
+      const d = Math.hypot(p.x - st.last.x, p.y - st.last.y);
+      if (d < 400) st.moveDist += d;   // a bigger jump is the pointer coming back into the window
+    }
+    st.last = p;
+    paintMove();
+    if (st.moveDist >= 600) mark('move');
+  });
+  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) st.last = null; });
+
+  $('#s1-click').addEventListener('click', (e) => {
+    if (!isMouse(e)) return;
+    e.currentTarget.classList.add('hit');
+    e.currentTarget.textContent = '點到了 ✓';
+    mark('click');
+  });
+
+  $('#s1-rc').addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    openMenu(e.clientX, e.clientY);
+  });
+  function openMenu(x, y) {
+    const m = $('#s1-menu');
+    m.hidden = false;
+    m.style.left = `${clamp(x, 8, window.innerWidth - m.offsetWidth - 8)}px`;
+    m.style.top = `${clamp(y, 8, window.innerHeight - m.offsetHeight - 8)}px`;
+  }
+  function closeMenu() { $('#s1-menu').hidden = true; }
+  for (const b of $$('#s1-menu button')) {
+    b.addEventListener('click', () => {
+      closeMenu();
+      st.rcPick = b.textContent;
+      paint1();
+      mark('rightclick');
+    });
+  }
+  document.addEventListener('mousedown', (e) => {
+    if (!$('#s1-menu').hidden && !e.target.closest('#s1-menu')) closeMenu();
+  });
+
+  $('#s1-list').addEventListener('scroll', (e) => {
+    const el = e.currentTarget;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 4) mark('scroll');
+    paintList();
+  }, { passive: true });
+
+  // Dragging with plain mouse events: SofaPad's long-press drag and drag lock both arrive as
+  // mousedown → mousemove with the button held → mouseup.
+  const BLOCKS = {
+    blue: { el: '#s1-blue', drop: '#s1-drop-blue', other: '#s1-drop-orange', check: 'drag', home: [20, 24] },
+    orange: { el: '#s1-orange', drop: '#s1-drop-orange', other: '#s1-drop-blue', check: 'draglock', home: [20, 134] },
+  };
+  function resetBlocks() {
+    for (const b of Object.values(BLOCKS)) {
+      const el = $(b.el);
+      el.style.left = `${b.home[0]}px`;
+      el.style.top = `${b.home[1]}px`;
+      el.classList.remove('dragging', 'placed');
+    }
+    $$('.drop').forEach((d) => d.classList.remove('over', 'filled'));
+  }
+  const centerIn = (el, box) => {
+    const r = el.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom;
+  };
+  for (const el of $$('.block')) {
+    el.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      const r = el.getBoundingClientRect();
+      const a = $('#s1-arena').getBoundingClientRect();
+      el.classList.remove('placed');
+      el.style.left = `${r.left - a.left}px`;
+      el.style.top = `${r.top - a.top}px`;
+      st.drag = { el, kind: el.dataset.kind, dx: e.clientX - r.left, dy: e.clientY - r.top };
+      el.classList.add('dragging');
+    });
+  }
+  function moveDrag(e) {
+    const { el, dx, dy } = st.drag;
+    const a = $('#s1-arena').getBoundingClientRect();
+    el.style.left = `${clamp(e.clientX - a.left - dx, 0, a.width - el.offsetWidth)}px`;
+    el.style.top = `${clamp(e.clientY - a.top - dy, 0, a.height - el.offsetHeight)}px`;
+    for (const d of $$('.drop')) d.classList.toggle('over', centerIn(el, d));
+  }
+  function dropDrag(evaluate) {
+    if (!st.drag) return;
+    const { el, kind } = st.drag;
+    st.drag = null;
+    el.classList.remove('dragging');
+    $$('.drop').forEach((d) => d.classList.remove('over'));
+    if (!evaluate) return;
+    const b = BLOCKS[kind];
+    const box = $(b.drop);
+    if (centerIn(el, box)) {
+      el.classList.add('placed');   // CSS centres it in its box
+      mark(b.check);
+      paint1();
+    } else if (centerIn(el, $(b.other))) {
+      toast('放錯框了：藍色放藍框，橘色放橘框');
+    }
+  }
+  document.addEventListener('mouseup', () => dropDrag(true));
+
+  // ---- stage 2: typing ----
+
+  /** How many characters one edit inserted: what is left after the common start and end. */
+  function inserted(before, after) {
+    const a = chars(before);
+    const b = chars(after);
+    let p = 0;
+    while (p < a.length && p < b.length && a[p] === b[p]) p++;
+    let s = 0;
+    while (s < a.length - p && s < b.length - p && a[a.length - 1 - s] === b[b.length - 1 - s]) s++;
+    return Math.max(0, b.length - p - s);
+  }
+  /** The longest piece of at least `min` characters that appears twice (overlap allowed), or ''. */
+  function longestRepeat(text, min) {
+    const a = chars(text).slice(0, 500);
+    let best = '';
+    for (let len = min; len < a.length; len++) {
+      const seen = new Set();
+      let found = '';
+      for (let i = 0; i + len <= a.length; i++) {
+        const sub = a.slice(i, i + len).join('');
+        if (seen.has(sub)) { found = sub; break; }
+        seen.add(sub);
+      }
+      if (!found) break;   // no repeat of this length means none longer either
+      best = found;
+    }
+    return best;
+  }
+  function paintTarget(sel, target, value) {
+    const t = chars(target);
+    const v = chars(norm(value).toLowerCase());
+    let k = 0;
+    while (k < t.length && k < v.length && t[k].toLowerCase() === v[k]) k++;
+    $(sel).replaceChildren(span(t.slice(0, k).join(''), 'hit'), document.createTextNode(t.slice(k).join('')));
+  }
+  function dictationInfo(value) {
+    const flat = value.replace(/\s+/g, '');
+    return { cjk: (flat.match(CJK) || []).length, rep: longestRepeat(flat, 4) };
+  }
+  function paint2() {
+    const live = $('#s2-live').value;
+    paintTarget('#s2-live-target', TEXT.live, live);
+    $('#s2-live').classList.toggle('ok', same(live, TEXT.live));
+    if (!live) status('#s2-live-status', '每選好一個字就送到 Mac');
+    else if (same(live, TEXT.live)) status('#s2-live-status', `打對了 ✓（收到 ${st.liveEvents} 次輸入）`, 'ok');
+    else status('#s2-live-status', `收到 ${st.liveEvents} 次輸入，繼續打`);
+
+    const buf = $('#s2-buffer').value;
+    paintTarget('#s2-buffer-target', TEXT.buffer, buf);
+    $('#s2-buffer').classList.toggle('ok', same(buf, TEXT.buffer) && st.bulk);
+    if (!buf) status('#s2-buffer-status', '切成「整段」，打好按「送出」');
+    else if (same(buf, TEXT.buffer) && st.bulk) status('#s2-buffer-status', `半秒內送進 ${st.bulkMax} 個字 ✓`, 'ok');
+    else if (same(buf, TEXT.buffer)) status('#s2-buffer-status', '字對了，但像是一個一個打的：清空，用整段模式再送一次', 'warn');
+    else status('#s2-buffer-status', `半秒內最多送進 ${st.bulkMax} 個字`);
+
+    const zy = $('#s2-zhuyin').value;
+    paintTarget('#s2-zhuyin-target', TEXT.zhuyin, zy);
+    $('#s2-zhuyin').classList.toggle('ok', same(zy, TEXT.zhuyin));
+    if (st.bopo) status('#s2-zhuyin-status', `看到注音符號「${st.bopo}」：還在組字的字不該送出`, 'bad');
+    else if (!zy) status('#s2-zhuyin-status', '用注音打，選好字才會送出');
+    else if (same(zy, TEXT.zhuyin)) status('#s2-zhuyin-status', '打對了 ✓ 沒有出現注音符號', 'ok');
+    else status('#s2-zhuyin-status', '沒有出現注音符號 ✓ 繼續打');
+
+    const dict = $('#s2-dictation').value;
+    const info = dictationInfo(dict);
+    $('#s2-dictation').classList.toggle('ok', info.cjk >= 6 && !info.rep);
+    if (!dict.trim()) status('#s2-dictation-status', '點進框裡，按鍵盤的 🎤 說一句話');
+    else if (info.rep) status('#s2-dictation-status', `疊字了：「${info.rep}」出現兩次`, 'bad');
+    else if (info.cjk < 6) status('#s2-dictation-status', `沒有疊字 ✓ 再多說幾個字（${info.cjk} / 6）`);
+    else status('#s2-dictation-status', '沒有疊字 ✓', 'ok');
+  }
+
+  // Values are read on every input event: SofaPad text can arrive as typing, several characters at once, or a paste.
+  $('#s2-live').addEventListener('input', (e) => {
+    st.liveEvents++;
+    paint2();
+    if (!e.isComposing && same(e.currentTarget.value, TEXT.live)) mark('live');
+  });
+  $('#s2-buffer').addEventListener('input', (e) => {
+    const el = e.currentTarget;
+    const before = st.prev.buffer || '';
+    st.prev.buffer = el.value;
+    if (!el.value) { st.bulk = false; st.burst = []; }
+    if (!e.isComposing) {
+      const type = e.inputType || '';
+      const data = /^insert(Text|FromPaste|ReplacementText)/.test(type) ? chars(e.data).length : 0;
+      const n = Math.max(inserted(before, el.value), data);
+      // The Mac types one character per key event (one paste while its own input method is on), so a sentence sent
+      // with 送出 arrives as a burst: ≥ 6 characters within half a second. Typing it on the phone takes far longer.
+      const t = now();
+      st.burst = st.burst.filter((x) => t - x.t < 500);
+      if (n) st.burst.push({ t, n });
+      const inBurst = st.burst.reduce((sum, x) => sum + x.n, 0);
+      if (inBurst >= 6) st.bulk = true;
+      st.bulkMax = Math.max(st.bulkMax, inBurst);
+    }
+    paint2();
+    if (st.bulk && same(el.value, TEXT.buffer)) mark('buffer');
+  });
+  function onZhuyin(e) {
+    const el = $('#s2-zhuyin');
+    if (e.isComposing) return;   // the Mac's own input method may show Zhuyin while composing; that is not SofaPad's
+    const m = BOPOMOFO.exec(el.value);
+    if (m) st.bopo = m[0];
+    if (!el.value) st.bopo = '';   // an emptied box starts over
+    paint2();
+    if (same(el.value, TEXT.zhuyin)) mark('zhuyin');
+  }
+  $('#s2-zhuyin').addEventListener('input', onZhuyin);
+  $('#s2-zhuyin').addEventListener('compositionend', onZhuyin);
+  $('#s2-dictation').addEventListener('input', (e) => {
+    const info = dictationInfo(e.currentTarget.value);
+    paint2();
+    if (info.cjk >= 6 && !info.rep) mark('dictation');
+  });
+
+  // ---- stage 3: the box empties after a send ----
+
+  /** Which characters of `next` sit in a piece of at least `min` characters that also appears in `prev`. */
+  function leftovers(prev, next, min = 3) {
+    const a = chars(next);
+    const mask = a.map(() => false);
+    for (let i = 0; i < a.length; i++) {
+      for (let j = a.length; j - i >= min; j--) {
+        if (prev.includes(a.slice(i, j).join(''))) {
+          for (let k = i; k < j; k++) mask[k] = true;
+          break;
+        }
+      }
+    }
+    return { a, mask, any: mask.some(Boolean) };
+  }
+  function marked(lo) {
+    const out = [];
+    let i = 0;
+    while (i < lo.a.length) {
+      let j = i;
+      while (j < lo.a.length && lo.mask[j] === lo.mask[i]) j++;
+      const text = lo.a.slice(i, j).join('');
+      if (lo.mask[i]) { const m = document.createElement('mark'); m.textContent = text; out.push(m); } else out.push(document.createTextNode(text));
+      i = j;
+    }
+    return out;
+  }
+  function paint3() {
+    const box = $('#s3-messages');
+    box.replaceChildren();
+    if (!st.s3.length) box.append(span('還沒有訊息', 'empty'));
+    st.s3.forEach((m, i) => {
+      const b = document.createElement('div');
+      b.className = 'bubble';
+      b.append(span(`第 ${i + 1} 句 · 點「傳送」`, 'meta'));
+      if (m.lo) b.append(...marked(m.lo)); else b.append(document.createTextNode(m.text));
+      box.append(b);
+    });
+    box.scrollTop = box.scrollHeight;
+    const r = $('#s3-result');
+    r.className = 'result';
+    if (!st.s3Leftover) {
+      r.textContent = st.s3.length ? '送出第二句後，這裡會檢查有沒有殘留' : '送出兩句後，這裡會檢查第二句有沒有殘留';
+    } else if (!st.s3Leftover.any) {
+      r.classList.add('ok');
+      r.textContent = '前一句沒有殘留 ✓';
+    } else {
+      r.classList.add('bad');
+      const q = span('', 'quote');
+      q.append(...marked(st.s3Leftover));
+      r.replaceChildren(document.createTextNode('有殘留（紅色是第一句的字）：按「清空重試」再來一次'), q);
+    }
+  }
+  $('#s3-send').addEventListener('mousedown', (e) => e.preventDefault());   // keep the caret in the box, like chat apps
+  $('#s3-send').addEventListener('click', (e) => {
+    const input = $('#s3-input');
+    if (!isMouse(e)) return;
+    const text = input.value;
+    if (!text.trim()) { toast('先打一句，再點「傳送」'); input.focus(); return; }
+    st.s3Clicks++;
+    const msg = { text, lo: null };
+    if (st.s3Clicks === 2) {
+      msg.lo = leftovers(st.s3[0].text, text);
+      st.s3Leftover = msg.lo;
+    }
+    st.s3.push(msg);
+    input.value = '';
+    input.focus();
+    paint3();
+    if (st.s3Clicks === 1) mark('sent1');
+    if (st.s3Clicks === 2) {
+      mark('sent2');
+      if (!msg.lo.any) mark('clean');
+    }
+  });
+  $('#s3-input').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    toast('這一關不用 Enter：請用觸控板點「傳送」');
+  });
+  control($('#s3-retry'), () => {
+    st.s3 = [];
+    st.s3Clicks = 0;
+    st.s3Leftover = null;
+    $('#s3-input').value = '';
+    ['sent1', 'sent2', 'clean'].forEach(unmark);
+    paint3();
+  });
+
+  // ---- stage 4: cursor pad ----
+
+  function paint4() {
+    const n = Math.min(3, st.arrows);
+    $('#s4-arrows').textContent = `方向鍵 ${n} / 3`;
+    note('arrows', isDone('arrows') ? '' : `${n} / 3`);
+    for (const id of ['arrows', 'word', 'select', 'fixed']) $(`#s4-${id}`).classList.toggle('ok', isDone(id));
+    $('#s4-text').classList.toggle('ok', same($('#s4-text').value, TEXT.fixed));
+    paintSel();
+  }
+  function paintSel() {
+    const ta = $('#s4-text');
+    const out = $('#s4-sel');
+    if (document.activeElement !== ta) { out.textContent = '先用觸控板點進上面的文字'; return; }
+    const a = ta.selectionStart;
+    const b = ta.selectionEnd;
+    if (a !== b) {
+      out.replaceChildren(document.createTextNode('選取中：'), document.createElement('b'));
+      out.lastChild.textContent = ta.value.slice(a, b);
+    } else {
+      const before = chars(ta.value.slice(0, a)).pop();
+      out.textContent = before ? `游標在「${before}」後面` : '游標在最前面';
+    }
+  }
+  $('#s4-text').addEventListener('keydown', (e) => {
+    if (!ARROWS.has(e.key)) return;
+    const ta = e.currentTarget;
+    if (e.altKey) mark('word');
+    if (e.shiftKey) {
+      setTimeout(() => { if (ta.selectionStart !== ta.selectionEnd) mark('select'); paint4(); }, 0);
+    } else {
+      st.arrows++;
+      if (st.arrows >= 3) mark('arrows');
+    }
+    setTimeout(paint4, 0);
+  });
+  $('#s4-text').addEventListener('input', (e) => {
+    if (same(e.currentTarget.value, TEXT.fixed)) mark('fixed');
+    paint4();
+  });
+  for (const type of ['focus', 'blur', 'keyup', 'mouseup', 'select']) $('#s4-text').addEventListener(type, paintSel);
+  document.addEventListener('selectionchange', () => {
+    if (S.current === '4') paintSel();
+    if (S.current === '5') fullSelect();
+  });
+  let arrowHintAt = 0;
+  document.addEventListener('keydown', (e) => {
+    if (S.current !== '4' || !ARROWS.has(e.key) || e.target === $('#s4-text')) return;
+    if (now() - arrowHintAt > 3000) { arrowHintAt = now(); toast('先用觸控板點進上面的文字，再用游標板'); }
+  });
+
+  // ---- stage 5: shortcuts ----
+
+  const keyChar = (e) => (/^Key[A-Z]$/.test(e.code || '') ? e.code.slice(3).toLowerCase() : String(e.key).toLowerCase());
+  function fullSelect() {
+    const src = $('#s5-source');
+    if (document.activeElement === src && src.value.length && src.selectionStart === 0 && src.selectionEnd === src.value.length) mark('selectall');
+  }
+  function paint5() {
+    const v = $('#s5-target').value;
+    if (isDone('paste') && norm(v)) status('#s5-status', `貼上了 ✓「${norm(v)}」`, 'ok');
+    else if (isDone('paste')) status('#s5-status', `貼上了 ✓${isDone('undo') ? '，又用 ⌘Z 復原了' : ''}`, 'ok');
+    else if (isDone('copy')) status('#s5-status', `拷貝了「${norm(st.copied) || '…'}」，點這裡 ⌘V`);
+    else status('#s5-status', '');
+    $('#s5-shot').classList.toggle('has', isDone('screenshot'));
+    if (isDone('screenshot')) status('#s5-shot-status', `收到截圖 ✓ ${st.shotSize}`, 'ok');
+    else status('#s5-shot-status', '');
+  }
+  document.addEventListener('keydown', (e) => {
+    if (S.current !== '5' || !e.metaKey) return;
+    const k = keyChar(e);
+    if (k === 'a') mark('selectall');
+    if (k === 'z' && !e.shiftKey) mark('undo');
+  }, true);
+  for (const type of ['select', 'keyup', 'mouseup']) $('#s5-source').addEventListener(type, fullSelect);
+  document.addEventListener('copy', () => {
+    if (S.current !== '5') return;
+    const a = document.activeElement;
+    st.copied = a && typeof a.selectionStart === 'number' && typeof a.value === 'string'
+      ? a.value.slice(a.selectionStart, a.selectionEnd)
+      : String(window.getSelection() || '');
+    mark('copy');
+    paint5();
+  }, true);
+  function imageIn(dt) {
+    if (!dt) return null;
+    const file = Array.from(dt.files || []).find((f) => /^image\//.test(f.type));
+    if (file) return file;
+    for (const it of Array.from(dt.items || [])) {
+      if (it.kind === 'file' && /^image\//.test(it.type)) return it.getAsFile();
+    }
+    return null;
+  }
+  function showShot(file) {
+    if (st.shotUrl) URL.revokeObjectURL(st.shotUrl);
+    st.shotUrl = URL.createObjectURL(file);   // a local blob, never leaves the page
+    const img = $('#s5-shot-img');
+    img.onload = () => { st.shotSize = `${img.naturalWidth} × ${img.naturalHeight}`; paint5(); };
+    img.src = st.shotUrl;
+    img.hidden = false;
+  }
+  // Paste is watched on the whole document while stage 5 is shown, so the focus does not matter for the screenshot.
+  document.addEventListener('paste', (e) => {
+    if (S.current !== '5') return;
+    const file = imageIn(e.clipboardData);
+    if (file) {
+      e.preventDefault();
+      showShot(file);
+      mark('screenshot');
+      paint5();
+      return;
+    }
+    if (e.target === $('#s5-target')) {
+      st.pasteArmed = norm(e.clipboardData ? e.clipboardData.getData('text/plain') : '') || '*';
+      setTimeout(checkPaste, 0);
+    }
+  }, true);
+  function checkPaste() {
+    const v = norm($('#s5-target').value);
+    if (st.pasteArmed && v && (st.pasteArmed === '*' || v.includes(st.pasteArmed) || v.includes(TEXT.copy))) mark('paste');
+    paint5();
+  }
+  $('#s5-target').addEventListener('input', (e) => {
+    if (e.inputType === 'insertFromPaste' && !st.pasteArmed) st.pasteArmed = '*';
+    checkPaste();
+  });
+  for (const type of ['beforeinput', 'input']) {
+    document.addEventListener(type, (e) => { if (S.current === '5' && e.inputType === 'historyUndo') mark('undo'); }, true);
+  }
+
+  // ---- stage 6: zoom and desktops ----
+
+  function paint6() {
+    $('#s6-art').style.transform = `scale(${st.zoom})`;
+    $('#s6-zoom').textContent = `${Math.round(st.zoom * 100)}%`;
+    if (isDone('away')) status('#s6-away-status', `離開了 ${(st.awayMs / 1000).toFixed(1)} 秒，又回來了 ✓`, 'ok');
+    else status('#s6-away-status', '這一頁在等你離開再回來');
+  }
+  function zoom(dir) {
+    st.zoom = clamp(st.zoom * (dir > 0 ? 1.25 : 0.8), 0.4, 3.2);
+    mark(dir > 0 ? 'zoomin' : 'zoomout');
+    paint6();
+  }
+  document.addEventListener('keydown', (e) => {
+    if (S.current !== '6' || !(e.metaKey || e.ctrlKey)) return;
+    const k = e.key;
+    const c = e.code;
+    if (k === '=' || k === '+' || c === 'Equal' || c === 'NumpadAdd') { e.preventDefault(); zoom(1); }
+    else if (k === '-' || k === '_' || k === '−' || c === 'Minus' || c === 'NumpadSubtract') { e.preventDefault(); zoom(-1); }
+  }, true);
+  window.addEventListener('wheel', (e) => {
+    if (S.current !== '6' || !e.ctrlKey) return;   // a Mac trackpad pinch arrives as ctrl + wheel
+    e.preventDefault();
+    st.wheelAcc += e.deltaY;
+    if (Math.abs(st.wheelAcc) >= 30) { zoom(st.wheelAcc < 0 ? 1 : -1); st.wheelAcc = 0; }
+  }, { passive: false });
+  // If the browser zooms the page anyway, the device pixel ratio changes.
+  window.addEventListener('resize', () => {
+    const d = window.devicePixelRatio || 1;
+    if (S.current === '6' && Math.abs(d - st.dpr) > 0.01) mark(d > st.dpr ? 'zoomin' : 'zoomout');
+    st.dpr = d;
+  });
+  function leave() { if (S.current === '6' && !st.awayAt) st.awayAt = now(); }
+  function back() {
+    if (!st.awayAt) return;
+    const ms = now() - st.awayAt;
+    st.awayAt = 0;
+    if (S.current !== '6' || ms < 300) return;   // shorter is a flicker, not a desktop switch
+    st.awayMs = ms;
+    mark('away');
+    paint6();
+  }
+  window.addEventListener('blur', leave);
+  window.addEventListener('focus', back);
+  document.addEventListener('visibilitychange', () => (document.visibilityState === 'hidden' ? leave() : back()));
+
+  // ---- stage 7: 4.3 layout ----
+
+  function paint7() {
+    const box = $('#s7-messages');
+    box.replaceChildren();
+    if (!st.s7.length) box.append(span('還沒有訊息', 'empty'));
+    for (const text of st.s7) {
+      const b = document.createElement('div');
+      b.className = 'bubble';
+      b.append(span('⏎ 送出', 'meta'), document.createTextNode(text));
+      box.append(b);
+    }
+    box.scrollTop = box.scrollHeight;
+  }
+  $('#s7-input').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    const input = e.currentTarget;
+    const text = input.value.trim();
+    if (!text) { toast('先打一行字，再按 ⏎'); return; }
+    st.s7.push(text);
+    input.value = '';
+    paint7();
+    mark('enter');
+  });
+
+  // ---- start ----
+
+  function paintAll() {
+    paint1(); paint2(); paint3(); paint4(); paint5(); paint6(); paint7();
+    paintSummary();
+    paintBanner(false);
+  }
+  function state() {
+    const stages = {};
+    for (const s of STAGES) {
+      const checks = {};
+      const times = {};
+      for (const c of s.checks) {
+        checks[c.id] = isDone(c.id);
+        if (isDone(c.id)) times[c.id] = Math.round(S.at[c.id]);
+      }
+      stages[s.id] = { name: s.name, done: stageDone(s.id), checks, manual: s.checks.filter((c) => c.manual).map((c) => c.id), times };
+    }
+    return {
+      current: S.current, rec: S.rec, elapsedMs: Math.round(now() - S.t0),
+      total: { done: Object.keys(S.at).length, all: ALL }, manual: MANUAL.slice(), stages,
+    };
+  }
+
+  buildNav();
+  buildChecks();
+  buildSummary();
+  buildList();
+  resetBlocks();
+  setRec(new URLSearchParams(location.search).get('rec') === '1', false);
+  paintAll();
+  if (!go(readHash() || '1')) go('1');
+  setInterval(() => { if (S.current === 'summary') paintElapsed(); }, 1000);
+
+  window.playground = Object.freeze({ state, go, reset });
+})();
+</script>
+</body>
+</html>

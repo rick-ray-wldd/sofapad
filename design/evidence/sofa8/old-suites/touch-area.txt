@@ -1,0 +1,6 @@
+portrait-no-keyboard             visual 844  pad 370×535  usable 175114 px²  (53.2% of visible)  clipped: —
+portrait-keyboard-homescreen     visual 508  pad 370×351  usable 115130 px²  (58.1% of visible)  clipped: —
+portrait-keyboard-safari         visual 464  pad 370×307  usable 100786 px²  (55.7% of visible)  clipped: —
+portrait-keyboard-shortcuts      visual 464  pad 370×307  usable 100786 px²  (55.7% of visible)  clipped: —
+portrait-keyboard-multiline      visual 464  pad 370×285  usable 93614 px²  (51.7% of visible)  clipped: —
+exit 0

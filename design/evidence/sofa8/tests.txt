@@ -1,0 +1,30 @@
+SOFA-8 (4.3.0) tests, 2026-10-30, this Mac (headless Chrome for the browser suites, dry-run Mac: nothing injected)
+
+Unit tests
+  JS  ℹ tests 91
+  JS  ℹ pass 91
+  JS  ℹ fail 0
+  Swift Executed 80 tests, with 0 failures (0 unexpected) in 0.621 (0.628) seconds
+  dist/SofaPad.app --self-test: 31 PASS, SELF-TEST OK (2 skipped: screen locked)
+
+Browser suites from 4.2 and before (logs in old-suites/)
+  v2-browser         41/41 PASS
+  pkm31-keyrow       14/14 PASS
+  pkm4-browser       10/10 PASS
+  sofa6-commit       35/35 PASS
+  sofa6-caret        15/15 PASS
+  pkm31-dictation    7/7 PASS
+  pkm33-send-clear   13/13 PASS
+  touch-area         measurements only (see touch-area.txt)
+
+  Changed on purpose (each marked SOFA-8 in the suite):
+    v2-browser: landscape checks run with the side panel collapsed (‹ = 4.2's full-screen pad); typing in
+      landscape: the box is in the panel beside the pad, pad height 190 (was: a row under the pad, ≥ 120);
+      the keyboard is closed with the panel's ⌄
+    pkm31-keyrow: default key row without ⏎ (moved next to the cursor pad); ⇧ 選取 is an editable key, so the
+      first edited key is at [2]; landscape collapsed first; ✎ at the end of the panel grid; the restored default
+    sofa6-textedit (real injection into TextEdit): not run, the Mac was locked
+
+New suites
+  sofa8-layout       46/46 PASS  (layout-browser.json has every measurement)
+  sofa8-playground   30/30 playground checks ticked (4 by hand on the page), 9 simulated macOS parts listed in playground-dryrun.json

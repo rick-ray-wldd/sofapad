@@ -1,0 +1,170 @@
+{
+ "state": {
+  "current": "summary",
+  "rec": true,
+  "elapsedMs": 219386,
+  "total": {
+   "done": 30,
+   "all": 30
+  },
+  "manual": [
+   "mission",
+   "portrait",
+   "reorder",
+   "landscape"
+  ],
+  "stages": {
+   "1": {
+    "name": "觸控板",
+    "done": true,
+    "checks": {
+     "move": true,
+     "click": true,
+     "rightclick": true,
+     "scroll": true,
+     "drag": true,
+     "draglock": true
+    },
+    "manual": [],
+    "times": {
+     "move": 6751,
+     "click": 25704,
+     "rightclick": 30689,
+     "scroll": 46219,
+     "drag": 58521,
+     "draglock": 64526
+    }
+   },
+   "2": {
+    "name": "打字",
+    "done": true,
+    "checks": {
+     "live": true,
+     "buffer": true,
+     "zhuyin": true,
+     "dictation": true
+    },
+    "manual": [],
+    "times": {
+     "live": 77948,
+     "buffer": 83860,
+     "zhuyin": 93101,
+     "dictation": 100710
+    }
+   },
+   "3": {
+    "name": "送出後自動清空",
+    "done": true,
+    "checks": {
+     "sent1": true,
+     "sent2": true,
+     "clean": true
+    },
+    "manual": [],
+    "times": {
+     "sent1": 117008,
+     "sent2": 118350,
+     "clean": 118350
+    }
+   },
+   "4": {
+    "name": "游標板",
+    "done": true,
+    "checks": {
+     "arrows": true,
+     "word": true,
+     "select": true,
+     "fixed": true
+    },
+    "manual": [],
+    "times": {
+     "arrows": 133301,
+     "word": 133333,
+     "select": 136633,
+     "fixed": 137491
+    }
+   },
+   "5": {
+    "name": "快捷鍵",
+    "done": true,
+    "checks": {
+     "selectall": true,
+     "copy": true,
+     "paste": true,
+     "undo": true,
+     "screenshot": true
+    },
+    "manual": [],
+    "times": {
+     "selectall": 152452,
+     "copy": 152967,
+     "paste": 156039,
+     "undo": 156549,
+     "screenshot": 169984
+    }
+   },
+   "6": {
+    "name": "縮放與桌面",
+    "done": true,
+    "checks": {
+     "zoomin": true,
+     "zoomout": true,
+     "away": true,
+     "mission": true
+    },
+    "manual": [
+     "mission"
+    ],
+    "times": {
+     "zoomin": 178852,
+     "zoomout": 180181,
+     "away": 182767,
+     "mission": 189862
+    }
+   },
+   "7": {
+    "name": "4.3 新排版",
+    "done": true,
+    "checks": {
+     "enter": true,
+     "portrait": true,
+     "reorder": true,
+     "landscape": true
+    },
+    "manual": [
+     "portrait",
+     "reorder",
+     "landscape"
+    ],
+    "times": {
+     "enter": 202198,
+     "portrait": 211665,
+     "reorder": 212966,
+     "landscape": 214235
+    }
+   }
+  }
+ },
+ "simulated": [
+  "⌘C（拷貝「SofaPad 很好用」到模擬剪貼簿）",
+  "⌘V（貼上模擬剪貼簿的「SofaPad 很好用」）",
+  "⌃⇧⌘4：拖一塊範圍截圖",
+  "截圖 258×67 存到剪貼簿",
+  "⌘V（貼上模擬剪貼簿裡的截圖）",
+  "切到右邊的桌面",
+  "回到左邊的桌面（這一頁）",
+  "Mission Control 打開",
+  "Mission Control 收起"
+ ],
+ "macEvents": 3681,
+ "byKind": {
+  "move": 3319,
+  "click": 25,
+  "scroll": 237,
+  "down": 3,
+  "up": 3,
+  "type": 62,
+  "key": 32
+ },
+ "video": "recorded (frames kept outside the repo)"
+}

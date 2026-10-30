@@ -38,7 +38,8 @@ try {
   const padSize = () => page.evaluate(() => { const r = document.getElementById('pad').getBoundingClientRect(); return `${Math.round(r.width)}×${Math.round(r.height)}`; });
   const padBefore = await padSize();
 
-  check('預設：即時、⌘ 快捷鍵、⇧ 選取（4.2 游標板）、esc…⌦，最後是 ✎ 編輯', JSON.stringify(await row()) === JSON.stringify(['即時', '⌘ 快捷鍵', '⇧ 選取', 'esc', 'tab', '⌫', '⏎', '←', '↑', '↓', '→', '⌘', '⌥', '⌃', '⇧', 'space', '⌦', '✎ 編輯']), JSON.stringify(await row()));
+  // SOFA-8 (D-47): ⏎ moved next to the cursor pad in the input row; ⇧ 選取 is the first (editable) key
+  check('預設：即時、⌘ 快捷鍵、⇧ 選取、esc…⌦（⏎ 在輸入列），最後是 ✎ 編輯', JSON.stringify(await row()) === JSON.stringify(['即時', '⌘ 快捷鍵', '⇧ 選取', 'esc', 'tab', '⌫', '←', '↑', '↓', '→', '⌘', '⌥', '⌃', '⇧', 'space', '⌦', '✎ 編輯']), JSON.stringify(await row()));
 
   // open from ✎ at the end of the row (scroll there first, like Ray would)
   await page.evaluate(() => { const s = document.getElementById('keyStrip'); s.scrollLeft = s.scrollWidth; });
@@ -96,7 +97,8 @@ try {
   await page.click('#rowDone');
   await sleep(150);
   const edited = await row();
-  check('按鍵列照編輯的順序：⌘C 在固定鍵後面第一個，esc 不見，最後是 ⌥⌘K 和 ✎', edited[3] === '⌘C' && !edited.includes('esc') && edited.at(-2) === '⌥⌘K' && edited.at(-1) === '✎ 編輯', JSON.stringify(edited));
+  // SOFA-8: the fixed keys are 即時 and ⌘ 快捷鍵 only, so the first edited key is at [2]
+  check('按鍵列照編輯的順序：⌘C 在固定鍵後面第一個，esc 不見，最後是 ⌥⌘K 和 ✎', edited[2] === '⌘C' && !edited.includes('esc') && edited.at(-2) === '⌥⌘K' && edited.at(-1) === '✎ 編輯', JSON.stringify(edited));
   await page.screenshot({ path: join(shotsDir, 'pkm31-keyrow-row-edited.png') });
 
   // use the new buttons
@@ -119,16 +121,18 @@ try {
   await page.setViewportSize({ width: 844, height: 390 });
   await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: INSETS.landscape });
   await sleep(300);
+  // SOFA-8 (D-48): landscape opens with the side panel; collapsed (‹) it is the full-screen pad checked here
+  await page.tap('#sideClose');
+  await sleep(200);
   const padLand = await padSize();
   check('橫拿：觸控板仍是全螢幕（按鍵列改過不影響）', padLand === '844×390', padLand);
   await page.tap('#fabKeyboard');
   await sleep(300);
   const typingPad = await padSize();
-  const rowBox = await page.evaluate(() => { const r = document.getElementById('keyStrip').getBoundingClientRect(); const p = document.getElementById('pad').getBoundingClientRect(); return { rowTop: Math.round(r.top), padBottom: Math.round(p.bottom) }; });
-  check('橫拿打字：按鍵列在觸控板下面，不蓋住觸控板', rowBox.rowTop >= rowBox.padBottom, JSON.stringify({ typingPad, ...rowBox }));
-  await page.evaluate(() => { const s = document.getElementById('keyStrip'); s.scrollLeft = s.scrollWidth; });
-  await sleep(150);
-  await page.tap('#keyStrip .row-edit');
+  const rowBox = await page.evaluate(() => { const r = document.getElementById('keyStrip').getBoundingClientRect(); const p = document.getElementById('pad').getBoundingClientRect(); return { rowRight: Math.round(r.right), rowTop: Math.round(r.top), padLeft: Math.round(p.left), padBottom: Math.round(p.bottom) }; });
+  // SOFA-8: the key row is in the side panel next to the pad now (was: under it)
+  check('橫拿打字：按鍵列在側欄，不蓋住觸控板', rowBox.rowRight <= rowBox.padLeft, JSON.stringify({ typingPad, ...rowBox }));
+  await page.tap('#sideCells .row-edit');   // SOFA-8: in landscape ✎ is at the end of the side panel's grid
   await sleep(250);
   const landOK = await page.evaluate(() => { const c = document.querySelector('#rowSheet .sheet-card').getBoundingClientRect(); return !document.getElementById('rowSheet').hidden && c.width > 600; });
   check('橫拿：編輯畫面打開、用寬版排列', landOK);
@@ -140,7 +144,7 @@ try {
   await page.click('#rowDone');
   await sleep(150);
   const back = await row();
-  check('恢復預設：回到 v2 的按鍵列（自訂快捷鍵本身還在）', back.slice(3, 17).join(' ') === 'esc tab ⌫ ⏎ ← ↑ ↓ → ⌘ ⌥ ⌃ ⇧ space ⌦' && await page.evaluate(() => JSON.parse(localStorage.getItem('pkm.shortcuts') || localStorage.getItem('shortcuts') || '{"items":[]}').items?.length !== 0), JSON.stringify(back));
+  check('恢復預設：回到預設的按鍵列（4.3：⏎ 在輸入列；自訂快捷鍵本身還在）', back.slice(3, 16).join(' ') === 'esc tab ⌫ ← ↑ ↓ → ⌘ ⌥ ⌃ ⇧ space ⌦' && await page.evaluate(() => JSON.parse(localStorage.getItem('pkm.shortcuts') || localStorage.getItem('shortcuts') || '{"items":[]}').items?.length !== 0), JSON.stringify(back));
   await page.setViewportSize({ width: 390, height: 844 });
   await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: INSETS.portrait });
   await sleep(300);

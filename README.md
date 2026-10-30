@@ -79,8 +79,8 @@ macOS requires you to allow any program that presses keys or moves the mouse for
 
 ### 7. Check the version
 
-- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.2.0 (build 2026-10-29 07:30)".
-- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the column of small buttons on the left). The top line reads "Web page 4.2.0 (build …) · Mac app 4.2.0 (build …)".
+- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.3.0 (build 2026-10-30 16:00)".
+- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the side panel's top row, or in the column of small buttons when the panel is closed). The top line reads "Web page 4.3.0 (build …) · Mac app 4.3.0 (build …)".
 - If the two versions differ, or it says "Old version (no version info)": install the new app on the Mac, then reload the page. For the Home Screen app, swipe it away in the app switcher and open it again.
 
 ### 8. Common problems
@@ -160,10 +160,11 @@ First **unlock the Mac**, put on Vision Pro and connect to Mac Virtual Display, 
   - If the Mac is still typing the previous passage (for example, the Mac has Zhuyin turned on, so every passage has to be pasted), text you type in the meantime waits for it to finish and is then sent in one go. It doesn't pile up on the Mac.
   - **When the text box empties** (4.2): pressing Enter, tapping the trackpad (for example, clicking a "Send" button in a Mac app with it), pressing a key or shortcut on the key row, a gesture, the cursor pad, closing the keyboard or switching to another app all mean "this piece is done": anything not sent yet goes to the Mac first, then the box empties, and you start the next piece from an empty box. Old text is never sent again. After Enter, a trackpad tap or a key, the keyboard stays up so you can keep typing. While Zhuyin is still composing, the box isn't emptied; that happens once the chosen characters are sent.
 - **Batch mode**: tap "Live (即時)", the leftmost item below the text box, to switch to "Batch (整段)". Type and edit on the phone first, then tap "Send (送出)" (which also dismisses the keyboard; if Zhuyin is still composing, it waits until the chosen characters are in the box and sends them too). The keyboard's own send key also sends, and keeps the keyboard up. If you close the keyboard without sending, the text stays in the box as a draft. It suits long paragraphs and dictation, and in settings you can choose to press Enter automatically after sending. Switching between Live and Batch does **not** send the text in the box.
-- **Cursor pad** (4.2): "◀ 游標 ▶" to the right of the text box. Hold it for about 0.3 seconds (the phone gives a short buzz), then drag left, right, up or down (your finger can leave the pad): the text cursor on the Mac follows with the arrow keys, at most about 30 presses a second, and stops the moment you lift your finger. A quick flick jumps a word at a time (⌥←→). Tap "⇧ 選取" (Select) on the key row, or tap with a second finger while dragging, to select text with Shift + arrows; type to replace the selection. The iPhone keyboard's own "hold the space bar to move the cursor" only moves the cursor inside the phone's text box, which the Mac never sees, so SofaPad has its own pad.
+- **The text box's row** (4.3): the text box takes half the width. The other half has the cursor pad "◀ 游標 ▶" and ⏎ (Enter) to its right. ⏎ sends what's still waiting, then presses Enter on the Mac, and the keyboard stays up. You can reorder these cells, take them out or add other keys (see "Customize" below).
+- **Cursor pad** (4.2): "◀ 游標 ▶" to the right of the text box. Hold it for about 0.3 seconds (the phone gives a short buzz), then drag left, right, up or down (your finger can leave the pad): the text cursor on the Mac follows with the arrow keys, at most about 30 presses a second, and stops the moment you lift your finger. A quick flick jumps a word at a time (⌥←→). Tap "⇧ 選取" (Select; since 4.3 an ordinary key on the key row that you can move or remove), or tap with a second finger while dragging (works even without the key), to select text with Shift + arrows; type to replace the selection. The iPhone keyboard's own "hold the space bar to move the cursor" only moves the cursor inside the phone's text box, which the Mac never sees, so SofaPad has its own pad.
 - **Text that was already sent isn't sent again**: after you send or press Enter, if the iPhone puts the text you just sent back into the box, SofaPad removes it right away. The phone's input box also has "undo / redo" turned off (shake, three-finger swipe, ⌘Z), because it would bring back text you already sent. To undo on the Mac, use the ⌘Z key on the key row or the shortcut panel.
-- **Key row**: the row under the text box scrolls left and right: Live/Batch, ⌘ Shortcuts, ⇧ 選取 (Select, for the cursor pad), esc, tab, ⌫, ⏎, arrow keys, ⌘ ⌥ ⌃ ⇧, space, ⌦. Keys are sent when you lift your finger, and ⌫ and the arrow keys repeat while held. Tap ⌘ so it lights up, then type c on the phone keyboard, and ⌘C is sent.
-- **Customize the key row**: "Edit (✎ 編輯)" at the end of the key row (or ⚙︎ → "Edit the key row below… (編輯下方按鍵列…)"). Hold ≡ and drag to reorder, and tap ✕ to remove. In the list below, tap an item to add it (common keys, arrows, modifier keys, copy and paste, screenshots, switching, My shortcuts, F1-F12). There's also "+ Add custom button (＋ 新增自訂按鈕)" and "Restore defaults (恢復預設)". It's saved on this phone.
+- **Key row**: the row under the text box scrolls left and right: Live/Batch, ⌘ Shortcuts, then ⇧ 選取 (Select, for the cursor pad), esc, tab, ⌫, arrow keys, ⌘ ⌥ ⌃ ⇧, space, ⌦ (⏎ moved next to the cursor pad in 4.3). Keys are sent when you lift your finger, and ⌫ and the arrow keys repeat while held. Tap ⌘ so it lights up, then type c on the phone keyboard, and ⌘C is sent.
+- **Customize** (4.3): "Edit (✎ 編輯)" at the end of the key row (or ⚙︎ → "Edit the text row and key row… (編輯輸入列和按鍵列…)"). Three tabs: **Text row (輸入列)** (the cells next to the text box, at most 6), **Key row (按鍵列)**, and **Landscape panel (橫拿側欄)** (extra keys shown only in landscape). Hold ≡ and drag to reorder, and tap ✕ to remove. In the list below, tap an item to add it (the cursor pad and ⇧ 選取, common keys, arrows, modifier keys, copy and paste, screenshots, switching, My shortcuts, F1-F12). The cursor pad and ⇧ 選取 exist once each: adding one to another row moves it there. There's also "+ Add custom button (＋ 新增自訂按鈕)" and "Restore all defaults (全部恢復預設)". It's saved on this phone. A key row you customized in 4.2 is kept as it was when you update, with ⇧ 選取 in front where 4.2 had it.
 
 ### Shortcut panel
 
@@ -177,13 +178,15 @@ Open it with "⌘ Shortcuts" on the key row. It covers the trackpad, and ✕ at 
 | Switch | ⌘Tab, ⌘Space, Mission Control, App Exposé, the desktop to the left / right |
 | Other | ⌘S, ⌘F, ⌘T, ⌘W, ⌘[, ⌘], ⌘=, ⌘−, ⌘←, ⌘→, ⌥⌫ |
 
-### Landscape: full-screen trackpad
+### Landscape: trackpad and side panel (4.3)
 
-Turn the phone sideways and the whole screen becomes the trackpad, with the scroll bar on the right. On the left is a column of small buttons: ● connection status (tap to reconnect), Aa brings up the text box and keyboard, ⌘ shortcut panel, the lock icon for drag lock, ⚙︎ settings. For full screen without Safari's address bar, open it from the Home Screen.
+Turn the phone sideways: the trackpad (with the scroll bar on its right edge) takes one side at full height, and a side panel the other: on top ● connection status (tap to reconnect), Aa / ⌄ keyboard, the lock icon for drag lock, ⚙︎ settings and ‹ to close the panel; then the text box with the cursor pad and ⏎; then a grid of keys: the key row, followed by extra shortcuts (⌘C ⌘V ⌘X ⌘Z ⇧⌘Z ⌘A ⌘Tab, Mission Control, the desktop to the left / right, screenshot to the clipboard, ⌘S), which you can change in the "Landscape panel" tab. The panel is on the left; in left-handed mode it's on the right. The trackpad stays at least as wide as in portrait, and while typing it keeps the full height above the keyboard.
+
+‹ closes the panel and the whole screen becomes the trackpad (as in 4.2), with a column of small buttons; › there opens the panel again. While closed, the panel still comes back while you type (it has the text box). For full screen without Safari's address bar, open it from the Home Screen.
 
 ### Settings (⚙︎)
 
-The version is at the top. Then: pointer speed, acceleration, scroll speed, reverse scrolling, left-handed mode, long-press drag, three-finger swipe (on by default), pinch to zoom (on by default), two-finger quick swipe left/right (off by default), haptic feedback, phone autocorrect, edit key row, input log (stored only on the phone, for the developer to debug), and make this phone forget the pairing.
+The version is at the top. Then: pointer speed, acceleration, scroll speed, reverse scrolling, left-handed mode, long-press drag, three-finger swipe (on by default), pinch to zoom (on by default), two-finger quick swipe left/right (off by default), haptic feedback, phone autocorrect, show the side panel in landscape, edit the text row and key row, input log (stored only on the phone, for the developer to debug), and make this phone forget the pairing.
 
 ### Small tips
 
@@ -223,6 +226,10 @@ The version is at the top. Then: pointer speed, acceleration, scroll speed, reve
 | Where's the log file | `~/Library/Logs/SofaPad.log` (when the app is opened from Finder). Each launch records the version and "Network interfaces: …" |
 
 ---
+
+## Showing it to someone (demo page)
+
+[`demo/playground.html`](demo/playground.html) is a practice page for the Mac: open it in a browser (it works offline and collects nothing), then go through it with the phone. Each feature is one stage, and a green tick lights when the page sees it done: trackpad, typing (live, batch, Zhuyin, dictation without doubled text), the box emptying after you send, the cursor pad, shortcuts and a screenshot pasted in, zoom and desktops, and the 4.3 layout. "錄影模式" (recording mode) hides the small print for a video. A scene-by-scene script for a 2–3 minute video and a 60-second one: [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) ([中文](docs/DEMO-SCRIPT.zh-TW.md)).
 
 ## Development
 

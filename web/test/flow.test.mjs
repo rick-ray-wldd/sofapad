@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { LiveTyping } from '../js/textsync.js';
-import { KeyRowStore } from '../js/keyrow.js';
+import { LayoutStore } from '../js/keyrow.js';
 
 function rig() {
   let value = '';
@@ -60,6 +60,6 @@ test('typed while offline: never sent later', () => {
 
 test('a saved key row with the old 🎤 key (or any unknown key) loads without it', () => {
   const store = new Map([['keyrow', JSON.stringify({ version: 1, items: ['k:escape', 'v:mic', 'mic', 'k:voice', 'k:tab'] })]]);
-  const row = new KeyRowStore({ get: (k) => store.get(k) ?? null, set: (k, v) => store.set(k, v) });
-  assert.deepEqual(row.ids, ['k:escape', 'k:tab']);
+  const row = new LayoutStore({ get: (k) => store.get(k) ?? null, set: (k, v) => store.set(k, v) });
+  assert.deepEqual(row.ids('keys'), ['x:select', 'k:escape', 'k:tab']);   // SOFA-8: 4.2's fixed ⇧ 選取 is now the first cell
 });

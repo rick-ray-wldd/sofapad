@@ -16,6 +16,7 @@
   --gap: 8px;
   --vvh: 100dvh;
   --vvtop: 0px;
+  --side-w: clamp(260px, 36vw, 300px);   /* landscape side panel, without the safe area (SOFA-8, D-48) */
   color-scheme: dark;
 }
 
@@ -205,7 +206,7 @@ button:active, button.active { background: var(--key-active); }
 
 .typing { display: flex; gap: var(--gap); }
 #input {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   min-height: 44px;
   max-height: 110px;
@@ -223,9 +224,24 @@ button:active, button.active { background: var(--key-active); }
 #input:focus { outline: none; border-color: var(--accent); }
 .send { padding: 0 16px; background: var(--accent); color: white; font-weight: 600; }
 
-/* Cursor pad (SOFA-6): next to the text box (no height taken from the trackpad, I-13); drags may leave it. */
+/* The input row's cells (SOFA-8): half the row, next to the box. Not a scroller: inside one, the cursor pad's drags
+   came in late and bunched, and a flick no longer jumped words (D-49). Too many cells get narrower instead (≤ 6). */
+.cells {
+  flex: 0 0 calc(50% - var(--gap) / 2);
+  min-width: 0;
+  display: flex;
+  gap: 6px;
+  overflow: clip;
+}
+.cells:empty { display: none; }
+.cells button { flex: 0 1 48px; min-width: 34px; min-height: 44px; padding: 0 4px; font-size: 17px; }
+.cells .caret-select { font-size: 14px; }
+.cells .mod.armed, .side-cells .mod.armed { background: var(--accent); color: white; }
+
+/* Cursor pad (SOFA-6): a cell, by default in the input row (no height taken from the trackpad, I-13); drags may
+   leave it. It takes what its row leaves over. */
 .caret-pad {
-  flex: 0 0 76px;
+  flex: 1 0 76px;
   min-height: 44px;
   border-radius: 12px;
   background: var(--key);
@@ -241,7 +257,8 @@ button:active, button.active { background: var(--key-active); }
 }
 .caret-pad.active { background: var(--accent-soft); color: #cfe0ff; box-shadow: inset 0 0 0 1px var(--accent); }
 .caret-pad.active.selecting { background: rgba(245, 185, 66, 0.16); color: #ffe2a8; box-shadow: inset 0 0 0 1px var(--warn); }
-.keys .caret-select[aria-pressed="true"] { background: var(--warn); color: #1d1d1f; }
+.controls .caret-select[aria-pressed="true"] { background: var(--warn); color: #1d1d1f; }
+.keys .caret-pad { flex: none; width: 116px; min-height: 42px; height: 42px; }
 
 .keys {
   display: flex;
@@ -282,6 +299,10 @@ button:active, button.active { background: var(--key-active); }
 @media (orientation: portrait) {
   #app.typing .bar, #app.typing .buttons, #app.typing .pad-hint { display: none; }
   #app.typing #input { max-height: 66px; }
+  /* Live mode: one line while typing (it scrolls). The half-width box wraps after about 9 characters, and a second line
+     took the pad below I-13's 290 px with Safari's keyboard (285); the text is on the Mac anyway (SOFA-8). 整段 keeps
+     its two lines for editing the draft, as in 4.2. */
+  #app.typing:not(.buffer) #input { max-height: 44px; }
   #app.typing .fab { display: flex; flex-direction: row; top: 8px; left: 8px; }
   #app.typing.lefty .fab { left: auto; right: 8px; }
   #app.typing .fab #fabKeyboard::before { content: "⌄"; }
@@ -290,19 +311,18 @@ button:active, button.active { background: var(--key-active); }
   #app.typing .badge { top: 60px; }
 }
 
-/* ---------- landscape: full-screen trackpad (D-16) ---------- */
+/* ---------- landscape: trackpad + side panel (SOFA-8, D-48); collapsed: full-screen trackpad (D-16) ---------- */
+.side-head, .side-cells { display: none; }
 @media (orientation: landscape) {
   #app { padding: 0; }
   .bar { display: none; }
-  .workspace { padding: 0; gap: 0; }
-  .pad { border-radius: 0; }
-  .pad-hint { left: 64px; right: 64px; }
+  .workspace, #app.kbd .workspace { flex-direction: row; padding: 0; gap: 0; }
+  .pad { border-radius: 0; min-height: 0; }
+  .pad-hint { left: 24px; right: calc(max(8px, env(safe-area-inset-right)) + 56px); }
+  #app.lefty .pad-hint { right: 24px; left: calc(max(8px, env(safe-area-inset-left)) + 56px); }
+  #app.side-closed .pad-hint { left: 64px; right: 64px; }
   .strip { right: max(8px, env(safe-area-inset-right)); top: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
   .lefty .strip { right: auto; left: max(8px, env(safe-area-inset-left)); }
-  .fab { display: flex; flex-direction: column; left: max(8px, env(safe-area-inset-left)); top: 50%; transform: translateY(-50%); }
-  .fab .fab-landscape { display: flex; }
-  .lefty .fab { left: auto; right: max(8px, env(safe-area-inset-right)); }
-  .lefty .pad-hint { left: 64px; right: 64px; }
   .badge { left: 50%; transform: translateX(-50%); }
   .banner {
     position: absolute;
@@ -315,25 +335,50 @@ button:active, button.active { background: var(--key-active); }
     z-index: 6;
     pointer-events: none;
   }
-  /* controls only come back while typing: one row of text box + keys under the pad */
-  .controls { display: none; }
-  #app.typing .controls {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: var(--gap);
-    padding: 6px max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left));
+  /* the side panel: right-handed on the left (where 4.2 had its buttons), 左手模式 on the right */
+  .controls {
+    order: -1;
+    flex: none;
+    width: calc(var(--side-w) + max(8px, env(safe-area-inset-left)) + 8px);
+    min-height: 0;
+    gap: 6px;
+    padding: 6px 8px max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    background: var(--panel);
+    border-right: 1px solid var(--pad-line);
   }
-  #app.typing .buttons { display: none; }
-  #app.typing .typing { flex: 1 1 45%; min-width: 0; }
-  #app.typing .keys-wrap { flex: 1 1 55%; min-width: 0; }
-  #app.typing .caret-pad { flex-basis: 64px; }
-  #app.typing #input { max-height: 44px; }
+  .lefty .controls {
+    order: 1;
+    width: calc(var(--side-w) + max(8px, env(safe-area-inset-right)) + 8px);
+    padding: 6px max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) 8px;
+    border-right: 0;
+    border-left: 1px solid var(--pad-line);
+  }
+  .side-head { display: flex; align-items: center; gap: 6px; flex: none; }
+  .side-head button { width: 42px; height: 36px; border-radius: 10px; font-size: 16px; display: flex; align-items: center; justify-content: center; touch-action: none; }
+  .side-head button[aria-pressed="true"] { background: var(--accent); color: white; }
+  .side-head .fab-status { background: transparent; }
+  #sideKeyboard { font-weight: 600; font-size: 15px; }
+  #app.typing #sideKeyboard { background: var(--accent); color: white; }
+  .buttons { display: none; }
+  .typing { flex: none; }
+  #input { max-height: 44px; padding: 10px; }
+  .cells button { padding: 0 8px; }
+  /* the key row and the side cells: one grid that scrolls up and down */
+  .key-area { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; touch-action: pan-y; scrollbar-width: none; }
+  .key-area::-webkit-scrollbar { display: none; }
+  .keys-wrap::before, .keys-wrap::after { display: none; }
+  .keys, .side-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; overflow: visible; padding: 0; touch-action: pan-y; }
+  .keys button, .side-cells button { min-width: 0; height: 40px; padding: 0 2px; font-size: 15px; white-space: nowrap; overflow: hidden; }
+  .keys .mode, .keys .more, .keys .caret-select, .side-cells .caret-select { grid-column: span 2; }
+  .keys .caret-pad, .side-cells .caret-pad { grid-column: span 2; width: auto; height: 40px; min-height: 40px; }
+  .keys .row-edit { display: none; }
+  .side-cells .row-edit { grid-column: span 2; color: var(--muted); }
+  /* floating buttons only when the panel is collapsed (and not typing: then the panel is back) */
+  #app.side-closed:not(.typing) .fab { display: flex; flex-direction: column; left: max(8px, env(safe-area-inset-left)); top: 50%; transform: translateY(-50%); }
+  .fab .fab-landscape { display: flex; }
+  #app.side-closed.lefty:not(.typing) .fab { left: auto; right: max(8px, env(safe-area-inset-right)); }
+  #app.side-closed:not(.typing) .controls { display: none; }
   #app.typing .pad-hint { display: none; }
-  /* the pad is short now: buttons go in one row at the top instead of a centred column */
-  #app.typing .fab { flex-direction: row; top: 8px; transform: none; }
-  #app.typing .fab .fab-landscape { display: none; }
-  #app.typing .fab #fabKeyboard { background: var(--accent); color: white; }
 }
 #fabKeyboard { font-size: 15px; font-weight: 600; }
 .lefty .strip { right: auto; left: 8px; }
@@ -488,3 +533,7 @@ button:active, button.active { background: var(--key-active); }
   .row-current li { flex: 0 0 auto; }
   .row-current .nm { display: none; }
 }
+/* row editor tabs (SOFA-8): which row the list and the catalog below are for */
+.row-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: #11141a; border-radius: 12px; padding: 4px; }
+.row-tabs button { height: 38px; font-size: 14px; background: transparent; }
+.row-tabs button[aria-selected="true"] { background: var(--accent); color: white; font-weight: 600; }

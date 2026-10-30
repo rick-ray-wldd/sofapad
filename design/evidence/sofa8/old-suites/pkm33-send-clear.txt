@@ -1,0 +1,19 @@
+S1: first ["我在 Orca 說的私人內容，不要外流。"] | box after ghost "" | later ["L"]
+S2: first ["我在 Orca 說的私人內容，不要外流。"] | box after ghost "" | later ["L"]
+S3: first ["我在 Orca 說的私人內容，不要外流。"] | box after ghost "" | later []
+S4: first ["我在 Orca 說的私人內容，不要外流。"] | box after ghost "" | later ["LINE"]
+PASS S1 第一次送出：私人內容送到 Orca 一次
+PASS S1 現在：之後不會再送出私人內容
+PASS S2 第一次送出：私人內容送到 Orca 一次
+PASS S2 現在：之後不會再送出私人內容
+PASS S3 第一次送出：私人內容送到 Orca 一次
+PASS S3 現在：之後不會再送出私人內容
+PASS S4 第一次送出：私人內容送到 Orca 一次
+PASS S4 現在：之後不會再送出私人內容
+PASS S1 現在：送到 LINE 的只有新打的字
+PASS S4 現在：送到 LINE 的只有新訊息
+PASS S1 現在：放回來的字當下就從輸入框拿掉
+PASS S2、S4 現在：悄悄放回來的字，不到 1 秒也從輸入框拿掉
+PASS 短回覆「好的」再打一次照樣送出（不會被誤擋）
+13/13 PASS
+exit 0

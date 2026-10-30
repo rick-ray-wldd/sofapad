@@ -266,6 +266,10 @@ try {
     check('轉向前：拖曳鎖定（送 left down）、整段模式打的字還沒送出', m.filter((x) => x.t === 'down').length === 1 && !m.some((x) => x.t === 'text'), JSON.stringify(m));
 
     await rotate(page, cdp, 'landscape');
+    // SOFA-8 (D-48): landscape opens with the side panel now; ‹ collapses it into the full-screen pad these checks are
+    // about (tools/sofa8-layout.mjs checks the panel itself).
+    await page.tap('#sideClose');
+    await sleep(150);
     const padL = await rect(page, '#pad');
     check('轉橫：觸控板全螢幕 844×390', Math.round(padL.w) === 844 && Math.round(padL.h) === 390, JSON.stringify(padL));
     check('轉橫：其他控制項收起，只剩浮動按鈕列', !(await rect(page, '.controls')).shown && !(await rect(page, '.bar')).shown && (await rect(page, '#fab')).shown);
@@ -280,12 +284,13 @@ try {
     await page.evaluate(() => window.__setKeyboard(200));
     await sleep(200);
     const ctl = await rect(page, '.controls');
-    check('橫拿點「⌨︎」→ 文字框和按鍵列出現在觸控板下方，文字框有焦點、內容還在',
+    // SOFA-8 (D-48): the text box comes back in the side panel next to the pad (was: a row under it)
+    check('橫拿點「⌨︎」→ 側欄（文字框和按鍵）出現在觸控板旁邊，文字框有焦點、內容還在',
       ctl.shown && (await page.evaluate(() => document.activeElement.id)) === 'input' && (await page.inputValue('#input')) === '轉向不能掉字', JSON.stringify(ctl));
     const padLk = await rect(page, '#pad');
-    check('橫拿打字（可視 190 px）：觸控板仍有 ≥ 120 px 高、整個寬度', padLk.h >= 120 && padLk.w >= 840, JSON.stringify(padLk));
-    await shot(page, 'v2-06-landscape-typing', '橫拿打字：觸控板在上，文字框＋按鍵列一列在下，鍵盤在最下面');
-    await page.tap('#fabKeyboard');
+    check('橫拿打字（可視 190 px）：觸控板高度用滿 190（4.2 是 ≥ 120 的整個寬度）、寬 ≥ 370', Math.round(padLk.h) === 190 && padLk.w >= 370, JSON.stringify(padLk));
+    await shot(page, 'v2-06-landscape-typing', '橫拿打字：側欄（文字框＋游標板＋⏎、按鍵格）在左，觸控板在右，鍵盤在最下面');
+    await page.tap('#sideKeyboard');   // SOFA-8: while typing the side panel is back, its ⌄ closes the keyboard
     await page.evaluate(() => window.__setKeyboard(0));
     await sleep(150);
     check('再點一次 → 收鍵盤，回到全螢幕觸控板', Math.round((await rect(page, '#pad')).h) === 390 && !(await rect(page, '.controls')).shown);

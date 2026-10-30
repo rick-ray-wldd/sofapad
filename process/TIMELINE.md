@@ -258,3 +258,18 @@
 | S6-M4 | 真實注入：15:45 Mac 鎖定沒跑；16:00–16:11 被 Siri 浮層擋 4 次（I-45）；16:11 5/6（第 6 項預期寫錯）；16:14 6/6 | 15:45–16:14 | — |
 | S6-M5 | 4.2.0：CHANGELOG、README、INSTALL、release notes、package.sh | 15:46–15:48 | dist/release（不提交） |
 | S6-M6 | 總控推之前發現 zip 的執行檔還有本機路徑（I-47）：build-app.sh 加 dSYM＋strip＋路徑檢查（D-46），重新打包；`--self-test` 33/33；zip 逐位元組掃 0 筆；新的 SHA-256 `4fc968ee…3f0b` | 17:17–17:25 | design/evidence/sofa6/release-zip-scan.txt |
+
+## SOFA-8（SofaPad 4.3，2026-10-30）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S8-M0 | 收到派工（⇧ 選取變一般按鍵、輸入框半寬＋游標板＋固定 Enter、橫拿重新設計、4.3.0）；ACK，估 3.5–4 小時 | 12:01 | — |
+| S8-M1 | 追加 1：示範練習網頁＋錄影腳本（交給 writer 子代理 1 個） | 約 12:05 | — |
+| S8-M2 | 三列共用格子、轉換 4.2 的按鍵列（D-47）；JS 單元測試 91/91 | 12:06–12:12 | web/test/keyrow.test.mjs |
+| S8-M3 | 輸入列放在捲動容器時，4.2 套件的甩動失敗（I-48）→ D-49 | 12:08–12:20 | design/evidence/sofa8/ |
+| S8-M4 | 橫拿側欄（D-48）；tools/sofa8-layout.mjs 45/45 | 12:20–12:34 | design/evidence/sofa8/layout-browser.json |
+| S8-M5 | 4.2 以前的瀏覽器套件跑新網頁：5 個不用改就通過；v2-browser、pkm31-keyrow 裡講舊橫拿版面和舊預設按鍵列的檢查照新設計改（每處標 SOFA-8），之後 41/41、14/14；測試伺服器卡住不結束（I-49） | 12:40–13:00 | design/evidence/sofa8/old-suites/ |
+| S8-M6 | 直拿打字時半寬輸入框換行會讓觸控板低於 290：即時模式只留一行（D-47） | 約 12:58 | touch-area.txt、layout-browser.json |
+| S8-M7 | 示範練習網頁、錄影腳本收到（writer 子代理），審過全部程式；「整段送出」改成半秒內 ≥ 6 字（D-51） | 12:24–12:40 | demo/playground.html |
+| S8-M8 | tools/sofa8-playground.mjs：手機網頁經 dry-run Mac 走完 7 關，30/30；兩支示範影片（screencast.mjs，系統 ffmpeg） | 12:45–13:12 | design/evidence/sofa8/playground-dryrun.json |
+| S8-M9 | 4.3.0：Swift 80/80、JS 91/91、`--self-test` OK；`tools/package.sh` → zip，逐位元組掃描 | 13:12–13:14 | design/evidence/sofa8/release-zip-scan.txt |

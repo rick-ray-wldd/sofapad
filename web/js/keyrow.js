@@ -1,17 +1,35 @@
-// The bottom key row, made editable (PKM-3-1 ②, D-28). No DOM here: what can go on the row, its labels,
-// and the saved order. The row is 即時／整段 and ⌘ 快捷鍵 (always first, not editable), then this list.
+// The phone's editable rows (PKM-3-1 ②, D-28; SOFA-8, D-47). No DOM here: what can go on a row, its labels, and the
+// saved order. Three rows share one list of cells, so a cell can be moved from one row to another:
+//   input   the text box's row: the box takes half the width, these cells the other half (portrait and landscape)
+//   keys    the key row under it, after 即時／整段 and ⌘ 快捷鍵 (always first, not editable); a grid in landscape
+//   side    more cells for the landscape side panel only (shown after the key row there)
 // Item ids stay readable and stable, so a saved row survives app updates:
 //   k:<key>          a key — esc, tab, ⌫, arrows… (key names as in shortcuts.js / pkm-server KeyMap)
 //   m:<mod>          a modifier to arm for the next key (⌘ ⌥ ⌃ ⇧)
 //   c:<mods>+<key>   a key combination, e.g. c:cmd+c (the built-in shortcuts)
 //   u:<id>           one of Ray's own shortcuts (ShortcutStore); dropped if he deletes it
+//   x:caret          the cursor pad (SOFA-6); x:select its ⇧ 選取 switch. One of each, in one row at a time.
 import { BUILTIN_GROUPS, MODIFIERS, comboLabel, keyLabel, ALL_KEYS } from './shortcuts.js';
 
-export const DEFAULT_ROW = [
+export const ROWS = ['input', 'keys', 'side'];
+export const ROW_NAMES = { input: '輸入列', keys: '按鍵列', side: '橫拿側欄' };
+export const DEFAULTS = {
+  input: ['x:caret', 'k:enter'],
+  keys: ['x:select', 'k:escape', 'k:tab', 'k:backspace', 'k:left', 'k:up', 'k:down', 'k:right',
+    'm:cmd', 'm:opt', 'm:ctrl', 'm:shift', 'k:space', 'k:forwarddelete'],
+  side: ['c:cmd+c', 'c:cmd+v', 'c:cmd+x', 'c:cmd+z', 'c:shift,cmd+z', 'c:cmd+a',
+    'c:cmd+tab', 'c:ctrl+up', 'c:ctrl+left', 'c:ctrl+right', 'c:ctrl,shift,cmd+4', 'c:cmd+s'],
+};
+/** The key row up to 4.2 (saved as `keyrow`, version 1); ⇧ 選取 was fixed in front of it. */
+export const V1_DEFAULT_ROW = [
   'k:escape', 'k:tab', 'k:backspace', 'k:enter', 'k:left', 'k:up', 'k:down', 'k:right',
   'm:cmd', 'm:opt', 'm:ctrl', 'm:shift', 'k:space', 'k:forwarddelete',
 ];
 export const MAX_ROW = 40;
+/** The input row shares its line with the text box: more than this and the cells get too narrow to hit. */
+export const MAX_CELLS = { input: 6, keys: MAX_ROW, side: MAX_ROW };
+/** Cells that exist once: adding one to a row takes it out of the row it was in. */
+export const SINGLE = new Set(['x:caret', 'x:select']);
 /** Keys that repeat while held (PKM-2-3). */
 export const REPEAT_KEYS = new Set(['backspace', 'forwarddelete', 'left', 'right', 'up', 'down']);
 
@@ -19,6 +37,10 @@ const ROW_LABELS = { escape: 'esc', tab: 'tab', space: 'space', enter: '⏎' };
 const KEY_NAMES = {
   escape: 'Esc', tab: 'Tab', backspace: '刪除（⌫）', enter: 'Enter（⏎）', space: '空白', forwarddelete: '往後刪（⌦）',
   left: '左', right: '右', up: '上', down: '下', home: 'Home', end: 'End', pageup: '上一頁', pagedown: '下一頁',
+};
+const SPECIAL = {
+  'x:caret': { kind: 'caret', label: '◀ 游標 ▶', name: '游標板（按住再拖）' },
+  'x:select': { kind: 'select', label: '⇧ 選取', name: '游標板改成選取' },
 };
 const MOD_IDS = MODIFIERS.map((m) => m.id);
 
@@ -29,10 +51,11 @@ export function comboId(key, mods = []) {
 
 /**
  * What an id means, or null when it cannot be shown (unknown key, deleted custom shortcut).
- * @returns {{id, kind:'key'|'mod'|'combo'|'custom', label, name, k?, mods?, mod?, repeat?}|null}
+ * @returns {{id, kind:'key'|'mod'|'combo'|'custom'|'caret'|'select', label, name, k?, mods?, mod?, repeat?}|null}
  */
 export function describe(id, customItems = []) {
   if (typeof id !== 'string') return null;
+  if (SPECIAL[id]) return { id, ...SPECIAL[id] };
   if (id.startsWith('k:')) {
     const k = id.slice(2);
     if (!ALL_KEYS.includes(k)) return null;
@@ -57,10 +80,11 @@ export function describe(id, customItems = []) {
   return null;
 }
 
-/** The reference list in the editor: everything that can go on the row, grouped. */
+/** The reference list in the editor: everything that can go on a row, grouped. */
 export function catalog(customItems = []) {
   const keys = (list) => list.map((k) => `k:${k}`);
   const groups = [
+    { id: 'caret', label: '游標板', ids: ['x:caret', 'x:select'] },
     { id: 'keys', label: '常用按鍵', ids: keys(['escape', 'tab', 'backspace', 'enter', 'space', 'forwarddelete']) },
     { id: 'arrows', label: '方向和翻頁', ids: keys(['left', 'up', 'down', 'right', 'home', 'end', 'pageup', 'pagedown']) },
     { id: 'mods', label: '修飾鍵（先按，再按下一個鍵）', ids: MOD_IDS.slice().reverse().map((m) => `m:${m}`) },
@@ -71,9 +95,16 @@ export function catalog(customItems = []) {
   return groups.map((g) => ({ ...g, items: g.ids.map((id) => describe(id, customItems)).filter(Boolean) }));
 }
 
-/** The saved row (`store` is the page's localStorage wrapper). */
-export class KeyRowStore {
-  constructor(store, customItems = () => [], key = 'keyrow') {
+const copyDefaults = () => Object.fromEntries(ROWS.map((r) => [r, DEFAULTS[r].slice()]));
+
+/**
+ * The saved rows (`store` is the page's localStorage wrapper), as `layout` version 2. A phone that still has 4.2's
+ * `keyrow` (version 1) is converted once: an untouched row becomes the new default; an edited one keeps every key in
+ * its order, with ⇧ 選取 in front where 4.2 had it fixed, and gets the default input and side rows. `keyrow` itself
+ * is left as it was, so going back to 4.2 still finds it.
+ */
+export class LayoutStore {
+  constructor(store, customItems = () => [], key = 'layout') {
     this.store = store;
     this.customItems = customItems;
     this.key = key;
@@ -81,69 +112,101 @@ export class KeyRowStore {
   }
 
   load() {
-    let data = null;
-    try { data = JSON.parse(this.store.get(this.key) || 'null'); } catch { data = null; }
-    const list = data && Array.isArray(data.items) ? data.items : null;
-    this.ids = list ? this.clean(list) : DEFAULT_ROW.slice();
+    const read = (k) => { try { return JSON.parse(this.store.get(k) || 'null'); } catch { return null; } };
+    const data = read(this.key);
+    this.migrated = false;
+    if (data && data.version === 2) {
+      this.rows = this.clean(Object.fromEntries(ROWS.map((r) => [r, Array.isArray(data[r]) ? data[r] : DEFAULTS[r]])));
+      return;
+    }
+    const v1 = read('keyrow');
+    if (v1 && Array.isArray(v1.items)) {
+      const kept = this.cleanRow(v1.items.filter((id) => !SINGLE.has(id)));
+      const untouched = kept.join() === V1_DEFAULT_ROW.join();
+      this.rows = untouched ? copyDefaults() : this.clean({ ...copyDefaults(), keys: ['x:select', ...kept] });
+      this.migrated = untouched ? 'default' : 'kept';
+      this.save();
+      return;
+    }
+    this.rows = copyDefaults();
   }
 
-  clean(list) {
+  cleanRow(list, taken = new Set()) {
     const seen = new Set();
-    return list.filter((id) => !seen.has(id) && seen.add(id) && describe(id, this.customItems())).slice(0, MAX_ROW);
+    return list.filter((id) => {
+      if (seen.has(id) || taken.has(id) || !describe(id, this.customItems())) return false;
+      seen.add(id);
+      if (SINGLE.has(id)) taken.add(id);
+      return true;
+    });
+  }
+
+  /** Unknown and repeated ids out; a single cell stays in the first row that has it. */
+  clean(rows) {
+    const taken = new Set();
+    return Object.fromEntries(ROWS.map((r) => [r, this.cleanRow(rows[r] || [], taken).slice(0, MAX_CELLS[r])]));
   }
 
   save() {
-    this.store.set(this.key, JSON.stringify({ version: 1, items: this.ids }));
+    this.store.set(this.key, JSON.stringify({ version: 2, ...this.rows }));
   }
 
   /** Drops ids that no longer mean anything (a custom shortcut deleted since). */
   prune() {
-    const c = this.clean(this.ids);
-    if (c.join() !== this.ids.join()) { this.ids = c; this.save(); }
+    const c = this.clean(this.rows);
+    if (ROWS.some((r) => c[r].join() !== this.rows[r].join())) { this.rows = c; this.save(); }
   }
 
-  /** The buttons to draw (a deleted custom shortcut disappears from the row). */
-  items() {
-    return this.ids.map((id) => describe(id, this.customItems())).filter(Boolean);
+  ids(row) { return this.rows[row]; }
+
+  /** The cells to draw (a deleted custom shortcut disappears from the row). */
+  items(row) {
+    return this.rows[row].map((id) => describe(id, this.customItems())).filter(Boolean);
   }
 
-  has(id) { return this.ids.includes(id); }
+  has(row, id) { return this.rows[row].includes(id); }
 
-  /** @returns true, or a reason it was not added */
-  add(id) {
-    if (this.ids.includes(id)) return '已經在按鍵列上';
+  /** The row a cell is in (the first one, for keys that are in several), or null. */
+  where(id) { return ROWS.find((r) => this.rows[r].includes(id)) || null; }
+
+  /** @returns true, or a reason it was not added. A single cell moves here from the row it was in. */
+  add(row, id) {
+    if (this.rows[row].includes(id)) return `已經在${ROW_NAMES[row]}上`;
     if (!describe(id, this.customItems())) return '這個按鍵不能用';
-    if (this.ids.length >= MAX_ROW) return `按鍵列最多 ${MAX_ROW} 個`;
-    this.ids.push(id);
+    if (this.rows[row].length >= MAX_CELLS[row]) return `${ROW_NAMES[row]}最多 ${MAX_CELLS[row]} 個`;
+    if (SINGLE.has(id)) for (const r of ROWS) this.rows[r] = this.rows[r].filter((x) => x !== id);
+    this.rows[row].push(id);
     this.save();
     return true;
   }
 
-  remove(id) {
-    this.ids = this.ids.filter((x) => x !== id);
+  remove(row, id) {
+    this.rows[row] = this.rows[row].filter((x) => x !== id);
     this.save();
   }
 
   /** Moves the item at `from` to position `to` (drag and drop). */
-  moveTo(from, to) {
-    if (from < 0 || from >= this.ids.length || to < 0 || to >= this.ids.length || from === to) return false;
-    const [id] = this.ids.splice(from, 1);
-    this.ids.splice(to, 0, id);
+  moveTo(row, from, to) {
+    const ids = this.rows[row];
+    if (from < 0 || from >= ids.length || to < 0 || to >= ids.length || from === to) return false;
+    const [id] = ids.splice(from, 1);
+    ids.splice(to, 0, id);
     this.save();
     return true;
   }
 
-  move(id, delta) {
-    const i = this.ids.indexOf(id);
-    return this.moveTo(i, i + delta);
+  move(row, id, delta) {
+    const i = this.rows[row].indexOf(id);
+    return this.moveTo(row, i, i + delta);
   }
 
+  /** All three rows back to the default. */
   reset() {
-    this.ids = DEFAULT_ROW.slice();
+    this.rows = copyDefaults();
     this.save();
   }
 
   isDefault() {
-    return this.ids.join() === DEFAULT_ROW.join();
+    return ROWS.every((r) => this.rows[r].join() === DEFAULTS[r].join());
   }
 }

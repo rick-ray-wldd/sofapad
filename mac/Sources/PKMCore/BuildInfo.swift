@@ -4,7 +4,7 @@ import Foundation
 /// The app bundle carries both in Info.plist (tools/build-app.sh); a build run from the source tree says "dev".
 public enum BuildInfo {
     /// Same as the VERSION file and web/js/version.js (a test checks they agree).
-    public static let sourceVersion = "4.2.0"
+    public static let sourceVersion = "4.3.0"
 
     public static var version: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? sourceVersion

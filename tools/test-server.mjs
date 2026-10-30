@@ -30,7 +30,14 @@ export async function startServer({ webRoot = join(ROOT, 'web'), env = {} } = {}
     log: () => log,
     pause: () => proc.kill('SIGSTOP'),    // the Mac stops answering (half-open connection), PKM-4
     resume: () => proc.kill('SIGCONT'),
-    stop: () => new Promise((r) => { if (proc.exitCode != null) return r(); proc.once('exit', r); proc.kill('SIGCONT'); proc.kill('SIGTERM'); }),
+    // SOFA-8 (I-49): now and then the server does not exit on SIGTERM and the suite hung here; 3 s later it is killed
+    stop: () => new Promise((r) => {
+      if (proc.exitCode != null || proc.signalCode != null) return r();
+      proc.once('exit', r);
+      proc.kill('SIGCONT');
+      proc.kill('SIGTERM');
+      setTimeout(() => { if (proc.exitCode == null && proc.signalCode == null) proc.kill('SIGKILL'); }, 3000).unref();
+    }),
   };
 }
 

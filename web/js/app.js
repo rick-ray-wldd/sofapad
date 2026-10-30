@@ -3,7 +3,7 @@ import { Link } from './connection.js';
 import { TrackpadGestures, Momentum, MoveCoalescer } from './pointer.js';
 import { LiveTyping, InputLog, ClearedTextGuard, shortcutFromInsert } from './textsync.js';
 import { CaretPad } from './caret.js';
-import { KeyRowStore, catalog } from './keyrow.js';
+import { LayoutStore, ROWS, ROW_NAMES, catalog } from './keyrow.js';
 import { VERSION, BUILD } from './version.js';
 import { BUILTIN_GROUPS, KEY_GROUPS, MODIFIERS, ShortcutStore, comboLabel, keyLabel, gestureShortcut, hotkeyHint, macStatusText } from './shortcuts.js';
 
@@ -100,7 +100,7 @@ const store = {
 const DEFAULTS = {
   sens: 1.5, accel: 0.6, scroll: 1.0, reverse: false, lefty: false, longPress: true,
   hapticsOn: true, autocorrect: false, enterAfter: false, mode: 'live',
-  threeFinger: true, pinch: true, navFlick: false,
+  threeFinger: true, pinch: true, navFlick: false, sidePanel: true,
 };
 let settings = { ...DEFAULTS };
 try { settings = { ...DEFAULTS, ...JSON.parse(store.get('settings') || '{}') }; } catch { /* defaults */ }
@@ -186,6 +186,7 @@ function renderBanner() {
 function onState(state, info) {
   dot.className = 'dot ' + (state === 'ready' ? 'ready' : state === 'offline' ? '' : 'connecting');
   $('fabDot').className = dot.className;
+  $('sideDot').className = dot.className;
   if (state === 'ready') {
     hostEl.textContent = info.host || link.host || 'Mac';
     renderVersion();
@@ -565,8 +566,10 @@ function setDragLock(on, notify = true) {
   dragLocked = on;
   btnLock.setAttribute('aria-pressed', String(on));
   btnLock.textContent = on ? '放開' : '拖曳鎖定';
-  $('fabLock').setAttribute('aria-pressed', String(on));
-  $('fabLock').textContent = on ? '放' : '鎖';
+  for (const id of ['fabLock', 'sideLock']) {
+    $(id).setAttribute('aria-pressed', String(on));
+    $(id).textContent = on ? '放' : '鎖';
+  }
   dragBadge.hidden = !on;
   pad.classList.toggle('dragging', on);
   if (notify) link.send({ t: on ? 'down' : 'up', b: 'left' });
@@ -574,6 +577,7 @@ function setDragLock(on, notify = true) {
 }
 tap(btnLock, () => setDragLock(!dragLocked));
 tap($('fabLock'), () => setDragLock(!dragLocked));
+tap($('sideLock'), () => setDragLock(!dragLocked));
 
 /** Connection lost or page hidden: forget local "held" state (the Mac side releases on its own). */
 function releaseLocalState() {
@@ -590,7 +594,7 @@ const armed = new Set();
 function armedList() { return Array.from(armed); }
 function clearArmed() {
   armed.clear();
-  for (const b of document.querySelectorAll('.keys .mod')) b.classList.remove('armed');
+  for (const b of document.querySelectorAll('.controls [data-mod]')) b.classList.remove('armed');
 }
 
 function sendKey(k, mods = []) {
@@ -605,7 +609,7 @@ function bindModButton(b) {
   stripButton(b, { onTap: () => {
     const m = b.dataset.mod;
     if (armed.has(m)) armed.delete(m); else armed.add(m);
-    b.classList.toggle('armed', armed.has(m));
+    for (const x of document.querySelectorAll(`.controls [data-mod="${m}"]`)) x.classList.toggle('armed', armed.has(m));
     haptic();
   } });
 }
@@ -631,63 +635,98 @@ function updateKeysHint() {
 keyStrip.addEventListener('scroll', updateKeysHint, { passive: true });
 if (window.ResizeObserver) new ResizeObserver(updateKeysHint).observe(keyStrip);
 
-// The key row (PKM-3-1 ②, D-28): 即時／整段 and ⌘ 快捷鍵 stay first; the rest is Ray's saved list; ✎ edits it.
+// The rows (PKM-3-1 ②, D-28; SOFA-8, D-47): the input row's cells next to the box, the key row (即時／整段 and
+// ⌘ 快捷鍵 stay first, ✎ edits) and, in landscape, the side panel's extra cells. All three come from the saved layout;
+// the cursor pad and ⇧ 選取 are cells too, so they can be moved or taken out like any key.
 const customShortcuts = new ShortcutStore(store);
-const keyRow = new KeyRowStore(store, () => customShortcuts.items);
-function renderKeyRow() {
-  keyRow.prune();
-  for (const b of keyStrip.querySelectorAll('.row-item, .row-edit')) b.remove();
-  for (const it of keyRow.items()) {
-    const b = document.createElement('button');
-    b.className = 'row-item';
-    b.textContent = it.label;
-    b.title = it.name;
-    b.dataset.id = it.id;
-    if (it.kind === 'mod') {
-      b.dataset.mod = it.mod;
-      b.classList.add('mod');
-      b.classList.toggle('armed', armed.has(it.mod));
-      bindModButton(b);
-    } else {
-      b.dataset.k = it.k;
-      if (it.mods.length) b.dataset.mods = it.mods.join(',');
-      if (it.repeat) b.setAttribute('data-repeat', '');
-      bindKeyButton(b);
-    }
-    keyStrip.append(b);
+const layout = new LayoutStore(store, () => customShortcuts.items);
+const inputCells = $('inputCells');
+const sideCells = $('sideCells');
+function cellButton(it) {
+  const b = document.createElement('button');
+  b.className = 'row-item';
+  b.textContent = it.label;
+  b.title = it.name;
+  b.dataset.id = it.id;
+  if (it.kind === 'select') {
+    // ⇧ 選取 (SOFA-6): the cursor pad selects (Shift + arrows) until it is pressed again
+    b.id = 'caretSelect';
+    b.classList.add('caret-select');
+    b.setAttribute('aria-label', '游標板改成選取（Shift）');
+    b.setAttribute('aria-pressed', String(caretPad.sticky));
+    stripButton(b, { onTap: () => { caretPad.setSelect(!caretPad.sticky); haptic(); renderCaret(); } });
+  } else if (it.kind === 'mod') {
+    b.dataset.mod = it.mod;
+    b.classList.add('mod');
+    b.classList.toggle('armed', armed.has(it.mod));
+    bindModButton(b);
+  } else {
+    b.dataset.k = it.k;
+    if (it.mods.length) b.dataset.mods = it.mods.join(',');
+    if (it.repeat) b.setAttribute('data-repeat', '');
+    bindKeyButton(b);
   }
+  return b;
+}
+function fillRow(container, row) {
+  for (const it of layout.items(row)) container.append(it.kind === 'caret' ? caretPadEl : cellButton(it));
+}
+function editButton() {
   const edit = document.createElement('button');
   edit.className = 'row-edit';
   edit.textContent = '✎ 編輯';
-  edit.setAttribute('aria-label', '編輯按鍵列');
-  stripButton(edit, { onTap: openRowEditor });
-  keyStrip.append(edit);
+  edit.setAttribute('aria-label', '編輯輸入列和按鍵列');
+  stripButton(edit, { onTap: () => openRowEditor('keys') });
+  return edit;
+}
+function renderRows() {
+  layout.prune();
+  // the cursor pad is one element, moved to the row it is in; taken out of every row, a drag on it ends
+  if (!layout.where('x:caret')) { caretTouch = null; caretPad.end(); caretPadEl.remove(); }
+  if (!layout.where('x:select') && caretPad.sticky) caretPad.setSelect(false);
+  inputCells.textContent = '';
+  fillRow(inputCells, 'input');
+  for (const b of keyStrip.querySelectorAll('.row-item, .row-edit')) b.remove();
+  fillRow(keyStrip, 'keys');
+  keyStrip.append(editButton());
+  sideCells.textContent = '';
+  fillRow(sideCells, 'side');
+  sideCells.append(editButton());
+  renderCaret();
   updateKeysHint();
 }
-renderKeyRow();
 
-// ---------- key row editor ----------
+// ---------- row editor ----------
 const rowSheet = $('rowSheet');
 const rowCurrent = $('rowCurrent');
 const rowCatalog = $('rowCatalog');
 let rowAddCustomPending = false;
+let editRow = 'keys';
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const ROW_NOTES = {
+  input: '輸入框右邊的格子（直拿、橫拿都一樣）：輸入框佔一半寬，這些格子分另一半。',
+  keys: '輸入框下面的按鍵列（橫拿時在側欄排成格子）。「即時／整段」和「⌘ 快捷鍵」固定在最前面。',
+  side: '只在橫拿的側欄出現，排在按鍵列後面。',
+};
 
-function openRowEditor() {
+function openRowEditor(row = 'keys') {
   input.blur();
+  editRow = row;
   $('rowMsg').textContent = '';
   renderRowEditor();
   rowSheet.hidden = false;
 }
 function rowChanged(msg) {
   renderRowEditor();
-  renderKeyRow();
+  renderRows();
   if (msg != null) $('rowMsg').textContent = msg;
 }
 function renderRowEditor() {
-  keyRow.prune();
+  layout.prune();
+  for (const t of $('rowTabs').querySelectorAll('[data-row]')) t.setAttribute('aria-selected', String(t.dataset.row === editRow));
+  $('rowNote').textContent = `${ROW_NOTES[editRow]}按住 ≡ 拖曳調順序，✕ 移除；下面的清單點一下加到最後（再點一下拿掉）。「◀ 游標 ▶」和「⇧ 選取」各只有一個，加到別的列會從原來的列移過去。`;
   rowCurrent.textContent = '';
-  const items = keyRow.items();
+  const items = layout.items(editRow);
   items.forEach((it, i) => {
     const li = el('li');
     li.dataset.id = it.id;
@@ -702,9 +741,9 @@ function renderRowEditor() {
       return b;
     };
     li.append(handle, el('span', 'lbl', it.label), el('span', 'nm', it.name),
-      small('↑', '往前移', () => { keyRow.move(it.id, -1); rowChanged(''); }, i === 0),
-      small('↓', '往後移', () => { keyRow.move(it.id, 1); rowChanged(''); }, i === items.length - 1),
-      small('✕', '移除', () => { keyRow.remove(it.id); rowChanged(`已移除 ${it.label}`); }, false));
+      small('↑', '往前移', () => { layout.move(editRow, it.id, -1); rowChanged(''); }, i === 0),
+      small('↓', '往後移', () => { layout.move(editRow, it.id, 1); rowChanged(''); }, i === items.length - 1),
+      small('✕', '移除', () => { layout.remove(editRow, it.id); rowChanged(`已從${ROW_NAMES[editRow]}移除 ${it.label}`); }, false));
     rowCurrent.append(li);
   });
   if (!items.length) rowCurrent.append(el('li', 'empty', '（空的：從下面的清單點選要放的鍵）'));
@@ -716,18 +755,25 @@ function renderRowEditor() {
       const b = el('button');
       b.type = 'button';
       b.dataset.id = it.id;
-      b.setAttribute('aria-pressed', String(keyRow.has(it.id)));
+      b.setAttribute('aria-pressed', String(layout.has(editRow, it.id)));
       b.append(document.createTextNode(it.label));
-      if (it.name !== it.label) b.append(el('small', '', it.name));
+      const elsewhere = it.id.startsWith('x:') && layout.where(it.id) && layout.where(it.id) !== editRow ? layout.where(it.id) : null;
+      if (it.name !== it.label || elsewhere) b.append(el('small', '', elsewhere ? `在${ROW_NAMES[elsewhere]}` : it.name));
       b.addEventListener('click', () => {
-        if (keyRow.has(it.id)) { keyRow.remove(it.id); rowChanged(`已移除 ${it.label}`); return; }
-        const r = keyRow.add(it.id);
-        rowChanged(r === true ? `已加到最後：${it.label}（${it.name}）` : r);
+        if (layout.has(editRow, it.id)) { layout.remove(editRow, it.id); rowChanged(`已從${ROW_NAMES[editRow]}移除 ${it.label}`); return; }
+        const from = layout.where(it.id);
+        const r = layout.add(editRow, it.id);
+        rowChanged(r !== true ? r : it.id.startsWith('x:') && from
+          ? `${it.label} 從${ROW_NAMES[from]}移到${ROW_NAMES[editRow]}最後`
+          : `已加到${ROW_NAMES[editRow]}最後：${it.label}（${it.name}）`);
       });
       chips.append(b);
     }
     rowCatalog.append(el('h3', '', g.label), chips);
   }
+}
+for (const t of $('rowTabs').querySelectorAll('[data-row]')) {
+  t.addEventListener('click', () => { editRow = t.dataset.row; $('rowMsg').textContent = ''; renderRowEditor(); });
 }
 // Drag ≡ to reorder: the item jumps to the place nearest the finger (works for the list and the wrapped
 // landscape layout alike).
@@ -756,8 +802,8 @@ rowCurrent.addEventListener('pointermove', (e) => {
     const d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
     if (d < bestD) { bestD = d; best = i; }
   });
-  const from = keyRow.ids.indexOf(rowDrag.id);
-  if (best >= 0 && keyRow.moveTo(from, best)) {
+  const from = layout.ids(editRow).indexOf(rowDrag.id);
+  if (best >= 0 && layout.moveTo(editRow, from, best)) {
     renderRowEditor();
     const moved = [...rowCurrent.querySelectorAll('li[data-id]')].find((li) => li.dataset.id === rowDrag.id);
     if (moved) moved.classList.add('dragging');
@@ -767,8 +813,8 @@ const endRowDrag = () => { if (!rowDrag) return; rowDrag = null; rowChanged('');
 rowCurrent.addEventListener('pointerup', endRowDrag);
 rowCurrent.addEventListener('pointercancel', endRowDrag);
 $('rowDone').addEventListener('click', () => { rowSheet.hidden = true; });
-$('rowReset').addEventListener('click', () => { keyRow.reset(); rowChanged(`已恢復預設（${keyRow.ids.length} 個鍵）`); });
-$('rowEditBtn').addEventListener('click', () => { $('settingsSheet').hidden = true; openRowEditor(); });
+$('rowReset').addEventListener('click', () => { layout.reset(); rowChanged('已恢復預設（輸入列、按鍵列、橫拿側欄）'); });
+$('rowEditBtn').addEventListener('click', () => { $('settingsSheet').hidden = true; openRowEditor('input'); });
 
 // ---------- shortcut panel (built-in + "我的") and the custom shortcut editor ----------
 const panel = $('shortcutPanel');
@@ -887,9 +933,9 @@ form.addEventListener('submit', (e) => {
   if (rowAddCustomPending && wasNew) {
     // came from the key row editor's「＋ 新增自訂按鈕」: put it on the row and go back there
     rowAddCustomPending = false;
-    keyRow.add(`u:${r.id}`);
+    layout.add(editRow, `u:${r.id}`);
     editorSheet.hidden = true;
-    rowChanged(`已新增並加到按鍵列：${comboLabel(r)}（${r.label}）`);
+    rowChanged(`已新增並加到${ROW_NAMES[editRow]}：${comboLabel(r)}（${r.label}）`);
   }
 });
 $('scCancel').addEventListener('click', () => {
@@ -931,7 +977,7 @@ function renderCustomList() {
     customList.append(li);
   });
   if (!panel.hidden) renderPanel();
-  renderKeyRow();                       // a renamed or deleted custom shortcut changes the row too
+  renderRows();                         // a renamed or deleted custom shortcut changes the rows too
   if (!rowSheet.hidden) renderRowEditor();
 }
 
@@ -985,10 +1031,22 @@ function fabKeyboard(e) {
   updateLayout();
 }
 // touchend (not touchstart): iOS only opens the keyboard for focus() inside a user-activation event.
-$('fabKeyboard').addEventListener('touchend', fabKeyboard, { passive: false });
-$('fabKeyboard').addEventListener('click', (e) => { if (e.detail === 0 || !('ontouchstart' in window)) fabKeyboard(e); });
-tap($('fabStatus'), () => { bannerState.replaced = false; link.reconnectNow(); });
-$('fabSettings').addEventListener('click', () => $('settingsBtn').click());
+for (const id of ['fabKeyboard', 'sideKeyboard']) {
+  $(id).addEventListener('touchend', fabKeyboard, { passive: false });
+  $(id).addEventListener('click', (e) => { if (e.detail === 0 || !('ontouchstart' in window)) fabKeyboard(e); });
+}
+for (const id of ['fabStatus', 'sideStatus']) tap($(id), () => { bannerState.replaced = false; link.reconnectNow(); });
+for (const id of ['fabSettings', 'sideSettings']) $(id).addEventListener('click', () => $('settingsBtn').click());
+// Landscape side panel (SOFA-8, D-48): ‹ collapses it (full-screen pad, as in 4.2), › on the floating buttons opens it.
+// Collapsed, it still comes back while typing, since it has the text box.
+function setSidePanel(open) {
+  settings.sidePanel = open;
+  saveSettings();
+  applyAll();
+  haptic();
+}
+tap($('sideClose'), () => setSidePanel(false));
+tap($('fabSide'), () => setSidePanel(true));
 const fsEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled;
 if (fsEnabled) {
   // Only where the Fullscreen API really works (Android, iPad); iPhone Safari has none (D-16, S-109).
@@ -1021,12 +1079,13 @@ function stalled() {
 function applyTypingSettings() {
   const live = settings.mode === 'live';
   modeBtn.textContent = live ? '即時' : '整段';
+  appEl.classList.toggle('buffer', !live);
   sendBtn.hidden = live;
   input.setAttribute('autocorrect', settings.autocorrect ? 'on' : 'off');
   input.setAttribute('autocomplete', settings.autocorrect ? 'on' : 'off');
   input.setAttribute('enterkeyhint', live ? 'enter' : 'send');
-  // short enough for one line next to the cursor pad (a wrapped placeholder makes the box, and the page, taller)
-  input.placeholder = live ? '點這裡打字，直接打到 Mac' : '打完整段再按「送出」';
+  // short enough for one line in the half-width box (a wrapped placeholder makes the box, and the page, taller)
+  input.placeholder = live ? '點這裡打字' : '打完按送出';
 }
 
 function autosize() {
@@ -1264,15 +1323,21 @@ tap(sendBtn, () => {
 // iOS's own space-bar cursor only moves the cursor inside the phone's box, which the Mac never sees: this pad moves the
 // Mac's text cursor with arrow keys instead (js/caret.js). Starting it ends the typed piece first (commitLive), like
 // any other key. Each press is one unacked `caret` message (at most 30 a second; the Mac only takes ←→↑↓ with ⇧ / ⌥).
-const caretPadEl = $('caretPad');
-const caretLabel = $('caretLabel');
-const caretSelectBtn = $('caretSelect');
+// SOFA-8: one element, put by renderRows() into the row that has the `x:caret` cell (by default the input row, ⏎ to its right).
+const caretPadEl = document.createElement('div');
+caretPadEl.id = 'caretPad';
+caretPadEl.className = 'caret-pad';
+caretPadEl.setAttribute('role', 'slider');
+caretPadEl.setAttribute('aria-label', '游標板：按住再拖曳，移動 Mac 上的文字游標');
+const caretLabel = document.createElement('span');
+caretLabel.id = 'caretLabel';
+caretPadEl.append(caretLabel);
 const CARET_IDLE = '◀ 游標 ▶';
 function renderCaret() {
   const on = caretPad.active;
   caretPadEl.classList.toggle('active', on);
   caretPadEl.classList.toggle('selecting', caretPad.selecting);
-  caretSelectBtn.setAttribute('aria-pressed', String(caretPad.sticky));
+  $('caretSelect')?.setAttribute('aria-pressed', String(caretPad.sticky));
   caretLabel.textContent = !on ? (caretPad.sticky ? '◀ 選取 ▶' : CARET_IDLE) : caretPad.selecting ? '⇧ 選取中' : '移動中';
 }
 const caretPad = new CaretPad({
@@ -1322,8 +1387,9 @@ for (const type of ['touchmove', 'touchend', 'touchcancel']) {
   }, { capture: true, passive: false });
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) { caretTouch = null; caretPad.end(); } });
-stripButton(caretSelectBtn, { onTap: () => { caretPad.setSelect(!caretPad.sticky); haptic(); renderCaret(); } });
-renderCaret();
+renderRows();
+if (layout.migrated === 'kept') note('已更新到 4.3：你改過的按鍵列都保留了；「⇧ 選取」現在是按鍵列的第一個鍵，可以移動或拿掉。游標板和 ⏎ 在輸入框右邊，按「✎ 編輯」可以調整。', 9000);
+else if (layout.migrated === 'default') note('已更新到 4.3：輸入框右邊是游標板和 ⏎，「⇧ 選取」變成一般按鍵。按鍵列最後的「✎ 編輯」可以調整順序。', 7000);
 
 let discardArmed = 0;
 stripButton(modeBtn, { onTap: () => {
@@ -1354,12 +1420,16 @@ stripButton(modeBtn, { onTap: () => {
 // ---------- settings sheet ----------
 const settingsSheet = $('settingsSheet');
 const sliders = { sens: 'sensOut', accel: 'accelOut', scroll: 'scrollOut' };
-const toggles = ['reverse', 'lefty', 'longPress', 'threeFinger', 'pinch', 'navFlick', 'hapticsOn', 'autocorrect', 'enterAfter'];
+const toggles = ['reverse', 'lefty', 'longPress', 'threeFinger', 'pinch', 'navFlick', 'hapticsOn', 'autocorrect', 'enterAfter', 'sidePanel'];
 
 function applyAll() {
   applyGestureSettings();
   applyTypingSettings();
-  document.getElementById('app').classList.toggle('lefty', !!settings.lefty);
+  appEl.classList.toggle('lefty', !!settings.lefty);
+  appEl.classList.toggle('side-closed', !settings.sidePanel);
+  $('sideClose').textContent = settings.lefty ? '›' : '‹';   // points the way the panel goes
+  $('fabSide').textContent = settings.lefty ? '‹' : '›';
+  updateKeysHint();
 }
 
 $('settingsBtn').addEventListener('click', () => {
