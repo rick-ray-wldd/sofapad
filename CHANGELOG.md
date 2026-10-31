@@ -2,6 +2,32 @@
 
 [README](README.md) · [繁體中文 README](README.zh-TW.md) · Development records (Chinese): [`process/`](process/)
 
+## 4.4.0 (2026-10-31)
+
+**The phone page in English and Chinese.** Every text on the phone, from the key row to the settings, the editors,
+pairing, the banners and the screen-reader labels, is in both languages. It opens in the phone's language (Chinese
+when the browser's first language is Chinese, English otherwise); ⚙︎ → Language (Auto, English, 中文) changes it at
+once, without a reload and without dropping the connection, and the phone remembers it. `<html lang>` follows. The
+texts live in two dictionaries, `web/js/lang/en.js` and `web/js/lang/zh.js` (the Chinese one is 4.3.0's wording); a
+test fails if a key is missing in either, and another if anything Chinese is left on screen in English.
+
+**Light and dark theme.** ⚙︎ → Theme: System (the default, follows the phone's appearance, also while the page is
+open), Light or Dark; applied at once and remembered. The page is drawn in the right theme from its first frame
+(`web/js/boot.js` runs before the stylesheet), and the browser bar colour follows; on a Home Screen app the iPhone's
+status bar takes the theme the next time the app opens. Colours are CSS custom properties: the light theme on `:root`,
+the dark one (4.3.0's colours) under `[data-theme="dark"]`. Every text meets WCAG AA in both themes; the one change
+to the dark colours is the filled blue (Send, the selected tab, drag lock on, an armed modifier), a little deeper
+(`#2f6fe4`), because white on 4.3.0's `#4f8cff` was 3.2:1.
+
+Nothing else changed: layouts, gestures, typing, dictation, emptying the box after each piece, the cursor pad and the
+rows behave as in 4.3.0. The 4.3 suites run as before, with the page in Chinese and dark as they were written for.
+
+Tests: `web/test/i18n.test.mjs` (the dictionaries, no text left in the markup or code, the start-up language and
+theme); `tools/sofa10-i18n-theme.mjs` (switching on a live connection, every screen in English with no Chinese left,
+the first frame's theme, contrast of every visible text in both themes and languages, screenshots in
+`design/screenshots/sofa10/`). The English demo page and recording script quote the phone's English labels now
+("Batch" instead of "Whole").
+
 ## 4.3.0 (2026-10-30)
 
 **New layout in portrait: the text box takes half the width.** The other half has the cursor pad "◀ 游標 ▶" (wider

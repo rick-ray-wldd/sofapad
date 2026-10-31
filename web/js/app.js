@@ -6,8 +6,15 @@ import { CaretPad } from './caret.js';
 import { LayoutStore, ROWS, ROW_NAMES, catalog } from './keyrow.js';
 import { VERSION, BUILD } from './version.js';
 import { BUILTIN_GROUPS, KEY_GROUPS, MODIFIERS, ShortcutStore, comboLabel, keyLabel, gestureShortcut, hotkeyHint, macStatusText } from './shortcuts.js';
+import { t, setLang, translate } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
+
+// Language and theme (SOFA-10): js/boot.js picked both before the page was drawn; every text comes from the
+// dictionaries (js/lang/), and relabel() below redraws them all when the language changes in ⚙︎.
+const prefs = window.pkmPrefs;
+setLang(prefs.currentLang());
+translate(document);
 
 /** Tap handler that never takes focus away from the text box (so the phone keyboard stays up). */
 function tap(el, fn) {
@@ -159,11 +166,13 @@ const rttEl = $('rtt');
 const banner = $('banner');
 const pairSheet = $('pairSheet');
 const pairMsg = $('pairMsg');
-let bannerState = { perm: true, secure: false, locked: false, offline: false, replaced: false, note: '' };
+let bannerState = { perm: true, secure: false, locked: false, offline: false, replaced: false, note: null };
 let hotkeysOff = new Set(); // macOS shortcuts the gestures need that are switched off on this Mac
 let macSpaces = null;        // Spaces on the Mac (desktops + full-screen apps); null = unknown
+let macKnown = false;        // ⚙︎ shows the Mac's version and shortcuts once it has said hello
 function renderMacStatus() {
   const el = $('macStatus');
+  if (!macKnown) { el.textContent = t('set.macStatus.waiting'); return; }
   const s = macStatusText(hotkeysOff, macSpaces);
   el.textContent = s.text;
   el.classList.toggle('bad', s.bad);
@@ -172,23 +181,35 @@ function renderMacStatus() {
 function renderBanner() {
   let text = '';
   let bad = false;
-  if (bannerState.replaced) { text = '另一支手機已經接手控制。點上方的狀態列重新連線。'; bad = true; }
-  else if (bannerState.offline) text = '和 Mac 的連線中斷，正在重新連線…（Mac 上的 SofaPad 要開著，手機和 Mac 要在同一個 Wi-Fi）。斷線時打的字不會補送。';
-  else if (bannerState.locked) { text = 'Mac 目前是鎖定畫面，為了安全，手機的輸入暫停。請先解鎖 Mac（用 Mac Virtual Display 之前本來就要先解鎖）。'; bad = true; }
-  else if (!bannerState.perm) { text = 'Mac 還沒開「輔助使用」權限，所以游標和打字不會動。請在 Mac 上打開：系統設定 → 隱私權與安全性 → 輔助使用 → 允許 SofaPad（舊名 Phone KeyMouse 的那一項可以移除）。'; bad = true; }
-  else if (bannerState.secure) text = 'Mac 正在輸入密碼（安全輸入模式），這時候文字打不進去，滑鼠還可以用。';
-  else if (bannerState.note) text = bannerState.note;
+  if (bannerState.replaced) { text = t('banner.replaced'); bad = true; }
+  else if (bannerState.offline) text = t('banner.offline');
+  else if (bannerState.locked) { text = t('banner.locked'); bad = true; }
+  else if (!bannerState.perm) { text = t('banner.perm'); bad = true; }
+  else if (bannerState.secure) text = t('banner.secure');
+  else if (bannerState.note) text = bannerState.note();
   banner.hidden = !text;
   banner.textContent = text;
   banner.classList.toggle('bad', bad);
 }
 
+/** The host line follows the link's state; kept so it can be said again in another language. */
+let hostShown = { state: '', info: {} };
+function renderHost() {
+  const { state, info } = hostShown;
+  if (state === 'ready') hostEl.textContent = info.host || link.host || 'Mac';
+  else if (state === 'need_pair') hostEl.textContent = t('host.unpaired', { host: info.host || link.host || 'Mac' });
+  else if (state === 'connecting') hostEl.textContent = info.attempt ? t('host.reconnecting', { n: info.attempt }) : t('host.connecting');
+  else if (state === 'offline') hostEl.textContent = t('host.offline');
+  else hostEl.textContent = t('host.finding');
+}
+
 function onState(state, info) {
+  hostShown = { state, info };
   dot.className = 'dot ' + (state === 'ready' ? 'ready' : state === 'offline' ? '' : 'connecting');
   $('fabDot').className = dot.className;
   $('sideDot').className = dot.className;
+  renderHost();
   if (state === 'ready') {
-    hostEl.textContent = info.host || link.host || 'Mac';
     renderVersion();
     // typed while the link was down: never sent later (D-30)
     if (settings.mode === 'live' && typeof live !== 'undefined') {
@@ -198,24 +219,21 @@ function onState(state, info) {
         live.reset();
         lastSeen = '';
         autosize();
-        note('斷線時打的字沒有送到 Mac（連上以後也不補送，以免打進別的視窗）。輸入框清空了，從 Mac 上現在的位置繼續打。', 6000);
+        note(() => t('note.dropped'), 6000);
       }
-      else if (info.reconnected) note('已重新連上 Mac。', 2000);
-    } else if (info.reconnected) note('已重新連上 Mac。', 2000);
+      else if (info.reconnected) note(() => t('note.reconnected'), 2000);
+    } else if (info.reconnected) note(() => t('note.reconnected'), 2000);
     bannerState = { ...bannerState, offline: false, replaced: false, perm: info.perm !== false, secure: !!info.secure, locked: !!info.locked };
     pairSheet.hidden = true;
     if (info.screen && info.screen.w && info.screen.h) root.style.setProperty('--aspect', String(info.screen.w / info.screen.h));
     hotkeysOff = new Set(info.hotkeysOff || []);
     macSpaces = typeof info.spaces === 'number' ? info.spaces : null;
+    macKnown = true;
     renderMacStatus();
   } else if (state === 'need_pair') {
-    hostEl.textContent = (info.host || link.host || 'Mac') + '（未配對）';
     bannerState.offline = false;
     pairSheet.hidden = false;
-  } else if (state === 'connecting') {
-    hostEl.textContent = info.attempt ? `重新連線中…（第 ${info.attempt} 次）` : '連線中…';
   } else if (state === 'offline') {
-    hostEl.textContent = '未連線';
     rttEl.textContent = '';
     if (info.reason === 'replaced') bannerState.replaced = true;
     else bannerState.offline = true;
@@ -225,22 +243,32 @@ function onState(state, info) {
 }
 
 /** ⚙︎ shows this page's version and the Mac app's (PKM-4: tell an old page or an old app from the new one). */
-function renderVersion() {
-  const mac = link.mac;
+function renderVersionLine() {
   const el = $('versionLine');
   if (!el) return;
-  el.textContent = `網頁 ${VERSION}（${BUILD === 'dev' ? '開發版' : '建置 ' + BUILD}）・Mac App ${mac ? `${mac.ver}（${mac.build === 'dev' ? '開發版' : '建置 ' + mac.build}）` : '舊版（沒有版本資訊）'}`;
-  const mismatch = mac && mac.ver !== VERSION;
-  el.classList.toggle('bad', !mac || !!mismatch);
-  if (!mac || mismatch) note('網頁和 Mac 上的 App 版本不同：請把 Mac 上的 SofaPad 換成新版，再重新整理這頁（主畫面 App 要關掉重開）。', 8000);
+  if (!macKnown) { el.textContent = t('set.version.loading'); return; }
+  const mac = link.mac;
+  const build = (b) => (b === 'dev' ? t('set.version.dev') : t('set.version.built', { time: b }));
+  el.textContent = t('set.version', {
+    page: t('set.version.build', { ver: VERSION, build: build(BUILD) }),
+    mac: mac ? t('set.version.build', { ver: mac.ver, build: build(mac.build) }) : t('set.version.old'),
+  });
+  el.classList.toggle('bad', !mac || mac.ver !== VERSION);
+}
+function renderVersion() {
+  macKnown = true;
+  renderVersionLine();
+  const mac = link.mac;
+  if (!mac || mac.ver !== VERSION) note(() => t('note.versions'), 8000);
 }
 
+/** A short message in the banner. `text` is a function, so a message on screen follows a change of language. */
 let noteTimer = null;
 function note(text, ms = 4000) {
   bannerState.note = text;
   renderBanner();
   clearTimeout(noteTimer);
-  noteTimer = setTimeout(() => { bannerState.note = ''; renderBanner(); }, ms);
+  noteTimer = setTimeout(() => { bannerState.note = null; renderBanner(); }, ms);
 }
 
 function onEvent(m) {
@@ -257,15 +285,15 @@ function onEvent(m) {
     case 'ack':
       if (m.ok === false && m.err === 'locked') { bannerState.locked = true; renderBanner(); }
       else if (m.ok === false && m.err === 'late') { /* reported as 'undelivered' */ }
-      else if (m.ok === false) note('Mac 沒有接受這個指令：' + (m.err || '未知錯誤'));
-      else if (m.warn === 'secure_input') note('Mac 正在輸入密碼（安全輸入），剛剛的文字可能沒打進去。');
+      else if (m.ok === false) note(() => t('note.refused', { err: m.err || t('note.refused.unknown') }));
+      else if (m.warn === 'secure_input') note(() => t('note.secureInput'));
       if (m.hotkey) {
         // ⌃←→↑↓: the Mac says, right now, whether the shortcut is on and how many Spaces there are (PKM-2-3)
         if (m.hotkeyOff) hotkeysOff.add(m.hotkey); else hotkeysOff.delete(m.hotkey);
         if (typeof m.spaces === 'number') macSpaces = m.spaces;
+        macKnown = true;
         renderMacStatus();
-        const hint = hotkeyHint(m);
-        if (hint) note(hint, 10000);
+        if (hotkeyHint(m)) note(() => hotkeyHint(m), 10000);
       }
       break;
     case 'drained':
@@ -276,8 +304,10 @@ function onEvent(m) {
       // may be in front by now. Said here; in 整段 an empty box gets the text back so 送出 can send it on purpose.
       const text = m.items.filter((x) => x.t === 'text').map((x) => x.s).join('');
       const keys = m.items.filter((x) => x.t === 'key').length;
-      const what = text ? `「${text.length > 24 ? text.slice(0, 24) + '…' : text}」` : `${keys} 個按鍵`;
-      const why = m.restarted ? 'Mac 上的 App 重新啟動過，' : m.late ? `連線卡住 ${(m.late / 1000).toFixed(1)} 秒，` : '連線中斷，';
+      const say = (key) => () => t(key, {
+        what: text ? t('note.undelivered.text', { text: text.length > 24 ? text.slice(0, 24) + '…' : text }) : t('note.undelivered.keys', { n: keys }),
+        why: m.restarted ? t('note.undelivered.restarted') : m.late ? t('note.undelivered.late', { s: (m.late / 1000).toFixed(1) }) : t('note.undelivered.dropped'),
+      });
       inputLog.add('undelivered', { len: text.length, tail: text.slice(-16) });
       if (settings.mode === 'live') {
         // the box no longer matches what the Mac has: start clean (the Mac keeps what it typed)
@@ -285,32 +315,26 @@ function onEvent(m) {
         live.reset();
         lastSeen = '';
         autosize();
-        note(`${why}${what}沒有打到 Mac，也不會自動補送（以免打進別的視窗）。輸入框清空了，從 Mac 上現在的位置繼續打。`, 9000);
+        note(say('note.undelivered.live'), 9000);
       } else if (text && !input.value) {
         input.value = text;
         lastSeen = text;
         guard.forget();
         autosize();
-        note(`${why}${what}沒有打到 Mac，也不會自動補送（以免打進別的視窗）。字放回輸入框了，確認 Mac 上要打的視窗後再按「送出」。`, 9000);
+        note(say('note.undelivered.back'), 9000);
       } else {
-        note(`${why}${what}沒有打到 Mac，也不會自動補送（以免打進別的視窗）。`, 9000);
+        note(say('note.undelivered'), 9000);
       }
       break;
     }
     case 'notsent':
-      if (m.msg.t === 'text' || m.msg.t === 'key') note('還沒連上 Mac，這個字沒有送出（連上以後也不會補送）。', 4000);
+      if (m.msg.t === 'text' || m.msg.t === 'key') note(() => t('note.notsent'), 4000);
       break;
     case 'pairing':
-      pairMsg.textContent = 'Mac 螢幕上已經跳出新的配對碼（2 分鐘內有效）。';
+      setPairMsg(() => t('pair.shown'));
       break;
     case 'auth_fail':
-      pairMsg.textContent = {
-        bad_code: '配對碼不對，請再看一次 Mac 螢幕。',
-        pairing_closed: 'Mac 目前沒有開放配對。請按「請 Mac 顯示配對碼」。',
-        bad_token: '這支手機的配對已失效，請重新配對。',
-        locked: `錯太多次了，請等 ${m.retry || 30} 秒再試。`,
-        unauthenticated: '請先配對。',
-      }[m.reason] || '配對失敗。';
+      setPairMsg(() => (PAIR_FAILS.includes(m.reason) ? t(`pair.fail.${m.reason}`, { s: m.retry || 30 }) : t('pair.fail')));
       break;
     case 'replaced':
       bannerState.replaced = true;
@@ -327,14 +351,20 @@ $('statusBtn').addEventListener('click', () => {
 });
 
 // ---------- pairing ----------
+const PAIR_FAILS = ['bad_code', 'pairing_closed', 'bad_token', 'locked', 'unauthenticated'];
+let pairMsgText = null;
+function setPairMsg(text) {
+  pairMsgText = text;
+  pairMsg.textContent = text ? text() : '';
+}
 const codeInput = $('codeInput');
 function submitCode() {
   const code = codeInput.value.replace(/\D/g, '');
   if (code.length !== 6) {
-    pairMsg.textContent = '配對碼是 6 位數字。';
+    setPairMsg(() => t('pair.digits'));
     return;
   }
-  pairMsg.textContent = '配對中…';
+  setPairMsg(() => t('pair.pairing'));
   link.pair(code);
 }
 $('pairBtn').addEventListener('click', submitCode);
@@ -342,7 +372,7 @@ codeInput.addEventListener('input', () => {
   if (codeInput.value.replace(/\D/g, '').length === 6) submitCode();
 });
 $('requestBtn').addEventListener('click', () => {
-  pairMsg.textContent = '已請 Mac 顯示配對碼…';
+  setPairMsg(() => t('pair.requested'));
   link.requestPairing();
 });
 
@@ -447,7 +477,7 @@ const gestures = new TrackpadGestures((a) => {
       const s = gestureShortcut(a);
       if (s) {
         sendCombo(s);
-        toast(`${s.label}　${comboLabel(s)}`); // if the Mac cannot do it, the ack brings a hint (hotkeyHint)
+        toast(t('toast.combo', { name: s.label, combo: comboLabel(s) })); // if the Mac cannot do it, the ack brings a hint (hotkeyHint)
       }
       break;
     }
@@ -565,15 +595,16 @@ function setDragLock(on, notify = true) {
   if (on === dragLocked) return;
   dragLocked = on;
   btnLock.setAttribute('aria-pressed', String(on));
-  btnLock.textContent = on ? '放開' : '拖曳鎖定';
-  for (const id of ['fabLock', 'sideLock']) {
-    $(id).setAttribute('aria-pressed', String(on));
-    $(id).textContent = on ? '放' : '鎖';
-  }
+  for (const id of ['fabLock', 'sideLock']) $(id).setAttribute('aria-pressed', String(on));
+  renderLock();
   dragBadge.hidden = !on;
   pad.classList.toggle('dragging', on);
   if (notify) link.send({ t: on ? 'down' : 'up', b: 'left' });
   haptic();
+}
+function renderLock() {
+  btnLock.textContent = t(dragLocked ? 'btn.release' : 'btn.lock');
+  for (const id of ['fabLock', 'sideLock']) $(id).textContent = t(dragLocked ? 'fab.release' : 'fab.lock');
 }
 tap(btnLock, () => setDragLock(!dragLocked));
 tap($('fabLock'), () => setDragLock(!dragLocked));
@@ -652,7 +683,7 @@ function cellButton(it) {
     // ⇧ 選取 (SOFA-6): the cursor pad selects (Shift + arrows) until it is pressed again
     b.id = 'caretSelect';
     b.classList.add('caret-select');
-    b.setAttribute('aria-label', '游標板改成選取（Shift）');
+    b.setAttribute('aria-label', t('caret.select.aria'));
     b.setAttribute('aria-pressed', String(caretPad.sticky));
     stripButton(b, { onTap: () => { caretPad.setSelect(!caretPad.sticky); haptic(); renderCaret(); } });
   } else if (it.kind === 'mod') {
@@ -674,8 +705,8 @@ function fillRow(container, row) {
 function editButton() {
   const edit = document.createElement('button');
   edit.className = 'row-edit';
-  edit.textContent = '✎ 編輯';
-  edit.setAttribute('aria-label', '編輯輸入列和按鍵列');
+  edit.textContent = t('keys.edit');
+  edit.setAttribute('aria-label', t('keys.edit.aria'));
   stripButton(edit, { onTap: () => openRowEditor('keys') });
   return edit;
 }
@@ -703,11 +734,6 @@ const rowCatalog = $('rowCatalog');
 let rowAddCustomPending = false;
 let editRow = 'keys';
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const ROW_NOTES = {
-  input: '輸入框右邊的格子（直拿、橫拿都一樣）：輸入框佔一半寬，這些格子分另一半。',
-  keys: '輸入框下面的按鍵列（橫拿時在側欄排成格子）。「即時／整段」和「⌘ 快捷鍵」固定在最前面。',
-  side: '只在橫拿的側欄出現，排在按鍵列後面。',
-};
 
 function openRowEditor(row = 'keys') {
   input.blur();
@@ -724,14 +750,14 @@ function rowChanged(msg) {
 function renderRowEditor() {
   layout.prune();
   for (const t of $('rowTabs').querySelectorAll('[data-row]')) t.setAttribute('aria-selected', String(t.dataset.row === editRow));
-  $('rowNote').textContent = `${ROW_NOTES[editRow]}按住 ≡ 拖曳調順序，✕ 移除；下面的清單點一下加到最後（再點一下拿掉）。「◀ 游標 ▶」和「⇧ 選取」各只有一個，加到別的列會從原來的列移過去。`;
+  $('rowNote').textContent = t('rowed.note', { row: t(`rowed.note.${editRow}`) });
   rowCurrent.textContent = '';
   const items = layout.items(editRow);
   items.forEach((it, i) => {
     const li = el('li');
     li.dataset.id = it.id;
     const handle = el('span', 'handle', '≡');
-    handle.setAttribute('aria-label', `拖曳調整 ${it.label} 的位置`);
+    handle.setAttribute('aria-label', t('rowed.drag.aria', { label: it.label }));
     const small = (text, label, fn, disabled) => {
       const b = el('button', '', text);
       b.type = 'button';
@@ -741,16 +767,16 @@ function renderRowEditor() {
       return b;
     };
     li.append(handle, el('span', 'lbl', it.label), el('span', 'nm', it.name),
-      small('↑', '往前移', () => { layout.move(editRow, it.id, -1); rowChanged(''); }, i === 0),
-      small('↓', '往後移', () => { layout.move(editRow, it.id, 1); rowChanged(''); }, i === items.length - 1),
-      small('✕', '移除', () => { layout.remove(editRow, it.id); rowChanged(`已從${ROW_NAMES[editRow]}移除 ${it.label}`); }, false));
+      small('↑', t('rowed.earlier'), () => { layout.move(editRow, it.id, -1); rowChanged(''); }, i === 0),
+      small('↓', t('rowed.later'), () => { layout.move(editRow, it.id, 1); rowChanged(''); }, i === items.length - 1),
+      small('✕', t('rowed.remove'), () => { layout.remove(editRow, it.id); rowChanged(t('rowed.removed', { row: ROW_NAMES[editRow], label: it.label })); }, false));
     rowCurrent.append(li);
   });
-  if (!items.length) rowCurrent.append(el('li', 'empty', '（空的：從下面的清單點選要放的鍵）'));
+  if (!items.length) rowCurrent.append(el('li', 'empty', t('rowed.empty')));
   rowCatalog.textContent = '';
   for (const g of catalog(customShortcuts.items)) {
     const chips = el('div', 'chips');
-    if (!g.items.length) chips.append(el('p', 'empty', '還沒有自訂快捷鍵：按下面的「＋ 新增自訂按鈕」。'));
+    if (!g.items.length) chips.append(el('p', 'empty', t('rowed.noCustom')));
     for (const it of g.items) {
       const b = el('button');
       b.type = 'button';
@@ -758,14 +784,14 @@ function renderRowEditor() {
       b.setAttribute('aria-pressed', String(layout.has(editRow, it.id)));
       b.append(document.createTextNode(it.label));
       const elsewhere = it.id.startsWith('x:') && layout.where(it.id) && layout.where(it.id) !== editRow ? layout.where(it.id) : null;
-      if (it.name !== it.label || elsewhere) b.append(el('small', '', elsewhere ? `在${ROW_NAMES[elsewhere]}` : it.name));
+      if (it.name !== it.label || elsewhere) b.append(el('small', '', elsewhere ? t('rowed.in', { row: ROW_NAMES[elsewhere] }) : it.name));
       b.addEventListener('click', () => {
-        if (layout.has(editRow, it.id)) { layout.remove(editRow, it.id); rowChanged(`已從${ROW_NAMES[editRow]}移除 ${it.label}`); return; }
+        if (layout.has(editRow, it.id)) { layout.remove(editRow, it.id); rowChanged(t('rowed.removed', { row: ROW_NAMES[editRow], label: it.label })); return; }
         const from = layout.where(it.id);
         const r = layout.add(editRow, it.id);
         rowChanged(r !== true ? r : it.id.startsWith('x:') && from
-          ? `${it.label} 從${ROW_NAMES[from]}移到${ROW_NAMES[editRow]}最後`
-          : `已加到${ROW_NAMES[editRow]}最後：${it.label}（${it.name}）`);
+          ? t('rowed.moved', { label: it.label, from: ROW_NAMES[from], to: ROW_NAMES[editRow] })
+          : t('rowed.added', { row: ROW_NAMES[editRow], label: it.label, name: it.name }));
       });
       chips.append(b);
     }
@@ -813,7 +839,7 @@ const endRowDrag = () => { if (!rowDrag) return; rowDrag = null; rowChanged('');
 rowCurrent.addEventListener('pointerup', endRowDrag);
 rowCurrent.addEventListener('pointercancel', endRowDrag);
 $('rowDone').addEventListener('click', () => { rowSheet.hidden = true; });
-$('rowReset').addEventListener('click', () => { layout.reset(); rowChanged('已恢復預設（輸入列、按鍵列、橫拿側欄）'); });
+$('rowReset').addEventListener('click', () => { layout.reset(); rowChanged(t('rowed.wasReset')); });
 $('rowEditBtn').addEventListener('click', () => { $('settingsSheet').hidden = true; openRowEditor('input'); });
 
 // ---------- shortcut panel (built-in + "我的") and the custom shortcut editor ----------
@@ -832,7 +858,7 @@ function shortcutButton(s, closeAfter) {
   b.dataset.combo = comboLabel(s);
   tapScrollable(b, () => {
     sendCombo(s);
-    toast(`${s.label}　${comboLabel(s)}`);
+    toast(t('toast.combo', { name: s.label, combo: comboLabel(s) }));
     if (closeAfter) setPanel(false);
   });
   return b;
@@ -840,7 +866,7 @@ function shortcutButton(s, closeAfter) {
 
 function renderPanel() {
   shortcutList.textContent = '';
-  const groups = [{ id: 'mine', label: '我的', items: customShortcuts.items }, ...BUILTIN_GROUPS];
+  const groups = [{ id: 'mine', label: t('panel.mine'), items: customShortcuts.items }, ...BUILTIN_GROUPS];
   for (const g of groups) {
     const section = document.createElement('section');
     section.className = 'sc-group';
@@ -851,7 +877,7 @@ function renderPanel() {
     if (g.id === 'mine' && g.items.length === 0) {
       const p = document.createElement('p');
       p.className = 'sc-empty';
-      p.textContent = '還沒有自訂快捷鍵。按右上角「自訂…」新增，例如 ⌃⇧⌘4。';
+      p.textContent = t('panel.mine.empty');
       section.append(p);
     } else {
       const grid = document.createElement('div');
@@ -881,16 +907,30 @@ const scKey = $('scKey');
 let editingId = null;
 let picked = new Set();
 
-for (const g of KEY_GROUPS) {
-  const og = document.createElement('optgroup');
-  og.label = g.label;
-  for (const k of g.keys) {
-    const o = document.createElement('option');
-    o.value = k;
-    o.textContent = keyLabel(k) + (k.length > 1 && keyLabel(k) !== k ? `（${k}）` : '');
-    og.append(o);
+function renderKeyOptions() {
+  const value = scKey.value;
+  scKey.textContent = '';
+  for (const g of KEY_GROUPS) {
+    const og = document.createElement('optgroup');
+    og.label = g.label;
+    for (const k of g.keys) {
+      const o = document.createElement('option');
+      o.value = k;
+      o.textContent = k.length > 1 && keyLabel(k) !== k ? t('key.option', { label: keyLabel(k), key: k }) : keyLabel(k);
+      og.append(o);
+    }
+    scKey.append(og);
   }
-  scKey.append(og);
+  if (value) scKey.value = value;
+}
+renderKeyOptions();
+for (const m of MODIFIERS) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.dataset.pick = m.id;
+  b.setAttribute('aria-pressed', 'false');
+  b.textContent = `${m.symbol} ${m.name}`;
+  $('modPicks').append(b);
 }
 
 function formValue() {
@@ -922,7 +962,7 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   const v = formValue();
   if (v.mods.length === 0 && /^[a-z0-9]$/.test(v.key)) {
-    $('scMsg').textContent = '單獨一個字母或數字會直接打字，請至少選一個修飾鍵。';
+    $('scMsg').textContent = t('ed.needMod');
     return;
   }
   const wasNew = !editingId;
@@ -935,7 +975,7 @@ form.addEventListener('submit', (e) => {
     rowAddCustomPending = false;
     layout.add(editRow, `u:${r.id}`);
     editorSheet.hidden = true;
-    rowChanged(`已新增並加到${ROW_NAMES[editRow]}：${comboLabel(r)}（${r.label}）`);
+    rowChanged(t('rowed.customAdded', { row: ROW_NAMES[editRow], combo: comboLabel(r), label: r.label }));
   }
 });
 $('scCancel').addEventListener('click', () => {
@@ -970,10 +1010,10 @@ function renderCustomList() {
       return b;
     };
     li.append(combo, name,
-      btn('↑', '往上移', () => { customShortcuts.move(s.id, -1); renderCustomList(); }, i === 0),
-      btn('↓', '往下移', () => { customShortcuts.move(s.id, 1); renderCustomList(); }, i === customShortcuts.items.length - 1),
-      btn('✎', '編輯', () => openForm(s)),
-      btn('✕', '刪除', () => { customShortcuts.remove(s.id); renderCustomList(); }));
+      btn('↑', t('ed.up'), () => { customShortcuts.move(s.id, -1); renderCustomList(); }, i === 0),
+      btn('↓', t('ed.down'), () => { customShortcuts.move(s.id, 1); renderCustomList(); }, i === customShortcuts.items.length - 1),
+      btn('✎', t('ed.edit'), () => openForm(s)),
+      btn('✕', t('ed.delete'), () => { customShortcuts.remove(s.id); renderCustomList(); }));
     customList.append(li);
   });
   if (!panel.hidden) renderPanel();
@@ -991,31 +1031,32 @@ $('editShortcuts').addEventListener('click', () => {
 $('addShortcut').addEventListener('click', () => openForm(null));
 $('closeEditor').addEventListener('click', () => { rowAddCustomPending = false; editorSheet.hidden = true; renderPanel(); });
 $('exportBtn').addEventListener('click', () => {
-  const t = $('ioText');
-  t.value = customShortcuts.exportJSON();
-  t.focus();
-  t.select();
+  const io = $('ioText');
+  io.value = customShortcuts.exportJSON();
+  io.focus();
+  io.select();
   let copied = false;
   try { copied = document.execCommand('copy'); } catch { copied = false; }
-  $('ioMsg').textContent = copied ? `已拷貝 ${customShortcuts.items.length} 個快捷鍵的 JSON。` : '已選取 JSON，請長按拷貝。';
+  $('ioMsg').textContent = copied ? t('io.copied', { n: customShortcuts.items.length }) : t('io.selected');
 });
 function doImport(mode) {
   const r = customShortcuts.importJSON($('ioText').value, mode);
-  $('ioMsg').textContent = r.error ? '匯入失敗：' + r.error : `匯入 ${r.added} 個${r.skipped ? `，略過 ${r.skipped} 個（重複或不能用）` : ''}。`;
+  $('ioMsg').textContent = r.error ? t('io.failed', { error: r.error }) : t('io.imported', r);
   renderCustomList();
 }
 $('importAppend').addEventListener('click', () => doImport('append'));
+const renderImportReplace = () => { const b = $('importReplace'); b.textContent = t(b.dataset.armed === '1' ? 'io.replace.again' : 'io.replace'); };
 $('importReplace').addEventListener('click', () => {
   // Two-step confirm without a blocking dialog.
   const b = $('importReplace');
   if (b.dataset.armed !== '1') {
     b.dataset.armed = '1';
-    b.textContent = '再按一次：取代全部';
-    setTimeout(() => { b.dataset.armed = ''; b.textContent = '匯入（取代全部）'; }, 3000);
+    renderImportReplace();
+    setTimeout(() => { b.dataset.armed = ''; renderImportReplace(); }, 3000);
     return;
   }
   b.dataset.armed = '';
-  b.textContent = '匯入（取代全部）';
+  renderImportReplace();
   doImport('replace');
 });
 
@@ -1078,14 +1119,14 @@ function stalled() {
 
 function applyTypingSettings() {
   const live = settings.mode === 'live';
-  modeBtn.textContent = live ? '即時' : '整段';
+  modeBtn.textContent = t(live ? 'mode.live' : 'mode.buffer');
   appEl.classList.toggle('buffer', !live);
   sendBtn.hidden = live;
   input.setAttribute('autocorrect', settings.autocorrect ? 'on' : 'off');
   input.setAttribute('autocomplete', settings.autocorrect ? 'on' : 'off');
   input.setAttribute('enterkeyhint', live ? 'enter' : 'send');
   // short enough for one line in the half-width box (a wrapped placeholder makes the box, and the page, taller)
-  input.placeholder = live ? '點這裡打字' : '打完按送出';
+  input.placeholder = t(live ? 'input.placeholder.live' : 'input.placeholder.buffer');
 }
 
 function autosize() {
@@ -1130,7 +1171,7 @@ function checkGhost() {
     inputLog.add('ghost', { len: input.value.length - fixed.length, tail: input.value.slice(-16) });
     input.value = fixed;
     autosize();
-    note('剛送出的字又跑回輸入框：已擋下，沒有再送一次。', 5000);
+    note(() => t('note.ghost'), 5000);
   }
   lastSeen = input.value;
 }
@@ -1243,7 +1284,7 @@ input.addEventListener('compositionend', (e) => {
 const isHistory = (e) => e.inputType === 'historyUndo' || e.inputType === 'historyRedo';
 function undoBlocked(e) {
   inputLog.add('undo-blocked', { type: e.inputType, len: input.value.length });
-  note('手機輸入框不能「還原／重做」（會把送出過的字又送一次）。要還原 Mac 上的字，用按鍵列的 ⌘Z。', 5000);
+  note(() => t('note.undo'), 5000);
 }
 input.addEventListener('input', (e) => {
   autosize();
@@ -1301,7 +1342,7 @@ function sendBuffered() {
   const text = input.value;
   if (link.state !== 'ready') {
     // never kept for later (D-30): the text stays here, Ray presses 送出 again once the dot is green
-    if (text) note('還沒連上 Mac：字留在輸入框裡，等上方變綠點再按「送出」。', 5000);
+    if (text) note(() => t('note.bufferOffline'), 5000);
     return;
   }
   if (text) link.sendReliable({ t: 'text', s: text, at: Date.now() });
@@ -1328,17 +1369,16 @@ const caretPadEl = document.createElement('div');
 caretPadEl.id = 'caretPad';
 caretPadEl.className = 'caret-pad';
 caretPadEl.setAttribute('role', 'slider');
-caretPadEl.setAttribute('aria-label', '游標板：按住再拖曳，移動 Mac 上的文字游標');
+caretPadEl.setAttribute('aria-label', t('caret.aria'));
 const caretLabel = document.createElement('span');
 caretLabel.id = 'caretLabel';
 caretPadEl.append(caretLabel);
-const CARET_IDLE = '◀ 游標 ▶';
 function renderCaret() {
   const on = caretPad.active;
   caretPadEl.classList.toggle('active', on);
   caretPadEl.classList.toggle('selecting', caretPad.selecting);
   $('caretSelect')?.setAttribute('aria-pressed', String(caretPad.sticky));
-  caretLabel.textContent = !on ? (caretPad.sticky ? '◀ 選取 ▶' : CARET_IDLE) : caretPad.selecting ? '⇧ 選取中' : '移動中';
+  caretLabel.textContent = t(!on ? (caretPad.sticky ? 'caret.idle.select' : 'caret.idle') : caretPad.selecting ? 'caret.selecting' : 'caret.moving');
 }
 const caretPad = new CaretPad({
   press: (p) => { link.send({ t: 'caret', k: p.k, mods: p.mods, n: 1 }); inputLog.add('caret', { data: (p.mods.length ? p.mods.join('+') + '+' : '') + p.k }); },
@@ -1388,8 +1428,8 @@ for (const type of ['touchmove', 'touchend', 'touchcancel']) {
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) { caretTouch = null; caretPad.end(); } });
 renderRows();
-if (layout.migrated === 'kept') note('已更新到 4.3：你改過的按鍵列都保留了；「⇧ 選取」現在是按鍵列的第一個鍵，可以移動或拿掉。游標板和 ⏎ 在輸入框右邊，按「✎ 編輯」可以調整。', 9000);
-else if (layout.migrated === 'default') note('已更新到 4.3：輸入框右邊是游標板和 ⏎，「⇧ 選取」變成一般按鍵。按鍵列最後的「✎ 編輯」可以調整順序。', 7000);
+if (layout.migrated === 'kept') note(() => t('note.migrated.kept'), 9000);
+else if (layout.migrated === 'default') note(() => t('note.migrated.default'), 7000);
 
 let discardArmed = 0;
 stripButton(modeBtn, { onTap: () => {
@@ -1402,13 +1442,13 @@ stripButton(modeBtn, { onTap: () => {
     // 整段 → 即時 never sends what is in the box (v2 did, I-24). Ask once; a second tap throws it away.
     if (Date.now() > discardArmed) {
       discardArmed = Date.now() + 6000;
-      note('輸入框裡還有沒送出的字：要送請按「送出」；6 秒內再點一次「整段」會清掉它（不送出）並切成即時。', 6000);
+      note(() => t('note.modeDiscard'), 6000);
       return;
     }
     input.value = '';
     lastSeen = '';
     autosize();
-    note('已清掉沒送出的字（沒有送到 Mac），改成即時模式。');
+    note(() => t('note.modeDiscarded'));
   }
   discardArmed = 0;
   settings.mode = settings.mode === 'live' ? 'buffer' : 'live';
@@ -1458,7 +1498,7 @@ for (const k of toggles) {
 $('closeSettings').addEventListener('click', () => { settingsSheet.hidden = true; });
 // Input log (PKM-3-1): rendered when opened; selecting is enough to copy on iOS (no clipboard API on http).
 const inputLogText = $('inputLogText');
-const renderInputLog = () => { inputLogText.value = inputLog.text() || '（還沒有紀錄：關掉設定，在輸入框打字或聽寫後再回來看）'; };
+const renderInputLog = () => { inputLogText.value = inputLog.text() || t('set.log.empty'); };
 $('inputLogBox').addEventListener('toggle', () => { if ($('inputLogBox').open) renderInputLog(); });
 $('inputLogSelect').addEventListener('click', () => { renderInputLog(); inputLogText.focus(); inputLogText.select(); inputLogText.setSelectionRange(0, inputLogText.value.length); });
 $('inputLogClear').addEventListener('click', () => { inputLog.clear(); renderInputLog(); });
@@ -1468,6 +1508,37 @@ $('forgetBtn').addEventListener('click', () => {
   link.stop();
   link.connect();
 });
+
+// ---------- language and theme (SOFA-10) ----------
+function renderPrefs() {
+  for (const b of $('langSeg').querySelectorAll('[data-lang]')) b.setAttribute('aria-checked', String(b.dataset.lang === prefs.lang()));
+  for (const b of $('themeSeg').querySelectorAll('[data-theme-choice]')) b.setAttribute('aria-checked', String(b.dataset.themeChoice === prefs.theme()));
+}
+/** Every text on the page in the current language: the markup's, then everything drawn from code. */
+function relabel() {
+  setLang(prefs.currentLang());
+  translate(document);
+  renderHost();
+  renderBanner();
+  renderVersionLine();
+  renderMacStatus();
+  renderLock();
+  applyTypingSettings();
+  caretPadEl.setAttribute('aria-label', t('caret.aria'));
+  renderRows();
+  renderKeyOptions();
+  renderImportReplace();
+  if (pairMsgText) pairMsg.textContent = pairMsgText();
+  if (!panel.hidden) renderPanel();
+  if (!rowSheet.hidden) renderRowEditor();
+  if (!editorSheet.hidden) renderCustomList();
+  if ($('inputLogBox').open) renderInputLog();
+  renderPrefs();
+}
+// Applied at once, without a reload: the link and what is typed stay as they are.
+for (const b of $('langSeg').querySelectorAll('[data-lang]')) b.addEventListener('click', () => { prefs.setLang(b.dataset.lang); relabel(); });
+for (const b of $('themeSeg').querySelectorAll('[data-theme-choice]')) b.addEventListener('click', () => { prefs.setTheme(b.dataset.themeChoice); renderPrefs(); });
+window.addEventListener('languagechange', () => { if (prefs.lang() === 'auto') { prefs.refreshLang(); relabel(); } });
 
 // ---------- lifecycle ----------
 document.addEventListener('visibilitychange', () => {
@@ -1482,4 +1553,6 @@ window.addEventListener('pagehide', () => link.send({ t: 'release_all' }));
 document.addEventListener('gesturestart', (e) => e.preventDefault()); // iOS pinch-zoom
 
 applyAll();
+relabel();
+prefs.ready();
 link.connect();

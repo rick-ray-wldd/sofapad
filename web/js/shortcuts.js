@@ -1,17 +1,21 @@
 // Shortcut catalogue (built-in + the user's own), with no DOM: key choices, labels, storage,
 // validation and JSON import/export. Key names are the ones pkm-server's KeyMap understands.
+// Labels are looked up when read (getters), so they follow a change of language (SOFA-10).
+import { t } from './i18n.js';
 
 const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
 const digits = '0123456789'.split('');
 
+const G = (id, keys) => ({ id, get label() { return t(`group.${id}`); }, keys });
+
 /** Keys a custom shortcut can use, grouped for the picker. */
 export const KEY_GROUPS = [
-  { label: '字母', keys: letters },
-  { label: '數字', keys: digits },
-  { label: '符號', keys: ['-', '=', '[', ']', '\\', ';', "'", ',', '.', '/', '`'] },
-  { label: '方向和翻頁', keys: ['left', 'right', 'up', 'down', 'home', 'end', 'pageup', 'pagedown'] },
-  { label: '特殊鍵', keys: ['space', 'enter', 'tab', 'escape', 'backspace', 'forwarddelete'] },
-  { label: '功能鍵', keys: Array.from({ length: 12 }, (_, i) => `f${i + 1}`) },
+  G('letters', letters),
+  G('digits', digits),
+  G('symbols', ['-', '=', '[', ']', '\\', ';', "'", ',', '.', '/', '`']),
+  G('arrows', ['left', 'right', 'up', 'down', 'home', 'end', 'pageup', 'pagedown']),
+  G('special', ['space', 'enter', 'tab', 'escape', 'backspace', 'forwarddelete']),
+  G('fkeys', Array.from({ length: 12 }, (_, i) => `f${i + 1}`)),
 ];
 export const ALL_KEYS = KEY_GROUPS.flatMap((g) => g.keys);
 
@@ -40,66 +44,68 @@ export function comboLabel({ key, mods = [] }) {
   return MODIFIERS.filter((m) => mods.includes(m.id)).map((m) => m.symbol).join('') + keyLabel(key);
 }
 
-const S = (label, key, mods, extra = {}) => ({ label, key, mods, ...extra });
+/** A built-in shortcut; `name` is its dictionary key (sc.<name>). */
+const S = (name, key, mods, extra = {}) => ({ get label() { return t(`sc.${name}`); }, key, mods, ...extra });
+const group = (id, items) => ({ id, get label() { return t(`group.${id}`); }, items });
 
 /**
  * Built-in shortcuts (PKM-2 §2-2). `close`: the panel closes after sending, because the next thing the user
  * does is on the trackpad (pick a screenshot area, pick a window) or the screen changes completely.
  */
 export const BUILTIN_GROUPS = [
-  { id: 'edit', label: '編輯', items: [
-    S('拷貝', 'c', ['cmd']), S('貼上', 'v', ['cmd']), S('剪下', 'x', ['cmd']),
-    S('還原', 'z', ['cmd']), S('重做', 'z', ['shift', 'cmd']), S('全選', 'a', ['cmd']),
-  ] },
-  { id: 'screenshot', label: '截圖', items: [
-    S('整個螢幕（存檔）', '3', ['shift', 'cmd'], { close: true }),
-    S('選取範圍（存檔）', '4', ['shift', 'cmd'], { close: true }),
-    S('截圖工具列', '5', ['shift', 'cmd'], { close: true }),
-    S('整個螢幕（到剪貼簿）', '3', ['ctrl', 'shift', 'cmd'], { close: true }),
-    S('選取範圍（到剪貼簿）', '4', ['ctrl', 'shift', 'cmd'], { close: true }),
-  ] },
-  { id: 'system', label: '切換', items: [
-    S('切換 App', 'tab', ['cmd'], { close: true }), S('Spotlight', 'space', ['cmd'], { close: true }),
-    S('Mission Control', 'up', ['ctrl'], { close: true }), S('App Exposé', 'down', ['ctrl'], { close: true }),
-    S('左邊桌面', 'left', ['ctrl'], { close: true }), S('右邊桌面', 'right', ['ctrl'], { close: true }),
-  ] },
-  { id: 'more', label: '其他', items: [
-    S('儲存', 's', ['cmd']), S('尋找', 'f', ['cmd']), S('新分頁', 't', ['cmd']), S('關閉', 'w', ['cmd']),
-    S('上一頁', '[', ['cmd']), S('下一頁', ']', ['cmd']), S('放大', '=', ['cmd']), S('縮小', '-', ['cmd']),
-    S('行首', 'left', ['cmd']), S('行尾', 'right', ['cmd']), S('刪一個詞', 'backspace', ['opt']),
-  ] },
+  group('edit', [
+    S('copy', 'c', ['cmd']), S('paste', 'v', ['cmd']), S('cut', 'x', ['cmd']),
+    S('undo', 'z', ['cmd']), S('redo', 'z', ['shift', 'cmd']), S('selectAll', 'a', ['cmd']),
+  ]),
+  group('screenshot', [
+    S('screenFile', '3', ['shift', 'cmd'], { close: true }),
+    S('areaFile', '4', ['shift', 'cmd'], { close: true }),
+    S('toolbar', '5', ['shift', 'cmd'], { close: true }),
+    S('screenClip', '3', ['ctrl', 'shift', 'cmd'], { close: true }),
+    S('areaClip', '4', ['ctrl', 'shift', 'cmd'], { close: true }),
+  ]),
+  group('system', [
+    S('switchApp', 'tab', ['cmd'], { close: true }), S('spotlight', 'space', ['cmd'], { close: true }),
+    S('missionControl', 'up', ['ctrl'], { close: true }), S('appExpose', 'down', ['ctrl'], { close: true }),
+    S('spaceLeft', 'left', ['ctrl'], { close: true }), S('spaceRight', 'right', ['ctrl'], { close: true }),
+  ]),
+  group('more', [
+    S('save', 's', ['cmd']), S('find', 'f', ['cmd']), S('newTab', 't', ['cmd']), S('close', 'w', ['cmd']),
+    S('back', '[', ['cmd']), S('forward', ']', ['cmd']), S('zoomIn', '=', ['cmd']), S('zoomOut', '-', ['cmd']),
+    S('lineStart', 'left', ['cmd']), S('lineEnd', 'right', ['cmd']), S('deleteWord', 'backspace', ['opt']),
+  ]),
 ];
 
 /** Trackpad gesture → Mac shortcut (D-15). Natural direction: swiping left brings in the space on the right. */
 export function gestureShortcut(action) {
-  if (action.type === 'zoom') return { key: action.dir === 'in' ? '=' : '-', mods: ['cmd'], label: action.dir === 'in' ? '放大' : '縮小' };
+  if (action.type === 'zoom') return { key: action.dir === 'in' ? '=' : '-', mods: ['cmd'], label: t(action.dir === 'in' ? 'sc.zoomIn' : 'sc.zoomOut') };
   if (action.type !== 'swipe') return null;
   if (action.fingers === 3) {
     return {
       // hotkey: the macOS setting it needs (pkm-server reports switched-off ones as `hotkeysOff`)
-      left: { key: 'right', mods: ['ctrl'], label: '右邊桌面', hotkey: 'spaceRight' },
-      right: { key: 'left', mods: ['ctrl'], label: '左邊桌面', hotkey: 'spaceLeft' },
-      up: { key: 'up', mods: ['ctrl'], label: 'Mission Control', hotkey: 'missionControl' },
-      down: { key: 'down', mods: ['ctrl'], label: 'App Exposé', hotkey: 'appWindows' },
+      left: { key: 'right', mods: ['ctrl'], label: t('sc.spaceRight'), hotkey: 'spaceRight' },
+      right: { key: 'left', mods: ['ctrl'], label: t('sc.spaceLeft'), hotkey: 'spaceLeft' },
+      up: { key: 'up', mods: ['ctrl'], label: t('sc.missionControl'), hotkey: 'missionControl' },
+      down: { key: 'down', mods: ['ctrl'], label: t('sc.appExpose'), hotkey: 'appWindows' },
     }[action.dir] || null;
   }
   if (action.fingers === 2) {
     return {
-      right: { key: '[', mods: ['cmd'], label: '上一頁' },
-      left: { key: ']', mods: ['cmd'], label: '下一頁' },
+      right: { key: '[', mods: ['cmd'], label: t('sc.back') },
+      left: { key: ']', mods: ['cmd'], label: t('sc.forward') },
     }[action.dir] || null;
   }
   return null;
 }
 
 /** macOS shortcuts behind the three-finger swipes, and their names in System Settings (README §4). */
+const hotkey = (name, combo) => ({ combo, get setting() { return t(`hotkey.${name}`); } });
 export const HOTKEYS = {
-  spaceLeft: { combo: '⌃←', setting: '移到左邊的空間' },
-  spaceRight: { combo: '⌃→', setting: '移到右邊的空間' },
-  missionControl: { combo: '⌃↑', setting: 'Mission Control' },
-  appWindows: { combo: '⌃↓', setting: '應用程式視窗' },
+  spaceLeft: hotkey('spaceLeft', '⌃←'),
+  spaceRight: hotkey('spaceRight', '⌃→'),
+  missionControl: hotkey('missionControl', '⌃↑'),
+  appWindows: hotkey('appWindows', '⌃↓'),
 };
-export const HOTKEY_SETTINGS_PATH = '系統設定 → 鍵盤 → 鍵盤快速鍵… → Mission Control';
 
 /**
  * What to tell Ray after the Mac acks a ⌃-arrow shortcut (PKM-2-3): the shortcut is switched off, or there is
@@ -108,12 +114,8 @@ export const HOTKEY_SETTINGS_PATH = '系統設定 → 鍵盤 → 鍵盤快速鍵
 export function hotkeyHint({ hotkey, hotkeyOff, spaces }) {
   const h = HOTKEYS[hotkey];
   if (!h) return '';
-  if (hotkeyOff) {
-    return `${h.combo} 在 Mac 上是關閉的，所以沒有反應。請在 Mac 打開：${HOTKEY_SETTINGS_PATH}，勾選「${h.setting}」（${h.combo}）。`;
-  }
-  if ((hotkey === 'spaceLeft' || hotkey === 'spaceRight') && spaces === 1) {
-    return 'Mac 目前只有 1 個桌面，沒有地方可以切換。三指往上滑打開 Mission Control，在畫面最上方按「＋」新增桌面。';
-  }
+  if (hotkeyOff) return t('hotkey.off', { combo: h.combo, path: t('hotkey.path'), setting: h.setting });
+  if ((hotkey === 'spaceLeft' || hotkey === 'spaceRight') && spaces === 1) return t('hotkey.oneSpace');
   return '';
 }
 
@@ -121,10 +123,15 @@ export function hotkeyHint({ hotkey, hotkeyOff, spaces }) {
 export function macStatusText(off, spaces) {
   const offKeys = Object.keys(HOTKEYS).filter((k) => off.has(k));
   const lines = [offKeys.length
-    ? `三指手勢需要的 Mac 快速鍵有 ${offKeys.length} 個是關閉的：${offKeys.map((k) => HOTKEYS[k].combo).join(' ')}。請在 Mac 打開：${HOTKEY_SETTINGS_PATH}，勾選${offKeys.map((k) => `「${HOTKEYS[k].setting}」`).join('')}。`
-    : '三指手勢需要的 Mac 快速鍵（⌃← ⌃→ ⌃↑ ⌃↓）都是打開的。'];
-  if (spaces === 1) lines.push('Mac 目前只有 1 個桌面：三指左右滑沒有地方可以切換。三指往上滑打開 Mission Control，在畫面最上方按「＋」新增桌面。');
-  else if (spaces > 1) lines.push(`Mac 目前有 ${spaces} 個空間（桌面＋全螢幕 App），三指左右滑可以切換。`);
+    ? t('mac.off', {
+      n: offKeys.length,
+      combos: offKeys.map((k) => HOTKEYS[k].combo).join(' '),
+      path: t('hotkey.path'),
+      settings: offKeys.map((k) => t('mac.off.setting', { setting: HOTKEYS[k].setting })).join(t('mac.off.sep')),
+    })
+    : t('mac.allOn')];
+  if (spaces === 1) lines.push(t('mac.oneSpace'));
+  else if (spaces > 1) lines.push(t('mac.spaces', { n: spaces }));
   return { text: lines.join('\n'), bad: offKeys.length > 0 || spaces === 1 };
 }
 
@@ -181,8 +188,8 @@ export class ShortcutStore {
   /** @returns the new item, or an error string */
   add(raw) {
     const s = normalizeShortcut(raw);
-    if (!s) return '這個組合鍵不能用';
-    if (this.items.length >= MAX_CUSTOM) return `最多 ${MAX_CUSTOM} 個自訂快捷鍵`;
+    if (!s) return t('sc.err.combo');
+    if (this.items.length >= MAX_CUSTOM) return t('sc.err.max', { n: MAX_CUSTOM });
     const item = { id: newId(), ...s };
     this.items.push(item);
     this.save();
@@ -192,8 +199,8 @@ export class ShortcutStore {
   update(id, raw) {
     const i = this.items.findIndex((x) => x.id === id);
     const s = normalizeShortcut(raw);
-    if (i < 0) return '找不到這個快捷鍵';
-    if (!s) return '這個組合鍵不能用';
+    if (i < 0) return t('sc.err.missing');
+    if (!s) return t('sc.err.combo');
     this.items[i] = { id, ...s };
     this.save();
     return this.items[i];
@@ -228,9 +235,9 @@ export class ShortcutStore {
    */
   importJSON(text, mode = 'append') {
     let data;
-    try { data = JSON.parse(text); } catch { return { added: 0, skipped: 0, error: '不是正確的 JSON' }; }
+    try { data = JSON.parse(text); } catch { return { added: 0, skipped: 0, error: t('sc.err.json') }; }
     const list = Array.isArray(data) ? data : data && Array.isArray(data.items) ? data.items : null;
-    if (!list) return { added: 0, skipped: 0, error: '找不到快捷鍵清單（items）' };
+    if (!list) return { added: 0, skipped: 0, error: t('sc.err.items') };
     const next = mode === 'replace' ? [] : [...this.items];
     let added = 0;
     let skipped = 0;

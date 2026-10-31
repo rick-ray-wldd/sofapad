@@ -20,7 +20,7 @@ const check = (name, ok, detail = '') => {
 const server = await startServer();
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 try {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: IPHONE_UA });
   const page = await ctx.newPage();
   page.on('pageerror', (e) => console.log('PAGE ERROR ' + e.message));
   const cdp = await ctx.newCDPSession(page);

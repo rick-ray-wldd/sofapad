@@ -19,7 +19,13 @@ const server = await startServer();
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const out = { runs: {} };
 try {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: IPHONE_UA });
+  // SOFA-10 (I-53): count the cursor-pad presses the page sends, so "at lift" can wait for the Mac's log to have them all
+  await ctx.addInitScript(() => {
+    window.__caretSent = 0;
+    const send = WebSocket.prototype.send;
+    WebSocket.prototype.send = function (d) { try { if (JSON.parse(d).t === 'caret') window.__caretSent++; } catch { /* not JSON */ } return send.call(this, d); };
+  });
   const page = await ctx.newPage();
   page.on('pageerror', (e) => console.log('PAGE ERROR ' + e.message));
   const cdp = await ctx.newCDPSession(page);
@@ -56,7 +62,10 @@ try {
   };
   const box = async () => page.locator('#caretPad').boundingBox();
   /** Hold `holdMs` at the pad's centre, then drag `dx`, `dy` in `ms` (16 ms steps). `second`: a second finger taps mid-way. */
+  const macKeys = () => [...server.log().matchAll(/\[dry-run\] key /g)].length;
   async function drag({ holdMs = 350, dx = 0, dy = 0, ms = 600, second = null, liftWait = 600 }) {
+    const sent0 = await page.evaluate(() => window.__caretSent);
+    const keys0 = macKeys();
     const b = await box();
     const x0 = b.x + b.width / 2;
     const y0 = b.y + b.height / 2;
@@ -77,6 +86,10 @@ try {
     }
     const dragMs = Date.now() - t0;
     await touch('touchEnd', []);
+    // A press sent in the same moment as the lift can reach the Mac's log a few ms after this point; wait (≤ 0.5 s) until
+    // the log has every press the page sent before the lift. One sent after the lift still shows up in `after`.
+    const sentAtLift = (await page.evaluate(() => window.__caretSent)) - sent0;
+    for (let w = 0; w < 50 && macKeys() - keys0 < sentAtLift; w++) await sleep(10);
     const atLift = macSince();
     await sleep(liftWait);
     return { atLift, after: macSince(), dragMs };

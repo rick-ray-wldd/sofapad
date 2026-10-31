@@ -48,7 +48,8 @@ const macLog = [];
 let out = {};
 try {
   const macCtx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
-  const phoneCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  // SOFA-10: the phone page in the demo page's language (it follows the browser's), in the dark theme as in 4.3.0
+  const phoneCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: IPHONE_UA, locale: lang === 'zh' ? 'zh-TW' : 'en-US', colorScheme: 'dark' });
   const mac = await macCtx.newPage();
   const phone = await phoneCtx.newPage();
   for (const [p, n] of [[mac, 'playground'], [phone, 'phone']]) p.on('pageerror', (e) => console.log(`PAGE ERROR (${n}) ${e.message}`));
@@ -82,7 +83,7 @@ try {
     phone: await startScreencast(phone, join(videoDir, 'phone'), { t0, maxWidth: 390, maxHeight: 844 }),
   } : null;
   await phone.evaluate(() => {
-    if (document.getElementById('modeBtn').textContent.trim() !== '即時') document.getElementById('modeBtn').click();
+    if (JSON.parse(localStorage.getItem('pkm.settings') || '{}').mode === 'buffer') document.getElementById('modeBtn').click();
     const el = document.getElementById('input');
     const ev = (type, init) => el.dispatchEvent(new InputEvent(type, { bubbles: true, cancelable: true, ...init }));
     window.__type = (s) => { el.focus(); for (const ch of s) { el.setRangeText(ch, el.selectionStart, el.selectionEnd, 'end'); ev('input', { inputType: 'insertText', data: ch }); } };

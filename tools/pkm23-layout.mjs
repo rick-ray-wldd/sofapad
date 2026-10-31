@@ -47,7 +47,7 @@ const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const results = [];
 try {
   // One phone (a pairing code pairs one phone); each size is a resize + reload, the token stays in storage.
-  const ctx = await browser.newContext({ viewport: DEVICES[0].viewport, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  const ctx = await browser.newContext({ viewport: DEVICES[0].viewport, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: IPHONE_UA });
   const page = await ctx.newPage();
   const cdp = await ctx.newCDPSession(page);
   await page.goto(server.url + '#pair=' + server.code);
@@ -116,7 +116,7 @@ if (label === 'after') {
   const hintServer = await startServer({ webRoot, env: { PKM_DRY_HOTKEYS_OFF: 'spaceLeft', PKM_DRY_SPACES: '1' } });
   const b2 = await chromium.launch({ channel: 'chrome', headless: true });
   try {
-    const ctx = await b2.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+    const ctx = await b2.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: IPHONE_UA });
     const page = await ctx.newPage();
     const cdp = await ctx.newCDPSession(page);
     await page.goto(hintServer.url + '#pair=' + hintServer.code);

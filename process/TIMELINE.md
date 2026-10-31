@@ -284,3 +284,16 @@
 | S9-M3 | 追加 1：示範場第 2 關英文即時（滑動輸入，逐字比對、說出哪個字錯）＋聽寫（中英都算）；實測包先換 | 17:40–17:56 | tools/sofa9-stage2.mjs |
 | S9-M4 | 追加 3／4：示範場雙語、預設英文（writer 子代理 1 個）；完整版照原樣，另有錄影精簡版（`?video=1` 或 meta）；實測包放兩個檔 | 17:58–18:20 | D-53 |
 | S9-M5 | 追加 2：README 最上面加示範場和 4.3.0 區塊；公開前檢查（docs/PUBLIC-CHECK.md「4.3」） | 18:20– | docs/PUBLIC-CHECK.md |
+
+## SOFA-10（SofaPad 4.4：手機網頁中英文、淺色深色主題，2026-10-31）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S10-M0 | 收到派工（Ray：收發 Pad 的瀏覽器沒有英文介面，要能切換中英文和深淺色主題，做完打包） | 15:41 | process/dispatch/DISPATCH-SOFA-10.md |
+| S10-M1 | 基線（4.3.0 的副本）：Swift 80/80、JS 91/91、self-test 33 PASS、13 個瀏覽器套件全過 | 15:45–16:00 | design/evidence/sofa10/tests.txt |
+| S10-M2 | 兩本字典（zh 是 4.3.0 原字）、`i18n.js`、畫第一個畫面前的 `boot.js`、CSS 顏色變數（淺色＋深色）、⚙︎ 的語言和主題開關；4.3 的套件固定在 zh-TW＋深色 | 15:50–16:12 | D-54 |
+| S10-M3 | 單元測試 JS 104/104（新增 13）；新瀏覽器套件 sofa10-i18n-theme 51/51，抓到匯出按鈕的 `t` 被蓋掉（I-51） | 16:00–16:15 | web/test/i18n.test.mjs、tools/sofa10-i18n-theme.mjs |
+| S10-M4 | 版本 4.4.0；全部套件重跑：除了 sofa6-caret 都和 4.3.0 一樣全過；sofa6-caret 兩版輪流比對，找到測試讀記錄的時間差（I-53） | 16:16–17:05 | design/evidence/sofa10/tests.txt |
+| S10-M5 | README、README.zh-TW、INSTALL、CHANGELOG、release notes 4.4.0、DEVELOPMENT；示範頁和錄影腳本的英文版改引用英文按鍵名 | 16:16–16:40 | docs/release/4.4.0.md |
+| S10-M6 | 錄影（60 fps，13.9 秒，同一條連線上切換語言和主題）；截圖 24 張 | 17:09–17:10 | design/screenshots/sofa10/ |
+| S10-M7 | 公開前檢查（新增的每一行和新檔案）；`tools/package.sh` → SofaPad-4.4.0-macOS.zip，逐位元組掃描，self-test | 17:05–17:13 | docs/PUBLIC-CHECK.md「4.4」、design/evidence/sofa10/release-zip-scan.txt |

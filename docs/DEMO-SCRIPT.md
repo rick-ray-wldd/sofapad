@@ -31,6 +31,8 @@ The release zip (`SofaPad-4.3.0-macOS.zip`) has a copy too: unzip it and double-
 
 - Open it in a browser on the Mac (Safari or Chrome). No network and no server needed.
 - **Language**: English by default; `?lang=zh`, or the 「中文」 button at the top right, gives the Chinese page.
+  The phone page follows the phone's language (4.4); for the English video, set the phone to English or pick
+  English in ⚙︎ → Language, so the labels on the phone match the ones quoted here.
 - **Recording mode**: click "Recording mode" at the top right, or add `?rec=1` to the end of the address,
   for example `file:///…/demo/playground.html?rec=1`. Recording mode:
   - hides each stage's small how-to text and the footer;
@@ -55,28 +57,28 @@ Narration and captions should describe it this way.
 ### Portrait
 
 - The text box is about half the phone's width.
-- The right half holds 「◀ 游標 ▶」 (the cursor pad) and ⏎ (Enter). By default ⏎ is fixed to the right of the cursor
+- The right half holds "◀ Cursor ▶" (the cursor pad) and ⏎ (Enter). By default ⏎ is fixed to the right of the cursor
   pad.
   - Cursor pad: hold for about 0.3 s (the phone gives a short buzz), then drag; the Mac's text cursor follows with the
     arrow keys. A quick flick jumps one word.
 - Below it is the key row:
-  - first 「即時／整段」 (Live / Whole) and 「⌘ 快捷鍵」 (⌘ Shortcuts);
-  - then 「⇧ 選取」 (⇧ Select), now an ordinary key that can be moved or removed;
+  - first "Live / Batch" and "⌘ Shortcuts";
+  - then "⇧ Select", now an ordinary key that can be moved or removed;
   - then esc, tab, ⌫, the arrows, ⌘ ⌥ ⌃ ⇧, space, ⌦;
-  - last, 「✎ 編輯」 (✎ Edit).
-- 「✎ 編輯」 opens an editor with three tabs, 「輸入列｜按鍵列｜橫拿側欄」 (Input row | Key row | Landscape panel):
+  - last, "✎ Edit".
+- "✎ Edit" opens an editor with three tabs, "Text row | Key row | Landscape panel":
   - drag ≡ to reorder;
   - ✕ to remove;
   - tap an item in the list below to add it;
-  - 「全部恢復預設」 (Restore all defaults: all three rows).
-- Even with 「⇧ 選取」 removed, a second finger tapping during a cursor-pad drag still selects.
+  - "Restore all defaults" (all three rows).
+- Even with "⇧ Select" removed, a second finger tapping during a cursor-pad drag still selects.
 
 ### Landscape
 
-- A side panel on one side that can collapse. Right-handed, it is on the left; in 「左手模式」 (left-hand mode) it is on
+- A side panel on one side that can collapse. Right-handed, it is on the left; in "Left-handed mode" it is on
   the right.
 - In the panel:
-  - a slim top row: connection status, keyboard, drag lock 「鎖」 (Lock), settings ⚙, collapse ‹;
+  - a slim top row: connection status, keyboard, drag lock "Lock", settings ⚙, collapse ‹;
   - the text box + cursor pad + ⏎;
   - below, a grid of keys: the key row's keys, plus shortcuts only shown in landscape, such as ⌘C ⌘V ⌘X ⌘Z ⌘A ⌘Tab,
     Mission Control, ⌃← ⌃→.
@@ -87,13 +89,13 @@ Narration and captions should describe it this way.
 
 - **Live mode**: the text appears on the Mac as you type; the iPhone's English keyboard can swipe (slide to type);
   Zhuyin is sent only after you pick the characters; dictation does not double the text.
-- **Whole mode + 送出 (Send)**: type and fix it on the phone first, then press 「送出」 to send it in one go.
+- **Batch mode + Send**: type and fix it on the phone first, then press "Send" to send it in one go.
 - **The box empties after sending** (since 4.2): when a piece ends (a trackpad click, a key, a gesture, the cursor pad,
   closing the keyboard), the text box empties, so old text is never sent again.
 - **Gestures**:
   - two-finger tap = right click; two-finger swipe up/down = scroll; two-finger spread / pinch = ⌘= / ⌘−;
   - three fingers left/right = switch desktop; up/down = Mission Control / App Exposé;
-  - long-press then drag = drag; 「鎖」 = drag lock;
+  - long-press then drag = drag; "Drag lock" ("Lock" in landscape) = drag lock;
   - the thin strip on the right edge = one-thumb scroll.
 - **Shortcuts panel**: including the screenshot-to-clipboard shortcut ⌃⇧⌘4.
 
@@ -165,7 +167,7 @@ After each stage, click "Next stage →" (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 0:08–0:33 (25 s) |
-| What the phone does | Slide one finger; tap "Click me"; two-finger tap on "Right-click here", then tap "👍 Like"; move the pointer onto the list and swipe down with two fingers to the end; long-press about half a second until 「拖曳中」 (Dragging) shows, and drag the blue block into the blue box; press 「鎖」 (Lock), drag the orange block into the orange box (in several strokes if you like), and press 「鎖」 again to let go. |
+| What the phone does | Slide one finger; tap "Click me"; two-finger tap on "Right-click here", then tap "👍 Like"; move the pointer onto the list and swipe down with two fingers to the end; long-press about half a second until "Dragging" shows, and drag the blue block into the blue box; press "Drag lock", drag the orange block into the orange box (in several strokes if you like), and press it again to let go. |
 | What the Mac shows | The bar fills to 600 px; the button turns green, "Got it ✓"; a custom menu pops up; the list scrolls to "Item 40: the end"; both blocks land in their boxes. Six green ticks on the right, and "✓ Done: Trackpad" at the bottom. |
 | Narration | "Move, click, right-click, scroll, drag: whatever the Mac's trackpad does, the phone does." |
 
@@ -174,7 +176,7 @@ After each stage, click "Next stage →" (with the phone's trackpad).
 | | |
 |---|---|
 | Time | 0:33–1:00 (27 s) |
-| What the phone does | Click box ①, and in Live mode type "I can type from the sofa with my phone" with the iPhone's English keyboard; you can swipe each word. Click box ②, switch to 「整段」 (Whole), type "Type it all, then send it at once" and press 「送出」 (Send). Switch back to 「即時」 (Live), click box ③ and type 「沙發上也能打中文」 (you can type Chinese from the sofa too) with Zhuyin. Click box ④, press the keyboard's 🎤 and say "It is a nice day, let's go for a walk in the park", then pause. |
+| What the phone does | Click box ①, and in Live mode type "I can type from the sofa with my phone" with the iPhone's English keyboard; you can swipe each word. Click box ②, switch to "Batch", type "Type it all, then send it at once" and press "Send". Switch back to "Live", click box ③ and type 「沙發上也能打中文」 (you can type Chinese from the sofa too) with Zhuyin. Click box ④, press the keyboard's 🎤 and say "It is a nice day, let's go for a walk in the park", then pause. |
 | What the Mac shows | ① turns green word by word; a word swiped wrong turns red and the page names it (for example word 3 is "tyre", should be "type"): delete it and swipe again. ② shows "… characters arrived within half a second ✓"; ③ shows "Correct ✓ no Zhuyin symbols showed up"; ④ shows "Nothing doubled ✓". |
 | Narration | "Type with the phone's own keyboard: swipe in English, Zhuyin sends only the characters you pick, and dictation does not double up." |
 
@@ -195,7 +197,7 @@ and ② for 「整段打好再一次送出」.
 | | |
 |---|---|
 | Time | 1:18–1:38 (20 s) |
-| What the phone does | Click into the sentence "SofaPad turns your iPhone into a keyboard and trackpda." with the trackpad. Hold 「◀ 游標 ▶」 (the cursor pad) about 0.3 s (short buzz), then drag left to the typo "trackpda"; flick once to jump a word. Press 「⇧ 選取」 (⇧ Select) and drag two steps to select "da" (or tap with a second finger while dragging). Type "ad". |
+| What the phone does | Click into the sentence "SofaPad turns your iPhone into a keyboard and trackpda." with the trackpad. Hold "◀ Cursor ▶" (the cursor pad) about 0.3 s (short buzz), then drag left to the typo "trackpda"; flick once to jump a word. Press "⇧ Select" and drag two steps to select "da" (or tap with a second finger while dragging). Type "ad". |
 | What the Mac shows | The bottom right shows the keys sent: ←, ⌥←, ⇧←; below the text, "Selected: da"; the typo becomes "trackpad", four green ticks. The ⇧ Select tick needs exactly "da" selected. |
 | Narration | "The cursor pad moves the Mac's text cursor directly; fixing a typo needs no mouse." |
 
@@ -204,7 +206,7 @@ and ② for 「整段打好再一次送出」.
 | | |
 |---|---|
 | Time | 1:38–1:58 (20 s) |
-| What the phone does | Click the top sentence, "SofaPad is handy". Open the panel with 「⌘ 快捷鍵」 (⌘ Shortcuts): ⌘A, ⌘C. Click the empty box below: ⌘V. Then ⌘Z. Then press the panel's ⌃⇧⌘4, select an area of the screen with a long-press drag, and press ⌘V. |
+| What the phone does | Click the top sentence, "SofaPad is handy". Open the panel with "⌘ Shortcuts": ⌘A, ⌘C. Click the empty box below: ⌘V. Then ⌘Z. Then press the panel's ⌃⇧⌘4, select an area of the screen with a long-press drag, and press ⌘V. |
 | What the Mac shows | The bottom right shows ⌘A, ⌘C, ⌘V, ⌘Z; the text is pasted into the box below and undone again; the screenshot appears in "Screenshot paste area". |
 | Narration | "Everyday shortcuts are one tap away, and a screenshot pastes straight in." |
 
@@ -222,7 +224,7 @@ and ② for 「整段打好再一次送出」.
 | | |
 |---|---|
 | Time | 2:18–2:42 (24 s) |
-| What the phone does | Hold the phone upright, screen to the camera: the half-width text box on the left, the cursor pad and ⏎ on the right. Click the playground's box, type a line, press the ⏎ next to the cursor pad. Press 「✎ 編輯」 (✎ Edit), drag a key by its ≡ to another place, close it. Turn the phone sideways: side panel on the left, full-height trackpad on the right; press ‹ to collapse it into a full-screen trackpad, then › to open it. Finally click the playground's three manual ticks on the right with the trackpad. |
+| What the phone does | Hold the phone upright, screen to the camera: the half-width text box on the left, the cursor pad and ⏎ on the right. Click the playground's box, type a line, press the ⏎ next to the cursor pad. Press "✎ Edit", drag a key by its ≡ to another place, close it. Turn the phone sideways: side panel on the left, full-height trackpad on the right; press ‹ to collapse it into a full-screen trackpad, then › to open it. Finally click the playground's three manual ticks on the right with the trackpad. |
 | What the Mac shows | The line appears in the chat box and "Type a line, press the ⏎ next to the cursor pad" is ticked; the three manual items turn green and "✓ Done: The 4.3 layout" appears. |
 | Narration | "The 4.3 layout: upright, type and move the cursor with one hand; sideways, a side panel with more shortcuts." |
 
@@ -277,7 +279,7 @@ recording version above leaves out stages 3 and 4, which this cut uses.)
 | 0:05–0:15 | Slide one finger, tap "Click me", two-finger tap for a right click, long-press and drag the blue block into its box | Green ticks light up one by one | "Whatever the Mac's trackpad does, the phone does." |
 | 0:15–0:27 | Stage 2: swipe the sentence in Live mode; dictate one with 🎤 | The text appears as you type; "Nothing doubled ✓" | "The phone's own keyboard: swiping and dictation both work." |
 | 0:27–0:35 | Stage 3: type a sentence, click "Send"; type another, click "Send" | "Nothing left over from the first message ✓" | "The text box empties after sending." |
-| 0:35–0:43 | Stage 4: drag the cursor pad to the typo, 「⇧ 選取」, type "ad" | "trackpda" becomes "trackpad" | "The cursor pad moves the Mac's text cursor directly." |
+| 0:35–0:43 | Stage 4: drag the cursor pad to the typo, "⇧ Select", type "ad" | "trackpda" becomes "trackpad" | "The cursor pad moves the Mac's text cursor directly." |
 | 0:43–0:50 | Stage 6: pinch; three fingers to another desktop and back | The picture zooms; the desktop slides away and back | "Pinch, three fingers: the same gestures." |
 | 0:50–0:57 | Show the cursor pad and ⏎ upright, then the side panel sideways | Stage 7 | "The 4.3 layout works upright and sideways." |
 | 0:57–1:00 | Click "Summary" | The count and the times | "SofaPad: use your Mac from the sofa." |

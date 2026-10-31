@@ -12,7 +12,7 @@ const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const shots = [];
 
 async function phone(width, height) {
-  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: UA });
+  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: UA });
   const page = await ctx.newPage();
   const cdp = await ctx.newCDPSession(page);
   return { ctx, page, cdp };

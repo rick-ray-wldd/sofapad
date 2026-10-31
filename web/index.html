@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
@@ -13,50 +13,52 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
+<!-- before the stylesheet: theme and language attributes, so the first frame is drawn in the right theme (SOFA-10) -->
+<script src="js/boot.js"></script>
 <link rel="stylesheet" href="style.css">
 <script type="module" src="js/app.js"></script>
 </head>
 <body>
 <div id="app">
   <header class="bar">
-    <button id="statusBtn" class="status" aria-label="連線狀態">
-      <span id="dot" class="dot"></span><span id="host">尋找 Mac…</span>
+    <button id="statusBtn" class="status" data-i18n-aria="status.aria">
+      <span id="dot" class="dot"></span><span id="host"></span>
     </button>
     <span id="rtt" class="rtt"></span>
-    <button id="settingsBtn" class="icon-btn" aria-label="設定">⚙︎</button>
+    <button id="settingsBtn" class="icon-btn" data-i18n-aria="settings.aria">⚙︎</button>
   </header>
   <div id="banner" class="banner" hidden></div>
 
   <main id="workspace" class="workspace">
-    <section id="pad" class="pad" aria-label="觸控板">
+    <section id="pad" class="pad" data-i18n-aria="pad.aria">
       <div class="pad-hint" id="padHint">
-        <p>單指滑動：移動游標　點一下：左鍵</p>
-        <p>雙指點：右鍵　雙指滑：捲動　捏合：縮放</p>
-        <p>三指左右滑：切換桌面　三指上／下滑：Mission Control／App Exposé</p>
-        <p>長按再拖：拖曳　右側長條：單手捲動</p>
+        <p data-i18n="pad.hint1"></p>
+        <p data-i18n="pad.hint2"></p>
+        <p data-i18n="pad.hint3"></p>
+        <p data-i18n="pad.hint4"></p>
       </div>
-      <div id="dragBadge" class="badge" hidden>拖曳中</div>
+      <div id="dragBadge" class="badge" data-i18n="pad.dragging" hidden></div>
       <div id="toast" class="toast" hidden></div>
-      <div id="strip" class="strip" aria-label="捲動條"><span>⇵</span></div>
+      <div id="strip" class="strip" data-i18n-aria="pad.strip.aria"><span>⇵</span></div>
 
       <!-- Floating buttons: shown in landscape (full-screen pad) and while typing in portrait (D-14, D-16). -->
       <div id="fab" class="fab">
-        <button id="fabStatus" class="fab-status" aria-label="連線狀態，點一下重新連線"><span id="fabDot" class="dot"></span></button>
-        <button id="fabKeyboard" aria-label="打字">Aa</button>
-        <button id="fabShortcuts" aria-label="快捷鍵">⌘</button>
-        <button id="fabLock" aria-label="拖曳鎖定" aria-pressed="false">鎖</button>
-        <button id="fabSettings" class="fab-landscape" aria-label="設定">⚙︎</button>
-        <button id="fabFullscreen" class="fab-landscape" aria-label="全螢幕" hidden>⛶</button>
-        <button id="fabSide" class="fab-landscape fab-side" aria-label="打開側欄（輸入框和按鍵）">›</button>
+        <button id="fabStatus" class="fab-status" data-i18n-aria="status.reconnect.aria"><span id="fabDot" class="dot"></span></button>
+        <button id="fabKeyboard" data-i18n-aria="fab.keyboard.aria">Aa</button>
+        <button id="fabShortcuts" data-i18n-aria="fab.shortcuts.aria">⌘</button>
+        <button id="fabLock" data-i18n-aria="fab.lock.aria" aria-pressed="false"></button>
+        <button id="fabSettings" class="fab-landscape" data-i18n-aria="settings.aria">⚙︎</button>
+        <button id="fabFullscreen" class="fab-landscape" data-i18n-aria="fab.fullscreen.aria" hidden>⛶</button>
+        <button id="fabSide" class="fab-landscape fab-side" data-i18n-aria="fab.side.aria">›</button>
       </div>
 
       <!-- Shortcut panel: covers the pad while open, never pushes it smaller (I-13). -->
       <div id="shortcutPanel" class="panel" hidden>
         <div class="panel-head">
-          <strong>快捷鍵</strong>
+          <strong data-i18n="panel.title"></strong>
           <span class="spacer"></span>
-          <button id="editShortcuts" class="chip">自訂…</button>
-          <button id="closeShortcuts" class="icon-btn" aria-label="關閉">✕</button>
+          <button id="editShortcuts" class="chip" data-i18n="panel.customize"></button>
+          <button id="closeShortcuts" class="icon-btn" data-i18n-aria="panel.close.aria">✕</button>
         </div>
         <div id="shortcutList" class="panel-body"></div>
       </div>
@@ -64,52 +66,52 @@
 
     <!-- Portrait: under the pad. Landscape: the side panel (SOFA-8, D-48), collapsible to a full-screen pad. -->
     <section id="controls" class="controls">
-      <div class="side-head" aria-label="側欄">
-        <button id="sideStatus" class="fab-status" aria-label="連線狀態，點一下重新連線"><span id="sideDot" class="dot"></span></button>
-        <button id="sideKeyboard" aria-label="打字">Aa</button>
-        <button id="sideLock" aria-label="拖曳鎖定" aria-pressed="false">鎖</button>
-        <button id="sideSettings" aria-label="設定">⚙︎</button>
+      <div class="side-head" data-i18n-aria="side.aria">
+        <button id="sideStatus" class="fab-status" data-i18n-aria="status.reconnect.aria"><span id="sideDot" class="dot"></span></button>
+        <button id="sideKeyboard" data-i18n-aria="fab.keyboard.aria">Aa</button>
+        <button id="sideLock" data-i18n-aria="fab.lock.aria" aria-pressed="false"></button>
+        <button id="sideSettings" data-i18n-aria="settings.aria">⚙︎</button>
         <span class="spacer"></span>
-        <button id="sideClose" aria-label="收起側欄（觸控板全螢幕）">‹</button>
+        <button id="sideClose" data-i18n-aria="side.close.aria">‹</button>
       </div>
 
       <div class="buttons">
-        <button id="btnLeft" class="mbtn">左鍵</button>
-        <button id="btnLock" class="mbtn lock" aria-pressed="false">拖曳鎖定</button>
-        <button id="btnRight" class="mbtn">右鍵</button>
+        <button id="btnLeft" class="mbtn" data-i18n="btn.left"></button>
+        <button id="btnLock" class="mbtn lock" aria-pressed="false"></button>
+        <button id="btnRight" class="mbtn" data-i18n="btn.right"></button>
       </div>
 
       <!-- The input row (SOFA-8): the box takes half the width, the cells the other half — by default the cursor pad
            (SOFA-6, D-44) and ⏎ to its right. The cells are editable like the key row (js/keyrow.js). -->
       <div class="typing">
-        <textarea id="input" aria-label="輸入框" rows="1" placeholder="點這裡用手機鍵盤打字（中文、英文都可以）"
+        <textarea id="input" data-i18n-aria="input.aria" rows="1"
           autocapitalize="off" autocomplete="off" spellcheck="false" enterkeyhint="enter"></textarea>
-        <button id="sendBtn" class="send" hidden>送出</button>
-        <div id="inputCells" class="cells" aria-label="輸入列"></div>
+        <button id="sendBtn" class="send" data-i18n="input.send" hidden></button>
+        <div id="inputCells" class="cells" data-i18n-aria="input.cells.aria"></div>
       </div>
 
       <div class="key-area" id="keyArea">
         <!-- Key row: scrolls sideways; the fades with ‹ › show there is more (PKM-2-3, I-19). Landscape: a grid. -->
         <div class="keys-wrap" id="keysWrap">
         <div class="keys" id="keyStrip">
-          <button id="modeBtn" class="chip mode" aria-label="輸入模式">即時</button>
-          <button id="shortcutsBtn" class="more">⌘ 快捷鍵</button>
+          <button id="modeBtn" class="chip mode" data-i18n-aria="mode.aria"></button>
+          <button id="shortcutsBtn" class="more" data-i18n="keys.shortcuts"></button>
           <!-- the rest comes from the saved key row (js/keyrow.js, PKM-3-1 ②); ✎ at the end edits it -->
         </div>
         </div>
         <!-- landscape only: more cells after the key row -->
-        <div class="side-cells" id="sideCells" aria-label="橫拿側欄"></div>
+        <div class="side-cells" id="sideCells" data-i18n-aria="keys.side.aria"></div>
       </div>
     </section>
   </main>
 
   <div id="pairSheet" class="sheet" hidden>
     <div class="sheet-card">
-      <h2>配對這支手機</h2>
-      <p class="muted">輸入 Mac 螢幕上的 6 位數配對碼。看不到配對碼的話，按下面的按鈕，Mac 會跳出新的一組。</p>
-      <input id="codeInput" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="••••••" aria-label="配對碼">
-      <button id="pairBtn" class="primary">配對</button>
-      <button id="requestBtn" class="secondary">請 Mac 顯示配對碼</button>
+      <h2 data-i18n="pair.title"></h2>
+      <p class="muted" data-i18n="pair.help"></p>
+      <input id="codeInput" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="••••••" data-i18n-aria="pair.code.aria">
+      <button id="pairBtn" class="primary" data-i18n="pair.pair"></button>
+      <button id="requestBtn" class="secondary" data-i18n="pair.request"></button>
       <p id="pairMsg" class="msg" role="status"></p>
     </div>
   </div>
@@ -117,34 +119,49 @@
 
   <div id="settingsSheet" class="sheet" hidden>
     <div class="sheet-card settings">
-      <h2>設定</h2>
-      <p id="versionLine" class="muted small version">網頁版本：讀取中…</p>
-      <label>游標速度 <output id="sensOut"></output><input id="sens" type="range" min="0.5" max="4" step="0.1"></label>
-      <label>加速度 <output id="accelOut"></output><input id="accel" type="range" min="0" max="1" step="0.05"></label>
-      <label>捲動速度 <output id="scrollOut"></output><input id="scroll" type="range" min="0.3" max="3" step="0.1"></label>
-      <label class="row"><input id="reverse" type="checkbox"> 反向捲動</label>
-      <label class="row"><input id="lefty" type="checkbox"> 左手模式（按鍵和捲動條換邊）</label>
-      <label class="row"><input id="longPress" type="checkbox"> 長按觸控板開始拖曳</label>
-      <label class="row"><input id="threeFinger" type="checkbox"> 三指滑動：切換桌面、Mission Control</label>
-      <label class="row"><input id="pinch" type="checkbox"> 雙指捏合：放大縮小（⌘＝／⌘−）</label>
-      <label class="row"><input id="navFlick" type="checkbox"> 雙指左右快滑：上一頁／下一頁（會和左右捲動搶，預設關）</label>
-      <p id="macStatus" class="muted small mac-status">連上 Mac 之後，這裡會顯示三指手勢需要的 Mac 快速鍵有沒有打開。</p>
-      <label class="row"><input id="hapticsOn" type="checkbox"> 觸覺回饋</label>
-      <label class="row"><input id="autocorrect" type="checkbox"> 手機自動修正與預測字（英文）</label>
-      <label class="row"><input id="enterAfter" type="checkbox"> 整段模式：送出後自動按 Enter</label>
-      <p class="muted small">即時模式：一個一個打的字馬上出現在 Mac，注音／拼音選字前不會送出；聽寫和預測字會等你停頓（約 0.7 秒）再一次送出，避免 Mac 上疊字。按 Enter、點觸控板、按任何按鍵或手勢、收起鍵盤，輸入框都會清空（字已經在 Mac 上），下次從空的框開始打。整段模式：先在手機上打完、改好，再按「送出」；收起鍵盤時沒送出的字會留在框裡。</p>
-      <p class="muted small">游標板（輸入框右邊的「◀ 游標 ▶」）：按住約 0.3 秒，手機輕震後左右、上下拖（手指可以拖出那一格），Mac 上的文字游標就用方向鍵跟著移動；快速甩一下一次跳一個字詞（⌥←→）。按「⇧ 選取」，或拖的時候另一根手指點一下，就改成 Shift＋方向鍵選取文字（「⇧ 選取」拿掉了，第二根手指照樣可以）。iPhone 鍵盤自己的「按住空白鍵移動游標」只會移動手機輸入框裡的游標，Mac 收不到，所以另外做了這個游標板。</p>
-      <p class="muted small">橫拿：一邊是觸控板，另一邊是側欄（輸入框、游標板、⏎、按鍵格）；按側欄右上的「‹」收起來，觸控板就變全螢幕，左邊浮動按鈕的「›」再打開。左手模式時側欄在右邊。</p>
-      <label class="row"><input id="sidePanel" type="checkbox"> 橫拿時顯示側欄（關掉＝觸控板全螢幕，打字時才出現）</label>
+      <h2 data-i18n="set.title"></h2>
+      <p id="versionLine" class="muted small version"></p>
+      <!-- SOFA-10: language and theme, applied at once (js/boot.js keeps them; no reload, the connection stays) -->
+      <div class="prefs">
+        <span id="langName" data-i18n="set.language"></span>
+        <div class="seg" id="langSeg" role="radiogroup" aria-labelledby="langName">
+          <button type="button" role="radio" data-lang="auto" data-i18n="lang.auto"></button>
+          <button type="button" role="radio" data-lang="en" lang="en" data-i18n="lang.en"></button>
+          <button type="button" role="radio" data-lang="zh" lang="zh-Hant" data-i18n="lang.zh"></button>
+        </div>
+        <span id="themeName" data-i18n="set.theme"></span>
+        <div class="seg" id="themeSeg" role="radiogroup" aria-labelledby="themeName">
+          <button type="button" role="radio" data-theme-choice="system" data-i18n="theme.system"></button>
+          <button type="button" role="radio" data-theme-choice="light" data-i18n="theme.light"></button>
+          <button type="button" role="radio" data-theme-choice="dark" data-i18n="theme.dark"></button>
+        </div>
+      </div>
+      <label><span data-i18n="set.sens"></span> <output id="sensOut"></output><input id="sens" type="range" min="0.5" max="4" step="0.1"></label>
+      <label><span data-i18n="set.accel"></span> <output id="accelOut"></output><input id="accel" type="range" min="0" max="1" step="0.05"></label>
+      <label><span data-i18n="set.scroll"></span> <output id="scrollOut"></output><input id="scroll" type="range" min="0.3" max="3" step="0.1"></label>
+      <label class="row"><input id="reverse" type="checkbox"> <span data-i18n="set.reverse"></span></label>
+      <label class="row"><input id="lefty" type="checkbox"> <span data-i18n="set.lefty"></span></label>
+      <label class="row"><input id="longPress" type="checkbox"> <span data-i18n="set.longPress"></span></label>
+      <label class="row"><input id="threeFinger" type="checkbox"> <span data-i18n="set.threeFinger"></span></label>
+      <label class="row"><input id="pinch" type="checkbox"> <span data-i18n="set.pinch"></span></label>
+      <label class="row"><input id="navFlick" type="checkbox"> <span data-i18n="set.navFlick"></span></label>
+      <p id="macStatus" class="muted small mac-status"></p>
+      <label class="row"><input id="hapticsOn" type="checkbox"> <span data-i18n="set.haptics"></span></label>
+      <label class="row"><input id="autocorrect" type="checkbox"> <span data-i18n="set.autocorrect"></span></label>
+      <label class="row"><input id="enterAfter" type="checkbox"> <span data-i18n="set.enterAfter"></span></label>
+      <p class="muted small" data-i18n="set.help.modes"></p>
+      <p class="muted small" data-i18n="set.help.caret"></p>
+      <p class="muted small" data-i18n="set.help.landscape"></p>
+      <label class="row"><input id="sidePanel" type="checkbox"> <span data-i18n="set.sidePanel"></span></label>
       <details class="io-log" id="inputLogBox">
-        <summary>輸入紀錄（除錯用，只存在這支手機，不會上傳）</summary>
-        <p class="muted small">記下手機鍵盤每次怎麼改輸入框、送了什麼到 Mac。聽寫送到 Mac 疊字時，打開這裡按「全選」，拷貝給開發者看。</p>
+        <summary data-i18n="set.log.summary"></summary>
+        <p class="muted small" data-i18n="set.log.help"></p>
         <textarea id="inputLogText" rows="8" readonly></textarea>
-        <div class="io-buttons"><button id="inputLogSelect" class="secondary">全選</button><button id="inputLogClear" class="secondary">清除</button></div>
+        <div class="io-buttons"><button id="inputLogSelect" class="secondary" data-i18n="set.log.selectAll"></button><button id="inputLogClear" class="secondary" data-i18n="set.log.clear"></button></div>
       </details>
-      <button id="rowEditBtn" class="secondary">編輯輸入列和按鍵列…</button>
-      <button id="forgetBtn" class="secondary">讓這支手機忘記配對</button>
-      <button id="closeSettings" class="primary">完成</button>
+      <button id="rowEditBtn" class="secondary" data-i18n="set.editRows"></button>
+      <button id="forgetBtn" class="secondary" data-i18n="set.forget"></button>
+      <button id="closeSettings" class="primary" data-i18n="done"></button>
     </div>
   </div>
 
@@ -152,21 +169,21 @@
   <div id="rowSheet" class="sheet" hidden>
     <div class="sheet-card rowedit">
       <div class="panel-head">
-        <h2>編輯按鍵</h2>
+        <h2 data-i18n="rowed.title"></h2>
         <span class="spacer"></span>
-        <button id="rowDone" class="chip">完成</button>
+        <button id="rowDone" class="chip" data-i18n="done"></button>
       </div>
-      <div class="row-tabs" id="rowTabs" role="tablist" aria-label="要編輯哪一列">
-        <button type="button" role="tab" data-row="input">輸入列</button>
-        <button type="button" role="tab" data-row="keys">按鍵列</button>
-        <button type="button" role="tab" data-row="side">橫拿側欄</button>
+      <div class="row-tabs" id="rowTabs" role="tablist" data-i18n-aria="rowed.tabs.aria">
+        <button type="button" role="tab" data-row="input" data-i18n="rowed.tab.input"></button>
+        <button type="button" role="tab" data-row="keys" data-i18n="rowed.tab.keys"></button>
+        <button type="button" role="tab" data-row="side" data-i18n="rowed.tab.side"></button>
       </div>
       <p id="rowNote" class="muted small"></p>
       <ol id="rowCurrent" class="row-current"></ol>
       <div id="rowCatalog" class="row-catalog"></div>
       <div class="row-foot">
-        <button id="rowAddCustom" class="secondary">＋ 新增自訂按鈕</button>
-        <button id="rowReset" class="secondary">全部恢復預設</button>
+        <button id="rowAddCustom" class="secondary" data-i18n="rowed.addCustom"></button>
+        <button id="rowReset" class="secondary" data-i18n="rowed.reset"></button>
       </div>
       <p id="rowMsg" class="msg" role="status"></p>
     </div>
@@ -174,39 +191,35 @@
 
   <div id="editorSheet" class="sheet" hidden>
     <div class="sheet-card editor">
-      <h2>自訂快捷鍵</h2>
-      <p class="muted small">存在這支手機上。新增的會出現在快捷鍵面板最上面的「我的」。</p>
+      <h2 data-i18n="ed.title"></h2>
+      <p class="muted small" data-i18n="ed.help"></p>
       <ol id="customList" class="custom-list"></ol>
-      <button id="addShortcut" class="secondary">＋ 新增快捷鍵</button>
+      <button id="addShortcut" class="secondary" data-i18n="ed.add"></button>
 
       <form id="shortcutForm" class="sc-form" hidden>
-        <label>名稱（可留空）<input id="scLabel" maxlength="24" placeholder="例如：截圖到剪貼簿" autocomplete="off"></label>
-        <div class="mod-picks" role="group" aria-label="修飾鍵">
-          <button type="button" data-pick="ctrl" aria-pressed="false">⌃ Control</button>
-          <button type="button" data-pick="opt" aria-pressed="false">⌥ Option</button>
-          <button type="button" data-pick="shift" aria-pressed="false">⇧ Shift</button>
-          <button type="button" data-pick="cmd" aria-pressed="false">⌘ Command</button>
-        </div>
-        <label>按鍵<select id="scKey"></select></label>
-        <p class="preview">預覽：<span id="scPreview"></span></p>
+        <label><span data-i18n="ed.name"></span><input id="scLabel" maxlength="24" data-i18n-placeholder="ed.name.placeholder" autocomplete="off"></label>
+        <!-- the modifier names come from MODIFIERS (js/shortcuts.js); macOS calls the keys this in every language -->
+        <div class="mod-picks" id="modPicks" role="group" data-i18n-aria="ed.mods.aria"></div>
+        <label><span data-i18n="ed.key"></span><select id="scKey"></select></label>
+        <p class="preview"><span data-i18n="ed.preview"></span><span id="scPreview"></span></p>
         <p id="scMsg" class="msg" role="status"></p>
         <div class="row-buttons">
-          <button type="button" id="scCancel" class="secondary">取消</button>
-          <button type="submit" id="scSave" class="primary">儲存</button>
+          <button type="button" id="scCancel" class="secondary" data-i18n="ed.cancel"></button>
+          <button type="submit" id="scSave" class="primary" data-i18n="ed.save"></button>
         </div>
       </form>
 
       <details class="io">
-        <summary>匯出／匯入（JSON）</summary>
-        <textarea id="ioText" rows="5" spellcheck="false" placeholder="按「匯出」產生 JSON；或把 JSON 貼在這裡再按「匯入」"></textarea>
+        <summary data-i18n="io.summary"></summary>
+        <textarea id="ioText" rows="5" spellcheck="false" data-i18n-placeholder="io.placeholder"></textarea>
         <div class="row-buttons">
-          <button type="button" id="exportBtn" class="secondary">匯出</button>
-          <button type="button" id="importAppend" class="secondary">匯入（加在後面）</button>
-          <button type="button" id="importReplace" class="secondary">匯入（取代全部）</button>
+          <button type="button" id="exportBtn" class="secondary" data-i18n="io.export"></button>
+          <button type="button" id="importAppend" class="secondary" data-i18n="io.append"></button>
+          <button type="button" id="importReplace" class="secondary"></button>
         </div>
         <p id="ioMsg" class="msg" role="status"></p>
       </details>
-      <button id="closeEditor" class="primary">完成</button>
+      <button id="closeEditor" class="primary" data-i18n="done"></button>
     </div>
   </div>
 

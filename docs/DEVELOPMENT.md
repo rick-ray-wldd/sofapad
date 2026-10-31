@@ -7,13 +7,17 @@
 | Path | What |
 |---|---|
 | `mac/` | Swift package. `PKMCore`: protocol, pairing, LAN server, sessions, pacing, addresses. `pkm-server`: CGEvent injection, menu bar, self-test (built into `SofaPad.app`). `pkm-probe`: window for the older end-to-end test |
-| `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable rows (text row, key row, landscape panel; 4.2's key row converted), `shortcuts.js`, `sha256.js` login proof, `version.js` |
+| `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable rows (text row, key row, landscape panel; 4.2's key row converted), `shortcuts.js`, `sha256.js` login proof, `version.js`; 4.4: `i18n.js` and `lang/en.js`, `lang/zh.js` (every text, one dictionary per language), `boot.js` (run before the page is drawn: theme and language, no flash). Colours are tokens in `style.css` (light on `:root`, dark under `[data-theme="dark"]`) |
 | `tools/` | `build-app.sh` (builds `dist/SofaPad.app`, stripped, with its dSYM next to it in `dist/`), `package.sh` (`dist/release/SofaPad-<version>-macOS.zip`: the app, release notes, install guide, demo page and recording scripts; + SHA-256), browser tests (Playwright + headless Chrome, dry-run Mac), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
 | `demo/` | `playground.html`: the demo / practice page for the Mac (one stage per feature, ticks itself; English by default, `?lang=zh` Chinese; `?video=1` or `<meta name="playground-mode" content="video">` the short recording version; see `docs/DEMO-SCRIPT.md`) |
 | `design/` | `SPEC.md`, screenshots, test evidence |
 | `research/` | The research report from v1 (papers, GitHub projects, products, Apple's own features) |
 | `process/` | Development records, in Chinese (timeline, decisions, issues, research log, tool log, summaries) |
 | `legacy/v0.2-python/` | The earlier Python SofaPad, kept as it was |
+
+The 4.3 browser suites open the page with `locale: 'zh-TW'` and the dark colour scheme, the conditions they were written
+for (since 4.4 the page follows the browser's language and the system theme); `sofa8-playground.mjs` gives the phone the
+demo page's language.
 
 Internal names stay as they were before the rename (the `pkm-server` target, the `PKMCore` module, `pkm.` keys in the phone's storage), so saved settings and paired phones keep working.
 
@@ -48,6 +52,8 @@ node tools/sofa6-textedit.mjs                      # 4.2: the same with real inj
 node tools/sofa8-layout.mjs [--video DIR]          # 4.3: half-width box + cursor pad + ⏎, the row editor, 4.2 row converted, landscape panel, sizes
 node tools/sofa8-playground.mjs [--lang en|zh] [--mode video] [--video DIR]   # 4.3: every stage of demo/playground.html from the phone page, through a dry-run Mac
 node tools/sofa9-stage2.mjs                        # 4.3: demo page typing stage: English swipe typing, dictation, both languages, ?video=1
+node tools/sofa10-i18n-theme.mjs [--video DIR]     # 4.4: English / Chinese and light / dark: switching on a live connection, no Chinese
+                                                   # left in English, the first frame's theme, WCAG contrast, screenshots (design/screenshots/sofa10)
 tools/e2e.sh                                       # older real-injection test into a probe window
 ```
 

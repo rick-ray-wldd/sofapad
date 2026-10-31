@@ -553,3 +553,20 @@ A 下方工具列                     B 可收合側欄（選這個）          
   - 英文版目標句：第 2 關即時 `I can type from the sofa with my phone`（完整版中文頁維持原本的中文句、逐字元比對）；聽寫建議 `It is a nice day, let's go for a walk in the park`；第 4 關錯字 `trackpda` → `trackpad`（選起 `da`，打 `ad`）；第 3 關兩句英文；注音那格兩種語言都是中文。
   - 判定順帶改得更準：⇧ 選取要剛好選起錯的那段才打勾（中文也是）；第 3 關的「殘留」改成用字詞比對（中文一字算一個），不算標點和空白。
   - 測試從 `window.playground.texts` 讀目標句，同一支測試兩種語言都能跑。
+
+## D-54 手機網頁中英文、淺色深色主題（SOFA-10，4.4.0）
+- Ray：「收發Pad的瀏覽器沒有英文版的介面」，要能切換中英文，也能選深色、淺色主題。其他行為全部照 4.3.0。
+- **語言**：所有字放在兩本字典 `web/js/lang/zh.js`、`en.js`，key 一樣；中文那本就是 4.3.0 的字，一字不改。網頁和程式裡不再寫任何介面文字（`data-i18n` 屬性和 `t('key')`），單元測試會掃。
+  - 預設跟瀏覽器的第一個語言：`zh` 開頭（zh-TW、zh-Hant、zh-CN、zh-HK）→ 中文，其他 → 英文。只看第一個，所以「英文為主、中文第二」的手機是英文。
+  - ⚙︎ 最上面「語言：自動／English／中文」。多一個「自動」：選過以後還能回到跟瀏覽器走。按下去馬上換，不重新整理、不重連（同一條 WebSocket），輸入框的字和正在顯示的提示一起換成新語言（提示存成函式，換語言時重算）。
+  - 英文介面裡唯一的中文是語言開關上的「中文」：語言名稱用它自己的文字寫，看不懂英文的人才找得到；那顆按鈕標 `lang="zh-Hant"`，讀螢幕軟體也會用中文念。測試把它當成唯一的例外。
+  - 英文用字照 README 已經在用的：Live／Batch／Send／Drag lock／Text row／Key row／Landscape panel／⇧ Select／◀ Cursor ▶。macOS 系統設定裡的名稱用 Apple 英文版的（Move left a space、Application windows）。
+- **主題**：「系統（預設）／淺色／深色」。顏色全部是 CSS 變數：`:root` 是淺色，`[data-theme="dark"]` 是深色（4.3.0 的顏色）。
+  - 不能閃：Mac App 的 CSP 只准外部 script（`script-src 'self'`），所以加一個一般的 `js/boot.js` 放在 stylesheet 前面，同步執行：讀 `pkm.theme`／`pkm.lang`，在畫第一個畫面前把 `data-theme`、`lang` 放上 `<html>`，也設 `theme-color`。#app 先藏起來，等 app.js 把字填好才顯示（最多 3 秒）。
+  - 「系統」時跟著手機外觀變（網頁開著也會變）；選了淺色或深色就不跟。
+  - iOS 狀態列：深色用 `black-translucent`（白字），淺色用 `default`（黑字）。主畫面 App 只在打開時讀，所以切換後下次打開才換；Safari 分頁裡跟著 theme-color。沒有真機驗證，寫在已知限制。
+  - WCAG AA：每個看得到的字都量（tools/sofa10-i18n-theme.mjs，兩種主題、兩種語言、22 個畫面狀態）。4.3.0 深色的實心藍按鈕（#4f8cff 上的白字）只有 3.2:1，所以多一個 `--accent-fill`（深色 #2f6fe4、淺色 #1a66e0）給「有白字的藍底」，框線和光圈還是原本的 `--accent`。這是深色主題唯一看得出來的改變。placeholder 也改用 `--muted`。
+- **其他照舊**：排版、手勢、打字、聽寫、送出後清空、游標板、各列按鍵的行為都沒動。4.3 的瀏覽器測試加 `locale: 'zh-TW'`、`colorScheme: 'dark'`（它們寫的時候的條件），結果和 4.3.0 一樣；`sofa8-playground` 的手機跟示範頁同一種語言。
+- **示範頁和錄影腳本的英文版**：原本引用手機上的中文按鍵名（「鎖 (Lock)」「整段 (Whole)」），因為那時手機只有中文（D-53）。現在英文手機顯示英文，所以改成英文名稱，「Whole」改成和手機、README 一樣的「Batch」。中文版不變。
+- iOS 模擬器測試台（tools/pkm4/run.mjs）用按鈕名稱找按鈕：改成先看頁面是不是中文，再從字典拿名稱。這次沒有重跑（要真的注入到「文字編輯」）。
+- 錄影：Chrome 的 screencast 只在畫面有變時送一張，ffmpeg 依時間戳排好後輸出固定 60 fps 的 MP4。

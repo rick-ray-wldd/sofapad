@@ -12,6 +12,8 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ROOT, bootSim, openURL, startDriver, terminateSafari } from './sim.mjs';
+import en from '../../web/js/lang/en.js';
+import zh from '../../web/js/lang/zh.js';
 
 const argv = process.argv.slice(2);
 const opt = (k, d) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : d; };
@@ -105,9 +107,11 @@ try {
   await waitLog(/authenticated /, 0, 30000);
   await drv.cmd('activate');
   await sleep(1200);
+  // SOFA-10: the page is in the simulator's language (an older build is always Chinese); the buttons are found by name
+  const L = (await drv.cmd('exists', { label: zh['mode.aria'], timeout: 2 })).exists ? zh : en;
   const box = { kind: 'textView', label: '' };
   if (mode === 'buffer') {
-    await drv.cmd('tap', { kind: 'button', label: '輸入模式' });
+    await drv.cmd('tap', { kind: 'button', label: L['mode.aria'] });
     await sleep(300);
   }
   const front = (w) => { const r = tewin('front', w); if (!r.ok) throw new Error(`could not bring window ${w} to the front`); };
@@ -136,7 +140,7 @@ try {
       await drv.cmd('tap', box);
       await drv.cmd('type', { text });
       const sentAt = Date.now();
-      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: '送出' });
+      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: L['input.send'] });
       else await drv.cmd('type', { text: '\n' });
       if (scenario === 'background') {            // Safari to the background and back, like switching apps on the phone
         await drv.cmd('home');
@@ -148,7 +152,7 @@ try {
       const switchedAt = Date.now();
       await drv.cmd('tap', box);
       await drv.cmd('type', { text: 'x' });
-      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: '送出' });
+      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: L['input.send'] });
       await sleep(900);
       results.rounds.push({ k, label, sentToSwitchMs: switchedAt - sentAt });
     }
@@ -201,7 +205,7 @@ try {
       front(A);
       await drv.cmd('tap', box);
       await drv.cmd('type', { text: `${label} undo test ` });
-      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: '送出' });
+      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: L['input.send'] });
       else await drv.cmd('type', { text: '\n' });
       await sleep(400);
       front(B);
@@ -211,7 +215,7 @@ try {
       await drv.cmd('typeKey', { key: 'z', mods: ['cmd', 'shift'] });
       await sleep(300);
       await drv.cmd('type', { text: 'x' });
-      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: '送出' });
+      if (mode === 'buffer') await drv.cmd('tap', { kind: 'button', label: L['input.send'] });
       await sleep(900);
       results.rounds.push({ k, label });
     }

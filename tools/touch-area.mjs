@@ -79,7 +79,7 @@ const server = await startServer({ webRoot });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const results = [];
 try {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: UA });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: UA });
   await ctx.addInitScript(fakeVisualViewport);
   const page = await ctx.newPage();
   const cdp = await ctx.newCDPSession(page);

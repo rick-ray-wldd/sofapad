@@ -1,24 +1,89 @@
+/* Colours are tokens (SOFA-10): the light theme here, the dark one (4.3.0's colours) below. js/boot.js puts
+   data-theme="light|dark" on <html> before the first frame: the choice in ⚙︎ (System follows prefers-color-scheme).
+   Text and key labels meet WCAG AA (4.5:1) in both; tools/sofa10-i18n-theme.mjs measures every visible text. */
 :root {
-  --bg: #0e1013;
-  --panel: #171a1f;
-  --pad: #1c2027;
-  --pad-line: #262b34;
-  --key: #252a32;
-  --key-active: #3a4352;
-  --text: #e9ecf1;
-  --muted: #9aa3b2;
-  --accent: #4f8cff;
-  --accent-soft: rgba(79, 140, 255, 0.18);
-  --ok: #3ecf8e;
+  --bg: #f2f3f5;
+  --panel: #f7f8fa;
+  --pad: #ffffff;
+  --pad-line: #eceef2;
+  --pad-edge: #dde1e7;
+  --key: #e4e7ec;
+  --key-active: #cdd2da;
+  --text: #15181d;
+  --muted: #545d6d;
+  --accent: #1f6feb;
+  --accent-fill: #1a66e0;
+  --on-accent: #ffffff;
+  --accent-soft: rgba(26, 102, 224, 0.12);
+  --accent-text: #0d4aa8;
+  --ok: #1f9d63;
   --warn: #f5b942;
-  --bad: #ff5d5d;
+  --on-warn: #1d1d1f;
+  --warn-soft: rgba(245, 185, 66, 0.24);
+  --warn-text: #5e3c00;
+  --warn-ink: #855400;
+  --bad: #e5484d;
+  --bad-soft: rgba(229, 72, 77, 0.12);
+  --bad-text: #8f1b1e;
+  --field: #ffffff;
+  --field-sunk: #ffffff;
+  --field-line: #c4cad4;
+  --inset: #e9ecf0;
+  --overlay: rgba(255, 255, 255, 0.97);
+  --scrim: rgba(20, 24, 31, 0.32);
+  --float: rgba(255, 255, 255, 0.94);
+  --float-dim: rgba(255, 255, 255, 0.72);
+  --float-shadow: 0 1px 4px rgba(20, 24, 31, 0.2);
+  --strip: rgba(20, 24, 31, 0.05);
+  --toast-bg: rgba(28, 31, 38, 0.9);
+  --toast-text: #f4f6f9;
+  color-scheme: light;
   --radius: 14px;
   --gap: 8px;
   --vvh: 100dvh;
   --vvtop: 0px;
   --side-w: clamp(260px, 36vw, 300px);   /* landscape side panel, without the safe area (SOFA-8, D-48) */
+}
+:root[data-theme="dark"] {
+  --bg: #0e1013;
+  --panel: #171a1f;
+  --pad: #1c2027;
+  --pad-line: #262b34;
+  --pad-edge: transparent;
+  --key: #252a32;
+  --key-active: #3a4352;
+  --text: #e9ecf1;
+  --muted: #9aa3b2;
+  --accent: #4f8cff;
+  --accent-fill: #2f6fe4;   /* 4.3.0 filled buttons with #4f8cff: white text on it was 3.2:1 */
+  --on-accent: #ffffff;
+  --accent-soft: rgba(79, 140, 255, 0.18);
+  --accent-text: #cfe0ff;
+  --ok: #3ecf8e;
+  --warn: #f5b942;
+  --on-warn: #1d1d1f;
+  --warn-soft: rgba(245, 185, 66, 0.14);
+  --warn-text: #ffe2a6;
+  --warn-ink: #f5b942;
+  --bad: #ff5d5d;
+  --bad-soft: rgba(255, 93, 93, 0.14);
+  --bad-text: #ffc4c4;
+  --field: #11141a;
+  --field-sunk: #0e1013;
+  --field-line: #2f3540;
+  --inset: #11141a;
+  --overlay: rgba(17, 20, 25, 0.97);
+  --scrim: rgba(0, 0, 0, 0.55);
+  --float: rgba(37, 42, 50, 0.88);
+  --float-dim: rgba(37, 42, 50, 0.6);
+  --float-shadow: none;
+  --strip: rgba(255, 255, 255, 0.05);
+  --toast-bg: rgba(14, 16, 19, 0.88);
+  --toast-text: #e9ecf1;
   color-scheme: dark;
 }
+/* js/boot.js hides the page until app.js has put the texts in (no moment of empty buttons) */
+.i18n-pending #app { visibility: hidden; }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -82,18 +147,18 @@ button:active, button.active { background: var(--key-active); }
 .dot.connecting { background: var(--warn); }
 .dot.ready { background: var(--ok); }
 .rtt { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
-.chip { padding: 6px 12px; border-radius: 999px; font-size: 13px; background: var(--accent-soft); color: #cfe0ff; }
+.chip { padding: 6px 12px; border-radius: 999px; font-size: 13px; background: var(--accent-soft); color: var(--accent-text); }
 .icon-btn { width: 40px; height: 36px; font-size: 18px; background: transparent; }
 
 .banner {
   margin: 0 10px 6px;
   padding: 8px 12px;
   border-radius: 10px;
-  background: rgba(245, 185, 66, 0.14);
-  color: #ffe2a6;
+  background: var(--warn-soft);
+  color: var(--warn-text);
   font-size: 13px;
 }
-.banner.bad { background: rgba(255, 93, 93, 0.14); color: #ffc4c4; }
+.banner.bad { background: var(--bad-soft); color: var(--bad-text); }
 
 /* ---------- workspace: portrait = pad on top, controls below ---------- */
 .workspace {
@@ -115,6 +180,8 @@ button:active, button.active { background: var(--key-active); }
     linear-gradient(var(--pad-line) 1px, transparent 1px) 0 0 / 28px 28px,
     linear-gradient(90deg, var(--pad-line) 1px, transparent 1px) 0 0 / 28px 28px,
     var(--pad);
+  outline: 1px solid var(--pad-edge);   /* the white pad on the light page */
+  outline-offset: -1px;
   touch-action: none;
   overflow: hidden;
 }
@@ -144,8 +211,8 @@ button:active, button.active { background: var(--key-active); }
   left: 10px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--accent);
-  color: white;
+  background: var(--accent-fill);
+  color: var(--on-accent);
   font-size: 12px;
   pointer-events: none;
 }
@@ -156,8 +223,8 @@ button:active, button.active { background: var(--key-active); }
   transform: translate(-50%, -50%);
   padding: 10px 16px;
   border-radius: 12px;
-  background: rgba(14, 16, 19, 0.88);
-  color: var(--text);
+  background: var(--toast-bg);
+  color: var(--toast-text);
   font-size: 15px;
   pointer-events: none;
   white-space: nowrap;
@@ -171,7 +238,7 @@ button:active, button.active { background: var(--key-active); }
   right: 8px;
   width: 44px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--strip);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -186,15 +253,16 @@ button:active, button.active { background: var(--key-active); }
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(37, 42, 50, 0.88);
+  background: var(--float);
+  box-shadow: var(--float-shadow);
   font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   touch-action: none;
 }
-.fab button[aria-pressed="true"] { background: var(--accent); color: white; }
-.fab .fab-status { background: rgba(37, 42, 50, 0.6); }
+.fab button[aria-pressed="true"] { background: var(--accent-fill); color: var(--on-accent); }
+.fab .fab-status { background: var(--float-dim); }
 .fab .fab-landscape { display: none; }
 
 .controls { display: flex; flex-direction: column; gap: var(--gap); flex: none; }
@@ -202,7 +270,7 @@ button:active, button.active { background: var(--key-active); }
 .buttons { display: grid; grid-template-columns: 1fr 0.8fr 1fr; gap: var(--gap); }
 .mbtn { height: 58px; font-size: 16px; font-weight: 600; touch-action: none; }
 .mbtn.lock { font-size: 14px; font-weight: 500; color: var(--muted); }
-.mbtn.lock[aria-pressed="true"] { background: var(--accent); color: white; }
+.mbtn.lock[aria-pressed="true"] { background: var(--accent-fill); color: var(--on-accent); }
 
 .typing { display: flex; gap: var(--gap); }
 #input {
@@ -211,10 +279,10 @@ button:active, button.active { background: var(--key-active); }
   min-height: 44px;
   max-height: 110px;
   resize: none;
-  border: 1px solid #2f3540;
+  border: 1px solid var(--field-line);
   border-radius: 12px;
   padding: 11px 12px;
-  background: #11141a;
+  background: var(--field);
   color: var(--text);
   font: inherit;
   font-size: 16px; /* 16px keeps iOS from zooming on focus */
@@ -222,7 +290,8 @@ button:active, button.active { background: var(--key-active); }
   user-select: text;
 }
 #input:focus { outline: none; border-color: var(--accent); }
-.send { padding: 0 16px; background: var(--accent); color: white; font-weight: 600; }
+::placeholder { color: var(--muted); opacity: 1; }
+.send { padding: 0 16px; background: var(--accent-fill); color: var(--on-accent); font-weight: 600; }
 
 /* The input row's cells (SOFA-8): half the row, next to the box. Not a scroller: inside one, the cursor pad's drags
    came in late and bunched, and a flick no longer jumped words (D-49). Too many cells get narrower instead (≤ 6). */
@@ -236,7 +305,7 @@ button:active, button.active { background: var(--key-active); }
 .cells:empty { display: none; }
 .cells button { flex: 0 1 48px; min-width: 34px; min-height: 44px; padding: 0 4px; font-size: 17px; }
 .cells .caret-select { font-size: 14px; }
-.cells .mod.armed, .side-cells .mod.armed { background: var(--accent); color: white; }
+.cells .mod.armed, .side-cells .mod.armed { background: var(--accent-fill); color: var(--on-accent); }
 
 /* Cursor pad (SOFA-6): a cell, by default in the input row (no height taken from the trackpad, I-13); drags may
    leave it. It takes what its row leaves over. */
@@ -255,9 +324,9 @@ button:active, button.active { background: var(--key-active); }
   user-select: none;
   -webkit-touch-callout: none;
 }
-.caret-pad.active { background: var(--accent-soft); color: #cfe0ff; box-shadow: inset 0 0 0 1px var(--accent); }
-.caret-pad.active.selecting { background: rgba(245, 185, 66, 0.16); color: #ffe2a8; box-shadow: inset 0 0 0 1px var(--warn); }
-.controls .caret-select[aria-pressed="true"] { background: var(--warn); color: #1d1d1f; }
+.caret-pad.active { background: var(--accent-soft); color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--accent); }
+.caret-pad.active.selecting { background: var(--warn-soft); color: var(--warn-text); box-shadow: inset 0 0 0 1px var(--warn); }
+.controls .caret-select[aria-pressed="true"] { background: var(--warn); color: var(--on-warn); }
 .keys .caret-pad { flex: none; width: 116px; min-height: 42px; height: 42px; }
 
 .keys {
@@ -270,8 +339,8 @@ button:active, button.active { background: var(--key-active); }
 }
 .keys::-webkit-scrollbar { display: none; }
 .keys button { flex: none; min-width: 46px; height: 42px; padding: 0 10px; font-size: 15px; }
-.keys .mod.armed { background: var(--accent); color: white; }
-.keys .more { background: var(--accent-soft); color: #cfe0ff; }
+.keys .mod.armed { background: var(--accent-fill); color: var(--on-accent); }
+.keys .more { background: var(--accent-soft); color: var(--accent-text); }
 .keys .mode { border-radius: 10px; }
 /* The row scrolls sideways (swipes on a button scroll it; a key goes on release). ‹ › fades show more (I-19). */
 .keys-wrap { position: relative; min-width: 0; }
@@ -293,7 +362,7 @@ button:active, button.active { background: var(--key-active); }
 .keys-wrap::after { content: "›"; right: 0; padding-right: 2px; justify-content: flex-end; background: linear-gradient(to left, var(--bg) 40%, transparent); }
 .keys-wrap.more-left::before, .keys-wrap.more-right::after { opacity: 1; }
 .mac-status { white-space: pre-line; }
-.mac-status.bad { color: var(--warn); }
+.mac-status.bad { color: var(--warn-ink); }
 
 /* ---------- portrait while typing: give the pad back the space (D-14, I-13) ---------- */
 @media (orientation: portrait) {
@@ -317,7 +386,7 @@ button:active, button.active { background: var(--key-active); }
   #app { padding: 0; }
   .bar { display: none; }
   .workspace, #app.kbd .workspace { flex-direction: row; padding: 0; gap: 0; }
-  .pad { border-radius: 0; min-height: 0; }
+  .pad { border-radius: 0; min-height: 0; outline: 0; }
   .pad-hint { left: 24px; right: calc(max(8px, env(safe-area-inset-right)) + 56px); }
   #app.lefty .pad-hint { right: 24px; left: calc(max(8px, env(safe-area-inset-left)) + 56px); }
   #app.side-closed .pad-hint { left: 64px; right: 64px; }
@@ -355,10 +424,10 @@ button:active, button.active { background: var(--key-active); }
   }
   .side-head { display: flex; align-items: center; gap: 6px; flex: none; }
   .side-head button { width: 42px; height: 36px; border-radius: 10px; font-size: 16px; display: flex; align-items: center; justify-content: center; touch-action: none; }
-  .side-head button[aria-pressed="true"] { background: var(--accent); color: white; }
+  .side-head button[aria-pressed="true"] { background: var(--accent-fill); color: var(--on-accent); }
   .side-head .fab-status { background: transparent; }
   #sideKeyboard { font-weight: 600; font-size: 15px; }
-  #app.typing #sideKeyboard { background: var(--accent); color: white; }
+  #app.typing #sideKeyboard { background: var(--accent-fill); color: var(--on-accent); }
   .buttons { display: none; }
   .typing { flex: none; }
   #input { max-height: 44px; padding: 10px; }
@@ -389,7 +458,7 @@ button:active, button.active { background: var(--key-active); }
   position: absolute;
   inset: 0;
   z-index: 8;
-  background: rgba(17, 20, 25, 0.97);
+  background: var(--overlay);
   display: flex;
   flex-direction: column;
   border-radius: inherit;
@@ -432,7 +501,7 @@ button:active, button.active { background: var(--key-active); }
 .sheet {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--scrim);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -461,40 +530,45 @@ button:active, button.active { background: var(--key-active); }
   text-align: center;
   padding: 10px;
   border-radius: 12px;
-  border: 1px solid #2f3540;
-  background: #11141a;
+  border: 1px solid var(--field-line);
+  background: var(--field);
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 .primary, .secondary { height: 48px; font-size: 16px; }
-.primary { background: var(--accent); color: white; font-weight: 600; }
-.msg { min-height: 1.4em; margin: 0; color: var(--warn); }
+.primary { background: var(--accent-fill); color: var(--on-accent); font-weight: 600; }
+.msg { min-height: 1.4em; margin: 0; color: var(--warn-ink); }
 .settings label { display: flex; flex-direction: column; gap: 6px; color: var(--text); }
 .settings label.row { flex-direction: row; align-items: center; gap: 10px; }
 .settings output { color: var(--muted); font-variant-numeric: tabular-nums; }
 .settings input[type="range"] { width: 100%; }
 .settings input[type="checkbox"] { width: 20px; height: 20px; flex: none; }
+/* language and theme (SOFA-10): a three-way switch each, at the top of ⚙︎ */
+.prefs { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--inset); border-radius: 12px; padding: 4px; }
+.seg button { height: 36px; padding: 0 4px; font-size: 14px; background: transparent; }
+.seg button[aria-checked="true"] { background: var(--accent-fill); color: var(--on-accent); font-weight: 600; }
 
 /* custom shortcut editor */
 .custom-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.custom-list li { display: flex; align-items: center; gap: 6px; background: #11141a; border-radius: 10px; padding: 6px 6px 6px 10px; }
+.custom-list li { display: flex; align-items: center; gap: 6px; background: var(--inset); border-radius: 10px; padding: 6px 6px 6px 10px; }
 .custom-list .combo { font-weight: 600; min-width: 64px; }
 .custom-list .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 13px; }
 .custom-list button { width: 36px; height: 36px; flex: none; }
-.sc-form { display: flex; flex-direction: column; gap: 10px; background: #11141a; border-radius: 12px; padding: 12px; }
+.sc-form { display: flex; flex-direction: column; gap: 10px; background: var(--inset); border-radius: 12px; padding: 12px; }
 .sc-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
 .sc-form input, .sc-form select, .io textarea, .io-log textarea {
   font: inherit;
   font-size: 16px;
   color: var(--text);
-  background: var(--bg);
-  border: 1px solid #2f3540;
+  background: var(--field-sunk);
+  border: 1px solid var(--field-line);
   border-radius: 10px;
   padding: 10px;
 }
 .mod-picks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .mod-picks button { height: 42px; }
-.mod-picks button[aria-pressed="true"] { background: var(--accent); color: white; }
+.mod-picks button[aria-pressed="true"] { background: var(--accent-fill); color: var(--on-accent); }
 .preview { margin: 0; font-size: 15px; }
 #scPreview { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
 .row-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -505,7 +579,7 @@ button:active, button.active { background: var(--key-active); }
 .io-buttons button { flex: 1; }
 
 .version { margin: -4px 0 4px; }
-.version.bad { color: var(--warn); }
+.version.bad { color: var(--warn-ink); }
 
 .haptic { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
 
@@ -534,6 +608,6 @@ button:active, button.active { background: var(--key-active); }
   .row-current .nm { display: none; }
 }
 /* row editor tabs (SOFA-8): which row the list and the catalog below are for */
-.row-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: #11141a; border-radius: 12px; padding: 4px; }
+.row-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--inset); border-radius: 12px; padding: 4px; }
 .row-tabs button { height: 38px; font-size: 14px; background: transparent; }
-.row-tabs button[aria-selected="true"] { background: var(--accent); color: white; font-weight: 600; }
+.row-tabs button[aria-selected="true"] { background: var(--accent-fill); color: var(--on-accent); font-weight: 600; }

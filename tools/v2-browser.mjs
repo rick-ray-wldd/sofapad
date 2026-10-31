@@ -60,7 +60,7 @@ const server = await startServer();
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 
 async function phone({ fresh = true } = {}) {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: IPHONE_UA });
   await ctx.addInitScript(recordSends);
   await ctx.addInitScript(fakeVisualViewport);
   const page = await ctx.newPage();

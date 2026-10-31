@@ -9,10 +9,17 @@
 //   c:<mods>+<key>   a key combination, e.g. c:cmd+c (the built-in shortcuts)
 //   u:<id>           one of Ray's own shortcuts (ShortcutStore); dropped if he deletes it
 //   x:caret          the cursor pad (SOFA-6); x:select its ⇧ 選取 switch. One of each, in one row at a time.
+// Labels and names come from the dictionaries (SOFA-10) each time a row is described, so they follow the language.
 import { BUILTIN_GROUPS, MODIFIERS, comboLabel, keyLabel, ALL_KEYS } from './shortcuts.js';
+import { t } from './i18n.js';
 
 export const ROWS = ['input', 'keys', 'side'];
-export const ROW_NAMES = { input: '輸入列', keys: '按鍵列', side: '橫拿側欄' };
+/** The rows' names as used in sentences (「已加到按鍵列最後」, "added to the end of the key row"). */
+export const ROW_NAMES = {
+  get input() { return t('row.input'); },
+  get keys() { return t('row.keys'); },
+  get side() { return t('row.side'); },
+};
 export const DEFAULTS = {
   input: ['x:caret', 'k:enter'],
   keys: ['x:select', 'k:escape', 'k:tab', 'k:backspace', 'k:left', 'k:up', 'k:down', 'k:right',
@@ -34,13 +41,12 @@ export const SINGLE = new Set(['x:caret', 'x:select']);
 export const REPEAT_KEYS = new Set(['backspace', 'forwarddelete', 'left', 'right', 'up', 'down']);
 
 const ROW_LABELS = { escape: 'esc', tab: 'tab', space: 'space', enter: '⏎' };
-const KEY_NAMES = {
-  escape: 'Esc', tab: 'Tab', backspace: '刪除（⌫）', enter: 'Enter（⏎）', space: '空白', forwarddelete: '往後刪（⌦）',
-  left: '左', right: '右', up: '上', down: '下', home: 'Home', end: 'End', pageup: '上一頁', pagedown: '下一頁',
-};
+/** Keys with a name of their own in the editor (key.<name> in the dictionaries); the others show their symbol. */
+const KEY_NAMES = new Set(['escape', 'tab', 'backspace', 'enter', 'space', 'forwarddelete',
+  'left', 'right', 'up', 'down', 'home', 'end', 'pageup', 'pagedown']);
 const SPECIAL = {
-  'x:caret': { kind: 'caret', label: '◀ 游標 ▶', name: '游標板（按住再拖）' },
-  'x:select': { kind: 'select', label: '⇧ 選取', name: '游標板改成選取' },
+  'x:caret': { kind: 'caret', label: 'cell.caret', name: 'cell.caret.name' },
+  'x:select': { kind: 'select', label: 'cell.select', name: 'cell.select.name' },
 };
 const MOD_IDS = MODIFIERS.map((m) => m.id);
 
@@ -55,15 +61,18 @@ export function comboId(key, mods = []) {
  */
 export function describe(id, customItems = []) {
   if (typeof id !== 'string') return null;
-  if (SPECIAL[id]) return { id, ...SPECIAL[id] };
+  if (SPECIAL[id]) {
+    const x = SPECIAL[id];
+    return { id, kind: x.kind, label: t(x.label), name: t(x.name) };
+  }
   if (id.startsWith('k:')) {
     const k = id.slice(2);
     if (!ALL_KEYS.includes(k)) return null;
-    return { id, kind: 'key', k, mods: [], label: ROW_LABELS[k] || keyLabel(k), name: KEY_NAMES[k] || keyLabel(k), repeat: REPEAT_KEYS.has(k) };
+    return { id, kind: 'key', k, mods: [], label: ROW_LABELS[k] || keyLabel(k), name: KEY_NAMES.has(k) ? t(`key.${k}`) : keyLabel(k), repeat: REPEAT_KEYS.has(k) };
   }
   if (id.startsWith('m:')) {
     const m = MODIFIERS.find((x) => x.id === id.slice(2));
-    return m ? { id, kind: 'mod', mod: m.id, label: m.symbol, name: `${m.name}（先按，再按下一個鍵）` } : null;
+    return m ? { id, kind: 'mod', mod: m.id, label: m.symbol, name: t('cell.mod.name', { name: m.name }) } : null;
   }
   if (id.startsWith('c:')) {
     const plus = id.lastIndexOf('+');
@@ -84,13 +93,13 @@ export function describe(id, customItems = []) {
 export function catalog(customItems = []) {
   const keys = (list) => list.map((k) => `k:${k}`);
   const groups = [
-    { id: 'caret', label: '游標板', ids: ['x:caret', 'x:select'] },
-    { id: 'keys', label: '常用按鍵', ids: keys(['escape', 'tab', 'backspace', 'enter', 'space', 'forwarddelete']) },
-    { id: 'arrows', label: '方向和翻頁', ids: keys(['left', 'up', 'down', 'right', 'home', 'end', 'pageup', 'pagedown']) },
-    { id: 'mods', label: '修飾鍵（先按，再按下一個鍵）', ids: MOD_IDS.slice().reverse().map((m) => `m:${m}`) },
+    { id: 'caret', label: t('cat.caret'), ids: ['x:caret', 'x:select'] },
+    { id: 'keys', label: t('cat.keys'), ids: keys(['escape', 'tab', 'backspace', 'enter', 'space', 'forwarddelete']) },
+    { id: 'arrows', label: t('cat.arrows'), ids: keys(['left', 'up', 'down', 'right', 'home', 'end', 'pageup', 'pagedown']) },
+    { id: 'mods', label: t('cat.mods'), ids: MOD_IDS.slice().reverse().map((m) => `m:${m}`) },
     ...BUILTIN_GROUPS.map((g) => ({ id: g.id, label: g.label, ids: g.items.map((s) => comboId(s.key, s.mods)) })),
-    { id: 'mine', label: '我的快捷鍵', ids: customItems.map((s) => `u:${s.id}`) },
-    { id: 'fkeys', label: '功能鍵', ids: keys(Array.from({ length: 12 }, (_, i) => `f${i + 1}`)) },
+    { id: 'mine', label: t('cat.mine'), ids: customItems.map((s) => `u:${s.id}`) },
+    { id: 'fkeys', label: t('cat.fkeys'), ids: keys(Array.from({ length: 12 }, (_, i) => `f${i + 1}`)) },
   ];
   return groups.map((g) => ({ ...g, items: g.ids.map((id) => describe(id, customItems)).filter(Boolean) }));
 }
@@ -171,9 +180,9 @@ export class LayoutStore {
 
   /** @returns true, or a reason it was not added. A single cell moves here from the row it was in. */
   add(row, id) {
-    if (this.rows[row].includes(id)) return `已經在${ROW_NAMES[row]}上`;
-    if (!describe(id, this.customItems())) return '這個按鍵不能用';
-    if (this.rows[row].length >= MAX_CELLS[row]) return `${ROW_NAMES[row]}最多 ${MAX_CELLS[row]} 個`;
+    if (this.rows[row].includes(id)) return t('row.err.there', { row: ROW_NAMES[row] });
+    if (!describe(id, this.customItems())) return t('row.err.key');
+    if (this.rows[row].length >= MAX_CELLS[row]) return t('row.err.full', { row: ROW_NAMES[row], n: MAX_CELLS[row] });
     if (SINGLE.has(id)) for (const r of ROWS) this.rows[r] = this.rows[r].filter((x) => x !== id);
     this.rows[row].push(id);
     this.save();

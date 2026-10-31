@@ -4,7 +4,7 @@ import { chromium } from 'playwright-core';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, v, i, arr) => (v.startsWith('--') ? [...a, [v.slice(2), arr[i + 1]]] : a), []));
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
-const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark' });
 const page = await ctx.newPage();
 await page.goto(args.url + '#pair=' + args.code);
 await page.waitForFunction(() => document.getElementById('dot').classList.contains('ready'));

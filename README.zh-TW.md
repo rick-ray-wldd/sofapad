@@ -25,12 +25,13 @@
 
 最後有總表，列出每一項和完成的時間。「錄影模式」（`?rec=1`）會把小字藏起來，適合錄影。錄短片用的「錄影精簡版」：網址加 `?video=1`，只有第 1、2、5、6、7 關，第 2 關是英文滑動輸入和聽寫。2–3 分鐘和 60 秒兩種錄影腳本：[`docs/DEMO-SCRIPT.zh-TW.md`](docs/DEMO-SCRIPT.zh-TW.md)（[English](docs/DEMO-SCRIPT.md)）。安裝包（zip）裡也有一份 `playground.html`。
 
-## 最新版：4.3.0
+## 最新版：4.4.0
 
-- **下載**：[GitHub Releases → SofaPad 4.3.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.3.0)（`SofaPad-4.3.0-macOS.zip`，macOS 13 以上，Apple 晶片）。安裝：[`docs/INSTALL.md`](docs/INSTALL.md)。
+- **下載**：[GitHub Releases → SofaPad 4.4.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.4.0)（`SofaPad-4.4.0-macOS.zip`，macOS 13 以上，Apple 晶片）。安裝：[`docs/INSTALL.md`](docs/INSTALL.md)。
+- **4.4 新功能**：手機網頁有**中文和英文**（跟著手機的語言；⚙︎ →「語言」可以換），還有**淺色和深色主題**（⚙︎ →「主題」：系統、淺色、深色）。切換馬上生效，不用重新整理，手機會記住。其他都和 4.3 一樣。
 - **4.3 新功能**：輸入框半寬，旁邊是游標板和 ⏎；輸入列、按鍵列、橫拿側欄都可以自己排；橫拿有側欄和全高的觸控板；示範場。
 - **4.3 的預設**：按鍵列不放 ⏎（在游標板右邊；要的話到「✎ 編輯」加）；直拿、即時模式打字時輸入框一行，觸控板保持 290 px 以上；橫拿側欄在左邊（左手模式在右邊）。
-- 完整更新紀錄：[`CHANGELOG.md`](CHANGELOG.md)（英文）。發行說明：[`docs/release/4.3.0.md`](docs/release/4.3.0.md)（中英）。
+- 完整更新紀錄：[`CHANGELOG.md`](CHANGELOG.md)（英文）。發行說明：[`docs/release/4.4.0.md`](docs/release/4.4.0.md)（中英）。
 
 ---
 
@@ -53,7 +54,7 @@
    - **會看到**最後一行 `Built …/dist/SofaPad.app`。
 3. 在 Finder 把 `dist/SofaPad.app` 拖到「應用程式」資料夾（權限設定比較穩定）。
 
-**B. 用別人建好的 `SofaPad.app`**（AirDrop、下載）：可以，但第一次打開會被擋，照第 2 步做。從發行的 zip（`SofaPad-<版本>-macOS.zip`，Apple 晶片；最新是 [4.3.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.3.0)）安裝：見 [`docs/INSTALL.md`](docs/INSTALL.md)，裡面有怎麼核對 SHA-256。
+**B. 用別人建好的 `SofaPad.app`**（AirDrop、下載）：可以，但第一次打開會被擋，照第 2 步做。從發行的 zip（`SofaPad-<版本>-macOS.zip`，Apple 晶片；最新是 [4.4.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.4.0)）安裝：見 [`docs/INSTALL.md`](docs/INSTALL.md)，裡面有怎麼核對 SHA-256。
 
 ### 2. 第一次打開 App（被 Gatekeeper 擋時）
 
@@ -102,8 +103,8 @@ macOS 規定：替你按鍵盤、動滑鼠的程式，要先由你允許。
 
 ### 7. 怎麼看版本
 
-- **Mac**：點選單列 `⌨︎🖱`，第一行就是版本，例如「SofaPad 4.3.0（建置 2026-10-30 16:00）」。
-- **iPhone**：右上角 ⚙︎（橫拿時在側欄最上面那排；側欄收起時是左邊那排小按鈕的 ⚙︎），最上面一行「網頁 4.3.0（建置 …）・Mac App 4.3.0（建置 …）」。
+- **Mac**：點選單列 `⌨︎🖱`，第一行就是版本，例如「SofaPad 4.4.0（建置 2026-10-31 16:00）」。
+- **iPhone**：右上角 ⚙︎（橫拿時在側欄最上面那排；側欄收起時是左邊那排小按鈕的 ⚙︎），最上面一行「網頁 4.4.0（建置 …）・Mac App 4.4.0（建置 …）」（英文介面是「Web page 4.4.0 (build …) · Mac app 4.4.0 (build …)」）。
 - 兩邊版本不同，或寫「舊版（沒有版本資訊）」：Mac 上換成新版 App，再重新整理網頁（主畫面 App 要從 App 切換器往上滑掉再打開）。
 
 ### 8. 常見問題
@@ -209,7 +210,7 @@ App 改名後，macOS 會把它當成新的 App，所以輔助使用權限要重
 
 ### 設定（⚙︎）
 
-最上面是版本。游標速度、加速度、捲動速度、反向捲動、左手模式、長按拖曳、三指滑動（預設開）、捏合縮放（預設開）、雙指左右快滑（預設關）、觸覺回饋、手機自動修正、橫拿時顯示側欄、編輯輸入列和按鍵列、輸入紀錄（只存在手機上，給開發者除錯用）、讓這支手機忘記配對。
+最上面是版本。接著是 4.4 的「**語言**」（自動、English、中文）和「**主題**」（系統、淺色、深色）：「自動」跟著手機的語言（中文就是中文，其他是英文），「系統」跟著手機的淺色／深色外觀，網頁開著的時候也會跟著變。切換馬上生效，不用重新整理，也不會斷線（輸入框裡的字還在），存在這支手機上。加到主畫面的 App，iPhone 狀態列的顏色下次打開 App 時才換。再來是游標速度、加速度、捲動速度、反向捲動、左手模式、長按拖曳、三指滑動（預設開）、捏合縮放（預設開）、雙指左右快滑（預設關）、觸覺回饋、手機自動修正、橫拿時顯示側欄、編輯輸入列和按鍵列、輸入紀錄（只存在手機上，給開發者除錯用）、讓這支手機忘記配對。
 
 ### 小提醒
 

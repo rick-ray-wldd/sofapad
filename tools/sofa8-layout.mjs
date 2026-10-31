@@ -104,7 +104,7 @@ const macSince = () => {
 };
 
 async function phone({ width, height, insets, name }) {
-  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: IPHONE_UA });
   await ctx.addInitScript(fakeVisualViewport);
   if (videoDir) await ctx.addInitScript(drawTouches);
   if (token) await ctx.addInitScript((t) => { if (!localStorage.getItem('pkm.token')) localStorage.setItem('pkm.token', t); }, token);

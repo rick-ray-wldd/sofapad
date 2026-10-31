@@ -88,7 +88,7 @@ try {
     const t = setTimeout(() => reject(new Error('no pairing code')), 10_000);
     const iv = setInterval(() => { const m = /配對碼：(\d{6})/.exec(serverLog); if (m) { clearTimeout(t); clearInterval(iv); resolve(m[1]); } }, 20);
   });
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, userAgent: IPHONE_UA });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, locale: 'zh-TW', colorScheme: 'dark', userAgent: IPHONE_UA });
   const page = await ctx.newPage();
   const cdp = await ctx.newCDPSession(page);
   await page.goto(`http://127.0.0.1:${port}/#pair=${code}`);

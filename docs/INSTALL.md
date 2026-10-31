@@ -11,7 +11,7 @@
 ## English
 
 1. **Check the download** (optional): in Terminal, in the folder with the zip, run
-   `shasum -a 256 -c SofaPad-4.3.0-macOS.zip.sha256`. **You'll see** `SofaPad-4.3.0-macOS.zip: OK`.
+   `shasum -a 256 -c SofaPad-4.4.0-macOS.zip.sha256`. **You'll see** `SofaPad-4.4.0-macOS.zip: OK`.
 2. Double-click the zip. Drag `SofaPad.app` from the folder that appears into **Applications**.
 3. Double-click **SofaPad** in Applications. If you get "**"SofaPad" Not Opened** / Apple could not verify…":
    1. Click **Done** (not Move to Trash).
@@ -26,13 +26,15 @@
 5. **Firewall** (only if it is on): when macOS asks whether SofaPad may accept incoming connections, click **Allow**.
 6. `⌨︎🖱` appears in the menu bar. Click it → **Scan with iPhone (用 iPhone 掃描)**, scan the QR code with the iPhone's
    camera, and pair with the code on the Mac's screen. Then follow README step 6.
-7. **Check the version**: the menu's first line reads "SofaPad 4.3.0 (build …)"; on the phone, ⚙︎ shows
-   "Web page 4.3.0 · Mac app 4.3.0".
+7. **Check the version**: the menu's first line reads "SofaPad 4.4.0 (build …)"; on the phone, ⚙︎ shows
+   "Web page 4.4.0 (build …) · Mac app 4.4.0 (build …)".
+8. **Language and theme** (4.4): the phone page is in English, or in Chinese when the phone's language is Chinese.
+   ⚙︎ → **Language** (Auto, English, 中文) and **Theme** (System, Light, Dark) change it at once; the phone remembers.
 
 ## 繁體中文
 
 1. **核對下載的檔案**（可選）：在終端機切到 zip 所在的資料夾，執行
-   `shasum -a 256 -c SofaPad-4.3.0-macOS.zip.sha256`，**會看到** `SofaPad-4.3.0-macOS.zip: OK`。
+   `shasum -a 256 -c SofaPad-4.4.0-macOS.zip.sha256`，**會看到** `SofaPad-4.4.0-macOS.zip: OK`。
 2. 雙擊 zip 解壓縮，把資料夾裡的 `SofaPad.app` 拖到「**應用程式**」。
 3. 在「應用程式」雙擊 **SofaPad**。如果出現「**無法打開「SofaPad」**／Apple 無法驗證…」：
    1. 按「**完成**」（不要按「丟到垃圾桶」）。
@@ -43,4 +45,5 @@
 4. **輔助使用權限**：系統設定 → 隱私權與安全性 → 輔助使用。清單裡如果有舊的 SofaPad，先選它按「**－**」移除；再按「**＋**」加入 `/應用程式/SofaPad.app` 並打開開關。（macOS 用簽章認 App，每次 build 的簽章都不一樣。）
 5. **防火牆**（有開才會問）：問 SofaPad 能不能接受連入的連線時，按「**允許**」。
 6. 選單列出現 `⌨︎🖱`：點它 →「**用 iPhone 掃描**」，用 iPhone 相機掃 QR code，輸入 Mac 螢幕上的配對碼。之後照 README 第 6 步。
-7. **確認版本**：選單第一行是「SofaPad 4.3.0（建置 …）」；手機 ⚙︎ 最上面是「網頁 4.3.0・Mac App 4.3.0」。
+7. **確認版本**：選單第一行是「SofaPad 4.4.0（建置 …）」；手機 ⚙︎ 最上面是「網頁 4.4.0（建置 …）・Mac App 4.4.0（建置 …）」。
+8. **語言和主題**（4.4）：手機的語言是中文時，網頁是中文，否則是英文。⚙︎ →「**語言**」（自動、English、中文）和「**主題**」（系統、淺色、深色）可以馬上切換，手機會記住。
