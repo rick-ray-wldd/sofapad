@@ -1,0 +1,53 @@
+SOFA-10 (4.4.0: English / Chinese, light / dark) tests, 2026-10-31, this Mac. Browser suites: headless Chrome, dry-run
+Mac (nothing injected). "Before" = the 4.3.0 tree (HEAD 869bba5, run from a copy), "after" = 4.4.0. Exit codes in
+brackets. The 4.3 suites open the page in zh-TW and the dark colour scheme since 4.4 (the conditions they were written
+for; the page now follows the browser's language and the system theme).
+
+                                            before (4.3.0)       after (4.4.0)
+Unit tests
+  Swift (swift test)                          80/80  [0]           80/80  [0]   (one checks VERSION = version.js = BuildInfo)
+  JS (node --test web/test)                   91/91  [0]          104/104 [0]   (+13: web/test/i18n.test.mjs)
+  SofaPad.app --self-test                     33 PASS, OK          31 PASS + 2 skipped, OK   (4.4.0 package build; the Mac's
+                                              (4.3.0 build,        screen was locked by then, and the two hit-test items
+                                              unlocked)            skip while it is, as documented)
+
+Browser suites
+  v2-browser                                  41/41  [0]           41/41  [0]
+  pkm31-dictation                             7/7    [0]           7/7    [0]   (pkm31-dictation-sofa10.json)
+  pkm33-send-clear                            13/13  [0]           13/13  [0]   (pkm33-send-clear-sofa10.json)
+  pkm31-keyrow                                14/14  [0]           14/14  [0]
+  pkm4-browser                                10/10  [0]           10/10  [0]
+  sofa6-commit                                35/35  [0]           35/35  [0]   (commit-sofa10.json)
+  sofa6-caret                                 15/15  [0]           14/15  [1] in the full run, then see below
+  sofa8-layout                                46/46  [0]           46/46  [0]
+  touch-area (measurements only)              [0]                  [0]          (v2-touch-area-run.json)
+  sofa9-stage2 (demo page, page level)        46/46  [0]           46/46  [0]
+  sofa8-playground --lang en                  30/30  [0]           30/30  [0]   (the phone page in English now)
+  sofa8-playground --lang zh                  30/30  [0]           30/30  [0]
+  sofa8-playground --lang en --mode video     21/21  [0]           21/21  [0]
+  sofa10-i18n-theme (new)                     —                    51/51  [0]; with --video 53/53 [0]
+
+sofa6-caret, both trees run alternately on an otherwise idle Mac:
+  "快速甩動：⌥→" (a 300 px flick in 150 ms, driven by awaited CDP touch events): fails now and then on both:
+      4.3.0 2 of 18 runs, 4.4.0 5 of 27 runs. The page code on that path (caret.js, the touch handlers) is unchanged;
+      it is the same timing sensitivity as I-48 (the flick is slower than meant when CDP calls take longer).
+  "放開手指立刻停（之後 0.8 秒沒有鍵）": 4.3.0 0 of 18, 4.4.0 3 of 13 (+1 run with an uncaptured failing check).
+      Measured inside the page over 58 instrumented drags (29 per tree): 0 presses sent after the lift on either;
+      the same messages (59 caret + 2 ping per drag). A press sent in the same few ms as the lift reached the dry-run
+      log after the test took its "at lift" snapshot (seen on both trees). The test now counts the presses the page sent
+      before the lift and waits (≤ 0.5 s) for the log to have them (process/ISSUES.md I-53); a press after the lift
+      still fails the check. After that: 0 of 8 runs fail it (8 runs: 6 × 15/15, 2 × the flick above).
+
+sofa10-i18n-theme in short
+  start-up language and theme (9 browser setups: en-US, zh-TW, zh-CN, fr-FR, ja-JP, saved choices): every frame from
+    the first has the right theme, lang and background; no frame shows empty buttons
+  live connection: 中文 / 深色 / English / Light / System on one WebSocket (no reconnect), the Mac keeps typing what the
+    phone types, a Batch draft stays, System follows the system while open, remembered after a reload
+  no Chinese on screen in English: 0 in all 22 states × light / dark (texts, aria-label, title, placeholder, key list;
+    the language switch's own 中文 is marked lang="zh-Hant" and is the one exception)
+  WCAG AA: 1231 texts per language × theme, 0 below the threshold; lowest 4.62:1 (light: the trackpad's hint text),
+    4.65:1 (dark: white on the filled blue)
+  recording: dist/sofa10/sofa10-language-theme.mp4 (not in git), 390×844, 60 fps constant (835 frames, 13.9 s);
+    Chrome's screencast delivered 62 distinct frames (it sends one only when the screen changes)
+
+Package: SofaPad-4.4.0-macOS.zip, see release-zip-scan.txt (SHA-256, byte scan).

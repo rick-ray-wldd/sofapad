@@ -112,3 +112,25 @@ One name was taken out before anything was pushed: a SOFA-8 test result named th
 unpushed commit was rewritten to describe it instead. The release zip was searched byte by byte again
 ([`design/evidence/sofa9/release-zip-scan.txt`](../design/evidence/sofa9/release-zip-scan.txt)): the same example
 values as 4.2 and nothing real. The new screenshots show only the demo page and the test phone page (example values).
+
+## 4.4 (2026-10-31)
+
+Before the 4.4.0 commit, every line it adds to tracked files and every new file (the dictionaries, `boot.js`,
+`i18n.js`, the tests, the release notes, the dispatch, the test results and the 24 new screenshots) was read as raw
+bytes and searched, with this computer's account and full name, its computer and local host names, the git user
+name, its LAN addresses (IPv4 and IPv6) read from its interfaces at the time and the owner's email address: none of
+those real values. Also searched: `/Users/` and the home folder, any email address, every private IPv4 range and the
+whole 100.64.0.0/10, Tailscale IPv6, `.local` names, six-digit numbers and pairing-code patterns, assistant-system ids
+(station, workspace, project, task, run, message and terminal ids, the session's own ids), the assistant system's name
+and files, and token formats. What it finds is only:
+
+| Where | What matches | Why it stays |
+|---|---|---|
+| `design/evidence/sofa10/pkm33-send-clear-sofa10.json` | 「我在 Orca 說的私人內容…」 | the made-up test sentence, as in 4.2 and 4.3 |
+| `process/dispatch/DISPATCH-SOFA-10.md` | `100.64.0.0/10` | the name of the range to search for |
+| `design/evidence/sofa10/v2-touch-area-run.json` | six-digit numbers | pixel areas, not codes |
+
+The screenshots show only the test page against the dry-run Mac, whose name is the model's default ("Mac mini").
+The release zip was searched byte by byte too
+([`design/evidence/sofa10/release-zip-scan.txt`](../design/evidence/sofa10/release-zip-scan.txt)): the same example
+values as 4.2 and 4.3 and nothing real; no debug map in the executable.

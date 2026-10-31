@@ -1,0 +1,70 @@
+{
+ "label": "sofa10",
+ "p19": {
+  "box": "然後現在需要按步驟，先按鍵盤打開來，",
+  "messages": [
+   {
+    "t": "text",
+    "s": "然後現在需要按步驟，先按鍵盤打開來，",
+    "at": 2298
+   }
+  ],
+  "mac": "然後現在需要按步驟，先按鍵盤打開來，",
+  "macLossy": "然後現在需要按步驟，先按鍵盤打開來，"
+ },
+ "singleCharMs": 2,
+ "longBoxAfter2600ms": 230,
+ "inputLogSample": [
+  "     0 input insertText data=\"然後\" len=2 …\"然後\"",
+  "   320 input deleteContentBackward len=0 …\"\"",
+  "   320 input insertText data=\"然後現在需要按\" len=7 …\"然後現在需要按\"",
+  "   651 input deleteContentBackward len=6 …\"然後現在需要\"",
+  "   651 input insertText data=\"按步驟，\" len=10 …\"然後現在需要按步驟，\"",
+  "   983 input deleteContentBackward len=7 …\"然後現在需要按\"",
+  "   983 input insertText data=\"步驟，先按鍵盤\" len=14 …\"然後現在需要按步驟，先按鍵盤\"",
+  "  1251 input deleteContentBackward len=12 …\"然後現在需要按步驟，先按\"",
+  "  1251 input insertText data=\"鍵盤\" len=14 …\"然後現在需要按步驟，先按鍵盤\"",
+  "  1561 input deleteContentBackward len=12 …\"然後現在需要按步驟，先按\"",
+  "  1561 input insertText data=\"鍵盤打開來，\" len=18 …\"現在需要按步驟，先按鍵盤打開來，\"",
+  "  2265 send ⌫0+\"然後現在需要按步驟，先按鍵盤打開來，\"",
+  "  3274 input insertText data=\"x\" len=19 …\"在需要按步驟，先按鍵盤打開來，x\"",
+  "  3275 send ⌫0+\"x\""
+ ],
+ "results": [
+  {
+   "name": "P-19 聽寫樣式：手機輸入框是對的",
+   "ok": true,
+   "detail": "然後現在需要按步驟，先按鍵盤打開來，"
+  },
+  {
+   "name": "現在：改寫在停頓前就合併，沒有送任何 ⌫",
+   "ok": true,
+   "detail": "[{\"t\":\"text\",\"s\":\"然後現在需要按步驟，先按鍵盤打開來，\",\"at\":2298}]"
+  },
+  {
+   "name": "現在：就算 ⌫ 會掉，Mac 上也是正確的句子",
+   "ok": true,
+   "detail": "然後現在需要按步驟，先按鍵盤打開來，"
+  },
+  {
+   "name": "一般打字：一個字 100 ms 內送出",
+   "ok": true,
+   "detail": "2 ms"
+  },
+  {
+   "name": "現在：打字（聽寫）中不清空輸入框",
+   "ok": true,
+   "detail": "230"
+  },
+  {
+   "name": "現在：收起鍵盤（blur）後才清空",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "⚙︎ 輸入紀錄：看得到 input／send 紀錄",
+   "ok": true,
+   "detail": "     0 input insertText data=\"然後\" len=2 …\"然後\"\n   320 input deleteContentBackward len=0 …\"\"\n   320 input insertText data=\"然後現在需要按\" len=7 …\"然後現在需要按\"\n   651 input deleteContentBackward len=6 …\"然後現在需要\"\n   651 input insertText data=\"按步驟，\" len=10 …\"然後現在需要按步驟，\"\n   983 input deleteContentBackward len=7 …\"然後"
+  }
+ ]
+}

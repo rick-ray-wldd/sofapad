@@ -1,0 +1,353 @@
+{
+ "results": [
+  {
+   "name": "start (en-US, system light): lang=en, theme light",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"light\",\"bar\":\"#f2f3f5\",\"status\":\"default\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(242, 243, 245)\",\"input\":\"\",\"stored\":{\"lang\":null,\"theme\":null}}"
+  },
+  {
+   "name": "start (en-US, system light): every frame from the first is light (19 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"light\",\"lang\":\"en\",\"pending\":true,\"bg\":\"rgb(242, 243, 245)\",\"mode\":\"\"}}"
+  },
+  {
+   "name": "start (en-US, system light): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (zh-TW, system dark): lang=zh-Hant, theme dark",
+   "ok": true,
+   "detail": "{\"lang\":\"zh-Hant\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"即時\",\"title\":\"設定\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":null,\"theme\":null}}"
+  },
+  {
+   "name": "start (zh-TW, system dark): every frame from the first is dark (17 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"dark\",\"lang\":\"zh-Hant\",\"pending\":false,\"bg\":\"rgb(14, 16, 19)\",\"mode\":\"即時\"}}"
+  },
+  {
+   "name": "start (zh-TW, system dark): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (zh-CN, system light): lang=zh-Hant, theme light",
+   "ok": true,
+   "detail": "{\"lang\":\"zh-Hant\",\"theme\":\"light\",\"bar\":\"#f2f3f5\",\"status\":\"default\",\"mode\":\"即時\",\"title\":\"設定\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(242, 243, 245)\",\"input\":\"\",\"stored\":{\"lang\":null,\"theme\":null}}"
+  },
+  {
+   "name": "start (zh-CN, system light): every frame from the first is light (17 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"light\",\"lang\":\"zh-Hant\",\"pending\":false,\"bg\":\"rgb(242, 243, 245)\",\"mode\":\"即時\"}}"
+  },
+  {
+   "name": "start (zh-CN, system light): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (fr-FR, system dark): lang=en, theme dark",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":null,\"theme\":null}}"
+  },
+  {
+   "name": "start (fr-FR, system dark): every frame from the first is dark (17 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"dark\",\"lang\":\"en\",\"pending\":false,\"bg\":\"rgb(14, 16, 19)\",\"mode\":\"Live\"}}"
+  },
+  {
+   "name": "start (fr-FR, system dark): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (ja-JP, system light): lang=en, theme light",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"light\",\"bar\":\"#f2f3f5\",\"status\":\"default\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(242, 243, 245)\",\"input\":\"\",\"stored\":{\"lang\":null,\"theme\":null}}"
+  },
+  {
+   "name": "start (ja-JP, system light): every frame from the first is light (17 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"light\",\"lang\":\"en\",\"pending\":false,\"bg\":\"rgb(242, 243, 245)\",\"mode\":\"Live\"}}"
+  },
+  {
+   "name": "start (ja-JP, system light): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (en-US, system light, saved {\"theme\":\"dark\"}): lang=en, theme dark",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":null,\"theme\":\"dark\"}}"
+  },
+  {
+   "name": "start (en-US, system light, saved {\"theme\":\"dark\"}): every frame from the first is dark (19 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"dark\",\"lang\":\"en\",\"pending\":true,\"bg\":\"rgb(14, 16, 19)\",\"mode\":\"\"}}"
+  },
+  {
+   "name": "start (en-US, system light, saved {\"theme\":\"dark\"}): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (zh-TW, system dark, saved {\"theme\":\"light\"}): lang=zh-Hant, theme light",
+   "ok": true,
+   "detail": "{\"lang\":\"zh-Hant\",\"theme\":\"light\",\"bar\":\"#f2f3f5\",\"status\":\"default\",\"mode\":\"即時\",\"title\":\"設定\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(242, 243, 245)\",\"input\":\"\",\"stored\":{\"lang\":null,\"theme\":\"light\"}}"
+  },
+  {
+   "name": "start (zh-TW, system dark, saved {\"theme\":\"light\"}): every frame from the first is light (17 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"light\",\"lang\":\"zh-Hant\",\"pending\":false,\"bg\":\"rgb(242, 243, 245)\",\"mode\":\"即時\"}}"
+  },
+  {
+   "name": "start (zh-TW, system dark, saved {\"theme\":\"light\"}): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (en-US, system dark, saved {\"lang\":\"zh\"}): lang=zh-Hant, theme dark",
+   "ok": true,
+   "detail": "{\"lang\":\"zh-Hant\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"即時\",\"title\":\"設定\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":\"zh\",\"theme\":null}}"
+  },
+  {
+   "name": "start (en-US, system dark, saved {\"lang\":\"zh\"}): every frame from the first is dark (19 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"dark\",\"lang\":\"zh-Hant\",\"pending\":true,\"bg\":\"rgb(14, 16, 19)\",\"mode\":\"\"}}"
+  },
+  {
+   "name": "start (en-US, system dark, saved {\"lang\":\"zh\"}): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "start (zh-TW, system light, saved {\"lang\":\"en\",\"theme\":\"dark\"}): lang=en, theme dark",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":\"en\",\"theme\":\"dark\"}}"
+  },
+  {
+   "name": "start (zh-TW, system light, saved {\"lang\":\"en\",\"theme\":\"dark\"}): every frame from the first is dark (19 frames), no frame shows empty buttons",
+   "ok": true,
+   "detail": "{\"first\":{\"theme\":\"dark\",\"lang\":\"en\",\"pending\":true,\"bg\":\"rgb(14, 16, 19)\",\"mode\":\"\"}}"
+  },
+  {
+   "name": "start (zh-TW, system light, saved {\"lang\":\"en\",\"theme\":\"dark\"}): no page error",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "live: English, light; the Mac types \"one \"",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"light\",\"bar\":\"#f2f3f5\",\"status\":\"default\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(242, 243, 245)\",\"input\":\"one \",\"stored\":{\"lang\":null,\"theme\":null}}"
+  },
+  {
+   "name": "⚙︎: Auto and System are the chosen ones at first",
+   "ok": true,
+   "detail": "true,false,false,true,false,false"
+  },
+  {
+   "name": "tap 中文: the page is Chinese at once (html lang, ⚙︎ title, mode, host), no reload",
+   "ok": true,
+   "detail": "{\"lang\":\"zh-Hant\",\"theme\":\"light\",\"bar\":\"#f2f3f5\",\"status\":\"default\",\"mode\":\"即時\",\"title\":\"設定\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(242, 243, 245)\",\"input\":\"\",\"stored\":{\"lang\":\"zh\",\"theme\":null}}"
+  },
+  {
+   "name": "… on the same connection (no new WebSocket, still ready)",
+   "ok": true,
+   "detail": "1 → 1, ready"
+  },
+  {
+   "name": "tap 深色: dark at once; theme-color and the status bar style follow; saved",
+   "ok": true,
+   "detail": "{\"lang\":\"zh-Hant\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"即時\",\"title\":\"設定\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":\"zh\",\"theme\":\"dark\"}}"
+  },
+  {
+   "name": "a picked theme stays when the system changes",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "after switching: the Mac still types what the phone types (\"two \")",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "a Batch draft stays in the box (not sent) while switching; the mode says Batch",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"light\",\"bar\":\"#f2f3f5\",\"status\":\"default\",\"mode\":\"Batch\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(242, 243, 245)\",\"input\":\"draft\",\"stored\":{\"lang\":\"en\",\"theme\":\"light\"}}"
+  },
+  {
+   "name": "… and Send sends it",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "System: follows the system going dark while open",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":\"en\",\"theme\":\"system\"}}"
+  },
+  {
+   "name": "System: and back to light",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "reload: still Chinese and dark (saved on the phone), from the first frame",
+   "ok": true,
+   "detail": "{\"s\":{\"lang\":\"zh-Hant\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"即時\",\"title\":\"設定\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":\"zh\",\"theme\":\"dark\"}},\"first\":{\"theme\":\"dark\",\"lang\":\"zh-Hant\",\"pending\":true,\"bg\":\"rgb(14, 16, 19)\",\"mode\":\"\"}}"
+  },
+  {
+   "name": "Auto: back to the browser's language (English here)",
+   "ok": true,
+   "detail": "{\"lang\":\"en\",\"theme\":\"dark\",\"bar\":\"#0e1013\",\"status\":\"black-translucent\",\"mode\":\"Live\",\"title\":\"Settings\",\"host\":\"Mac mini\",\"link\":\"ready\",\"opens\":1,\"bg\":\"rgb(14, 16, 19)\",\"input\":\"\",\"stored\":{\"lang\":\"auto\",\"theme\":\"dark\"}}"
+  },
+  {
+   "name": "the whole run on one connection per page load; no page error (switch took 5204 ms of test time)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "en-light: walked every state on one connection, no page error",
+   "ok": true,
+   "detail": "{\"opens\":1,\"link\":\"ready\",\"errors\":[]}"
+  },
+  {
+   "name": "en-light: WCAG AA for every text (1231 measured over 22 states; lowest 4.62:1 \"One finger: move the pointer · Tap: clic\" p in #padHint)",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "en-light: no Chinese on screen in any state (texts, aria-label, title, placeholder, key list)",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "en-dark: walked every state on one connection, no page error",
+   "ok": true,
+   "detail": "{\"opens\":1,\"link\":\"ready\",\"errors\":[]}"
+  },
+  {
+   "name": "en-dark: WCAG AA for every text (1231 measured over 22 states; lowest 4.65:1 \"Auto\" button in #langSeg)",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "en-dark: no Chinese on screen in any state (texts, aria-label, title, placeholder, key list)",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "zh-light: walked every state on one connection, no page error",
+   "ok": true,
+   "detail": "{\"opens\":1,\"link\":\"ready\",\"errors\":[]}"
+  },
+  {
+   "name": "zh-light: WCAG AA for every text (1231 measured over 22 states; lowest 4.62:1 \"單指滑動：移動游標　點一下：左鍵\" p in #padHint)",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "zh-dark: walked every state on one connection, no page error",
+   "ok": true,
+   "detail": "{\"opens\":1,\"link\":\"ready\",\"errors\":[]}"
+  },
+  {
+   "name": "zh-dark: WCAG AA for every text (1231 measured over 22 states; lowest 4.65:1 \"自動\" button in #langSeg)",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "name": "recording: one connection the whole time, the Mac typed \"Hello 沙發 again\"",
+   "ok": true,
+   "detail": "{\"all\":\"Hello 沙發 again\",\"opens\":1,\"link\":\"ready\"}"
+  },
+  {
+   "name": "recording: 390×844, 60.0 fps, 13.9 s",
+   "ok": true,
+   "detail": "{\"width\":390,\"height\":844,\"r_frame_rate\":\"60/1\",\"avg_frame_rate\":\"60/1\",\"duration\":\"13.916667\",\"nb_frames\":\"835\"}"
+  }
+ ],
+ "contrast": {
+  "en-light": {
+   "texts": 1231,
+   "min": {
+    "text": "One finger: move the pointer · Tap: clic",
+    "el": "p in #padHint",
+    "ratio": 4.62,
+    "need": 4.5,
+    "state": "main"
+   },
+   "fails": []
+  },
+  "en-dark": {
+   "texts": 1231,
+   "min": {
+    "text": "Auto",
+    "el": "button in #langSeg",
+    "ratio": 4.65,
+    "need": 4.5,
+    "state": "settings"
+   },
+   "fails": []
+  },
+  "zh-light": {
+   "texts": 1231,
+   "min": {
+    "text": "單指滑動：移動游標　點一下：左鍵",
+    "el": "p in #padHint",
+    "ratio": 4.62,
+    "need": 4.5,
+    "state": "main"
+   },
+   "fails": []
+  },
+  "zh-dark": {
+   "texts": 1231,
+   "min": {
+    "text": "自動",
+    "el": "button in #langSeg",
+    "ratio": 4.65,
+    "need": 4.5,
+    "state": "settings"
+   },
+   "fails": []
+  }
+ },
+ "cjkFound": {},
+ "screenshots": [
+  "design/screenshots/sofa10/en-light-portrait.png",
+  "design/screenshots/sofa10/en-light-settings.png",
+  "design/screenshots/sofa10/en-light-landscape.png",
+  "design/screenshots/sofa10/en-light-caret.png",
+  "design/screenshots/sofa10/en-light-row-editor.png",
+  "design/screenshots/sofa10/en-light-pairing.png",
+  "design/screenshots/sofa10/en-dark-portrait.png",
+  "design/screenshots/sofa10/en-dark-settings.png",
+  "design/screenshots/sofa10/en-dark-landscape.png",
+  "design/screenshots/sofa10/en-dark-caret.png",
+  "design/screenshots/sofa10/en-dark-row-editor.png",
+  "design/screenshots/sofa10/en-dark-pairing.png",
+  "design/screenshots/sofa10/zh-light-portrait.png",
+  "design/screenshots/sofa10/zh-light-settings.png",
+  "design/screenshots/sofa10/zh-light-landscape.png",
+  "design/screenshots/sofa10/zh-light-caret.png",
+  "design/screenshots/sofa10/zh-light-row-editor.png",
+  "design/screenshots/sofa10/zh-light-pairing.png",
+  "design/screenshots/sofa10/zh-dark-portrait.png",
+  "design/screenshots/sofa10/zh-dark-settings.png",
+  "design/screenshots/sofa10/zh-dark-landscape.png",
+  "design/screenshots/sofa10/zh-dark-caret.png",
+  "design/screenshots/sofa10/zh-dark-row-editor.png",
+  "design/screenshots/sofa10/zh-dark-pairing.png"
+ ],
+ "video": {
+  "width": 390,
+  "height": 844,
+  "r_frame_rate": "60/1",
+  "avg_frame_rate": "60/1",
+  "duration": "13.916667",
+  "nb_frames": "835",
+  "fps": 60,
+  "chromeFrames": 62,
+  "chromeFramesUnder20ms": 5
+ }
+}
