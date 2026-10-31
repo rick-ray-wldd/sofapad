@@ -297,3 +297,13 @@
 | S10-M5 | README、README.zh-TW、INSTALL、CHANGELOG、release notes 4.4.0、DEVELOPMENT；示範頁和錄影腳本的英文版改引用英文按鍵名 | 16:16–16:40 | docs/release/4.4.0.md |
 | S10-M6 | 錄影（60 fps，13.9 秒，同一條連線上切換語言和主題）；截圖 24 張 | 17:09–17:10 | design/screenshots/sofa10/ |
 | S10-M7 | 公開前檢查（新增的每一行和新檔案）；`tools/package.sh` → SofaPad-4.4.0-macOS.zip，逐位元組掃描，self-test | 17:05–17:13 | docs/PUBLIC-CHECK.md「4.4」、design/evidence/sofa10/release-zip-scan.txt |
+
+## SOFA-11（README 放 Logo，2026-10-31）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S11-M0 | 收到派工：Logo 01「ON 沙發」放進 README 顯眼處 | 17:50 | process/dispatch/DISPATCH-SOFA-11.md |
+| S11-M1 | design/brand/：SVG 整理成單純形狀（不用 mask／id），和原檔算圖比對；圖示 PNG；social preview 1280×640；說明檔 | 17:52–17:58 | design/brand/README.md、D-55 |
+| S11-M2 | 中英 README 頂端 hero（picture 淺／深色、標語、徽章、語言切換） | 17:58–18:00 | README.md、README.zh-TW.md |
+| S11-M3 | 用 GitHub 的 README 樣式渲染：淺／深 × 桌機／手機 × 中英 8 張，兩種 picture 都載入，連結都在 | 18:00–18:05 | design/screenshots/sofa11/、design/evidence/sofa11/readme-render.json |
+| S11-M4 | 公開前檢查 | 18:05– | docs/PUBLIC-CHECK.md「SOFA-11」 |

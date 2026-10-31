@@ -1,0 +1,106 @@
+{
+ "what": "README.md and README.zh-TW.md rendered as on GitHub, light / dark, desktop (1280 px) / mobile (390 px)",
+ "how": "pandoc 3.9.0.2, -f gfm (GitHub-flavored Markdown, raw HTML kept); github-markdown-css 5.8.1 (GitHub's README styles); headless Chrome with prefers-color-scheme emulated. Not sent to the GitHub API (nothing unpublished leaves this Mac).",
+ "checks": "which <picture> source loaded (currentSrc), that it and every other image loaded (complete, naturalWidth > 0), the hero width, the tagline",
+ "results": [
+  {
+   "file": "README.md",
+   "device": "desktop",
+   "scheme": "light",
+   "hero": "sofapad-lockup-light.svg",
+   "heroWidth": 440,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "Sofa mode on. Your iPhone becomes the Mac’s keyboard and trackpad."
+  },
+  {
+   "file": "README.md",
+   "device": "desktop",
+   "scheme": "dark",
+   "hero": "sofapad-lockup-dark.svg",
+   "heroWidth": 440,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "Sofa mode on. Your iPhone becomes the Mac’s keyboard and trackpad."
+  },
+  {
+   "file": "README.md",
+   "device": "mobile",
+   "scheme": "light",
+   "hero": "sofapad-lockup-light.svg",
+   "heroWidth": 358,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "Sofa mode on. Your iPhone becomes the Mac’s keyboard and trackpad."
+  },
+  {
+   "file": "README.md",
+   "device": "mobile",
+   "scheme": "dark",
+   "hero": "sofapad-lockup-dark.svg",
+   "heroWidth": 358,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "Sofa mode on. Your iPhone becomes the Mac’s keyboard and trackpad."
+  },
+  {
+   "file": "README.zh-TW.md",
+   "device": "desktop",
+   "scheme": "light",
+   "hero": "sofapad-lockup-light.svg",
+   "heroWidth": 440,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "沙發模式 ON。iPhone 就是 Mac 的鍵盤和觸控板。"
+  },
+  {
+   "file": "README.zh-TW.md",
+   "device": "desktop",
+   "scheme": "dark",
+   "hero": "sofapad-lockup-dark.svg",
+   "heroWidth": 440,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "沙發模式 ON。iPhone 就是 Mac 的鍵盤和觸控板。"
+  },
+  {
+   "file": "README.zh-TW.md",
+   "device": "mobile",
+   "scheme": "light",
+   "hero": "sofapad-lockup-light.svg",
+   "heroWidth": 358,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "沙發模式 ON。iPhone 就是 Mac 的鍵盤和觸控板。"
+  },
+  {
+   "file": "README.zh-TW.md",
+   "device": "mobile",
+   "scheme": "dark",
+   "hero": "sofapad-lockup-dark.svg",
+   "heroWidth": 358,
+   "heroLoaded": true,
+   "images": 5,
+   "broken": [],
+   "tagline": "沙發模式 ON。iPhone 就是 Mac 的鍵盤和觸控板。"
+  }
+ ],
+ "screenshots": [
+  "design/screenshots/sofa11/readme-en-desktop-light.png",
+  "design/screenshots/sofa11/readme-en-desktop-dark.png",
+  "design/screenshots/sofa11/readme-en-mobile-light.png",
+  "design/screenshots/sofa11/readme-en-mobile-dark.png",
+  "design/screenshots/sofa11/readme-zh-desktop-light.png",
+  "design/screenshots/sofa11/readme-zh-desktop-dark.png",
+  "design/screenshots/sofa11/readme-zh-mobile-light.png",
+  "design/screenshots/sofa11/readme-zh-mobile-dark.png"
+ ],
+ "links": "every relative href / src / srcset in both READMEs exists in the repository (20 each)"
+}

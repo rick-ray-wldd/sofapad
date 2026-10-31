@@ -1,6 +1,20 @@
-# SofaPad：iPhone 當 Mac 的鍵盤和觸控板
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="design/brand/sofapad-lockup-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="design/brand/sofapad-lockup-light.svg">
+    <img src="design/brand/sofapad-lockup-light.svg" alt="SofaPad：iPhone 當 Mac 的鍵盤和觸控板" width="440">
+  </picture>
+</p>
 
-[English](README.md) | **繁體中文**
+<p align="center"><strong>沙發模式 ON。</strong>iPhone 就是 Mac 的鍵盤和觸控板。</p>
+
+<p align="center">
+  <a href="https://github.com/rick-ray-wldd/sofapad/releases/latest"><img src="https://img.shields.io/github/v/release/rick-ray-wldd/sofapad?label=%E6%9C%80%E6%96%B0%E7%89%88&amp;color=2D5BFF" alt="最新版"></a>
+  <a href="docs/INSTALL.md"><img src="https://img.shields.io/badge/macOS-13%2B%20%C2%B7%20Apple%20%E6%99%B6%E7%89%87-2D5BFF" alt="macOS 13 以上，Apple 晶片"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/%E6%8E%88%E6%AC%8A-MIT-2D5BFF" alt="授權：MIT"></a>
+</p>
+
+<p align="center"><a href="README.md">English</a> · <b>繁體中文</b></p>
 
 給戴 Vision Pro、在沙發上用 Mac Virtual Display 工作的人：手機放在胸口或腿上，用**手機平常的鍵盤**（注音、拼音、英文、鍵盤的聽寫都可以）打字，字直接出現在 Mac 上；手機另一半是觸控板，一隻手就能移動游標、點擊、右鍵、捲動、拖曳、三指切桌面。
 

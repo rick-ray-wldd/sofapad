@@ -134,3 +134,13 @@ The screenshots show only the test page against the dry-run Mac, whose name is t
 The release zip was searched byte by byte too
 ([`design/evidence/sofa10/release-zip-scan.txt`](../design/evidence/sofa10/release-zip-scan.txt)): the same example
 values as 4.2 and 4.3 and nothing real; no debug map in the executable.
+
+## SOFA-11: the logo in the README (2026-10-31)
+
+Before the commit, every added line and every new file (the brand SVGs and PNGs, `design/brand/README.md`, the eight
+README screenshots, the render results and the dispatch) was read as raw bytes and searched with the same list as 4.4:
+none of this computer's or the owner's real values, no local paths, email addresses, private or VPN addresses,
+`.local` names, pairing codes, assistant-system ids or token formats. The one "email-like" match is inside a PNG's
+compressed image data. `rick-ray-wldd` is the repository's own address (the badge links). The SVGs hold only `svg`,
+`g`, `rect` and `path` elements: no metadata, comments, ids, fonts or file paths. The PNGs have no text or EXIF
+chunks (IHDR, IDAT, IEND only). The private folder the logo came from is not named anywhere in the repository.

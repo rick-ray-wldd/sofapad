@@ -1,6 +1,20 @@
-# SofaPad: your iPhone as a Mac keyboard and trackpad
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="design/brand/sofapad-lockup-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="design/brand/sofapad-lockup-light.svg">
+    <img src="design/brand/sofapad-lockup-light.svg" alt="SofaPad: your iPhone as a Mac keyboard and trackpad" width="440">
+  </picture>
+</p>
 
-**English** | [繁體中文](README.zh-TW.md)
+<p align="center"><strong>Sofa mode on.</strong> Your iPhone becomes the Mac’s keyboard and trackpad.</p>
+
+<p align="center">
+  <a href="https://github.com/rick-ray-wldd/sofapad/releases/latest"><img src="https://img.shields.io/github/v/release/rick-ray-wldd/sofapad?label=release&amp;color=2D5BFF" alt="Latest release"></a>
+  <a href="docs/INSTALL.md"><img src="https://img.shields.io/badge/macOS-13%2B%20%C2%B7%20Apple%20silicon-2D5BFF" alt="macOS 13 or later, Apple silicon"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2D5BFF" alt="License: MIT"></a>
+</p>
+
+<p align="center"><b>English</b> · <a href="README.zh-TW.md">繁體中文</a></p>
 
 This is for people who work from the sofa in Vision Pro with Mac Virtual Display. Rest the phone on your chest or lap and type with the **phone's normal keyboard** (Zhuyin, Pinyin, English, and the keyboard's dictation all work). The text shows up on the Mac. The other half of the phone is a trackpad: with one hand you can move the pointer, click, right-click, scroll, drag, and switch desktops with three fingers.
 

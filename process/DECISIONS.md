@@ -570,3 +570,12 @@ A 下方工具列                     B 可收合側欄（選這個）          
 - **示範頁和錄影腳本的英文版**：原本引用手機上的中文按鍵名（「鎖 (Lock)」「整段 (Whole)」），因為那時手機只有中文（D-53）。現在英文手機顯示英文，所以改成英文名稱，「Whole」改成和手機、README 一樣的「Batch」。中文版不變。
 - iOS 模擬器測試台（tools/pkm4/run.mjs）用按鈕名稱找按鈕：改成先看頁面是不是中文，再從字典拿名稱。這次沒有重跑（要真的注入到「文字編輯」）。
 - 錄影：Chrome 的 screencast 只在畫面有變時送一張，ffmpeg 依時間戳排好後輸出固定 60 fps 的 MP4。
+
+## D-55 README 放 Logo 01「ON 沙發」（SOFA-11）
+- Ray 選定 Logo 01（沙發的坐墊是一顆切到 ON 的膠囊開關），要放在 GitHub README 顯眼的地方、和頁面融合。App 和手機網頁的圖示這次不換（另外決定）。
+- `design/brand/` 只放 README 用得到的：淺色底和深色底的橫式標誌、圖示 SVG、1024 px 圖示 PNG、1280×640 的 social preview，加一份說明（檔案、字型 Unbounded SemiBold 和 OFL 1.1、顏色）。
+  - SVG 重新整理成單純的形狀：開關圓鈕原本用 `<mask id>` 挖洞，改成坐墊路徑加圓形的 even-odd 填色，沒有 defs、id、註解或 metadata；字標本來就是外框。和原檔各自算圖比對：形狀一樣，只差邊緣反鋸齒。
+  - 交付的大圖（hero.png）裡有參考別家作品的縮圖，不放進 repo。
+- README 頂端：置中的 `<picture>`，`prefers-color-scheme` 切換淺色／深色版本，寬 440（手機上縮到欄寬）；原本的標題字放進圖片的 alt（讀螢幕和搜尋用），所以不另外放 `<h1>`。下面一句標語接上 Logo 的概念：英文「Sofa mode on.」、中文「沙發模式 ON。」；三個徽章（最新版、macOS 13+ · Apple 晶片、MIT）都用品牌藍，不用 Apple logo，這樣 375 px 寬的手機也排得成一行；再來是原本的語言切換。README 其他內容不動。
+- 渲染檢查不送 GitHub API（還沒公開的內容不離開這台 Mac）：pandoc 的 GFM 加 GitHub 的 README 樣式（github-markdown-css），headless Chrome 模擬淺色／深色、桌機／手機。
+- social preview：品牌藍底、全白標誌（圓鈕的洞透出藍色）、標語用 Space Grotesk（OFL）。要在 GitHub 的 repo 設定上傳，Ray 自己設。
