@@ -90,6 +90,10 @@ sed -i '' "s/export const VERSION = '[^']*';/export const VERSION = '$VERSION';/
 grep -q "sourceVersion = \"$VERSION\"" mac/Sources/PKMCore/BuildInfo.swift || die "BuildInfo.swift was not bumped"
 grep -q "VERSION = '$VERSION'" web/js/version.js || die "web/js/version.js was not bumped"
 git --no-pager diff --stat -- VERSION mac/Sources/PKMCore/BuildInfo.swift web/js/version.js || true
+# what the release is built from: HEAD, unless something is not committed (checked now: the browser suites below
+# refresh their own screenshots and results in the tree)
+TARGET="$(git rev-parse HEAD)"
+DIRTY="$(git status --porcelain --untracked-files=no)"
 
 # ---- 2. tests
 step "2/7 tests"
@@ -164,13 +168,13 @@ BLOB="https://github.com/$REPO_SLUG/blob/v$VERSION"
 sed -e "s|](\.\./\.\./|]($BLOB/|g" -e "s|](\.\./|]($BLOB/docs/|g" "$NOTES" > "$OUT/RELEASE-NOTES-$VERSION.md"
 echo "$OUT/RELEASE-NOTES-$VERSION.md"
 
-TARGET="$(git rev-parse HEAD)"
-DIRTY="$(git status --porcelain --untracked-files=no)"
 printf '\nReady: dist/release/%s (+ .sha256), dist/release/appcast.xml. Nothing was pushed, tagged or published.\n' "$ZIP"
 if [ -n "$DIRTY" ]; then
-  echo "NOTE: these changes are not committed, so they are not in $TARGET; commit them and run this again:"
+  echo "NOTE: these changes were not committed when the build started, so they are not in $TARGET; commit them and"
+  echo "run this again:"
   echo "$DIRTY"
 fi
+[ "$BROWSER" = 0 ] || echo "(the browser suites refreshed their screenshots and results; git checkout them if you keep the old ones)"
 echo "To publish (coordinator, from the repository folder, after pushing $TARGET):"
 echo
 echo "gh release create v$VERSION --repo $REPO_SLUG --target $TARGET --title \"SofaPad $VERSION\"" \
