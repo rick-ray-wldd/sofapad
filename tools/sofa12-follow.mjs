@@ -273,5 +273,5 @@ await browser.close();
 await server.stop();
 const passed = results.filter((r) => r.ok).length;
 writeFileSync(join(evDir, 'follow.json'), JSON.stringify({ when: new Date().toISOString(), passed, total: results.length, results }, null, 2));
-console.log(`\nsofa12-follow: ${passed}/${results.length} PASS`);
+console.log(`\n${passed}/${results.length} PASS`);
 process.exit(passed === results.length ? 0 : 1);

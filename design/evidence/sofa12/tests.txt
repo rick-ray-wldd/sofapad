@@ -1,0 +1,40 @@
+SOFA-12 (4.5.0: updates, the page follows the Mac, protocol versions) tests, 2026-11-01, this Mac. Browser suites:
+headless Chrome, dry-run Mac (nothing injected). "Before" = 4.4.0 as recorded in design/evidence/sofa10/tests.txt
+(2026-10-31, the same Mac); "after" = 4.5.0 (commit 19afbef, run 20:30-20:55). Exit codes in brackets.
+
+                                            before (4.4.0)       after (4.5.0)
+Unit tests
+  Swift (swift test)                          80/80  [0]           88/88  [0]   (+8: SOFA12Tests: versions, refusal, no-store,
+                                                                                  docs/PROTOCOL.md names every message)
+  JS (node --test web/test)                   104/104 [0]          111/111 [0]  (+7: web/test/follow.test.mjs)
+  SofaPad.app --self-test                     31 PASS + 2 SKIP     31 PASS + 2 SKIP, OK (the release build; both times the Mac's
+                                                                                  screen was locked, and the two hit-test items skip then)
+
+Browser suites
+  v2-browser                                  41/41  [0]           41/41  [0]
+  pkm31-dictation                             7/7    [0]           7/7    [0]   (pkm31-dictation-sofa12.json)
+  pkm33-send-clear                            13/13  [0]           13/13  [0]   (pkm33-send-clear-sofa12.json)
+  pkm31-keyrow                                14/14  [0]           14/14  [0]
+  pkm4-browser                                10/10  [0]           10/10  [0]
+  sofa6-commit                                35/35  [0]           35/35  [0]   (commit-sofa12.json)
+  sofa6-caret                                 14/15 then 15/15     15/15  [0]   (4.4: see sofa10/tests.txt, I-53)
+  sofa8-layout                                46/46  [0]           46/46  [0]
+  touch-area (measurements only)              [0]                  [0]          (v2-touch-area-run.json)
+  sofa9-stage2 (demo page, page level)        46/46  [0]           46/46  [0]
+  sofa8-playground --lang en                  30/30  [0]           30/30  [0]
+  sofa8-playground --lang zh                  30/30  [0]           30/30  [0]
+  sofa8-playground --lang en --mode video     21/21  [0]           21/21  [0]
+  sofa10-i18n-theme                           51/51  [0]           51/51  [0]
+  sofa12-follow (new)                         —                    30/30  [0]   (follow.json; screenshots design/screenshots/sofa12)
+
+End-to-end update (new, this Mac, test signing)
+  sofa12-update-e2e                           —                    E2E
+
+Release script (20:39-20:41, clean tree at 0bfbcc1)
+  tools/release.sh 4.5.0                      exit 0: swift test 88/88, JS 111/111, v2-browser 41/41, sofa12-follow 30/30;
+                                              build + ad-hoc signing (Sparkle signed inside out, codesign --deep --strict valid);
+                                              dist/release/SofaPad-4.5.0-macOS.zip
+                                              sha256 8ea1766aeaf93e05ecccdc57ec3cfcb8894c2b53cff01eb59f81733aa5933f1d;
+                                              zip and appcast.xml signed with the Keychain key and verified with
+                                              tools/sparkle-public-key.txt alone ("✓ feed signed with the key, archive
+                                              signed with the key, length right, notes in English and Chinese")

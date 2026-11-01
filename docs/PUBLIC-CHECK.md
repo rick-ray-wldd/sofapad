@@ -144,3 +144,32 @@ none of this computer's or the owner's real values, no local paths, email addres
 compressed image data. `rick-ray-wldd` is the repository's own address (the badge links). The SVGs hold only `svg`,
 `g`, `rect` and `path` elements: no metadata, comments, ids, fonts or file paths. The PNGs have no text or EXIF
 chunks (IHDR, IDAT, IEND only). The private folder the logo came from is not named anywhere in the repository.
+
+## 4.5 (2026-11-01)
+
+Before the 4.5.0 commits were handed over, all 56 files they add or change (3,498 added lines: the Swift and web code,
+the tests, `docs/PROTOCOL.md`, `docs/RELEASING.md`, the release notes, the scripts, the dispatch, the test results and
+the screenshots) were read as raw bytes and searched with the same list as 4.4: none of this computer's or the owner's
+real values (account, full name, computer and host names, git user name, LAN addresses read from its interfaces,
+email address), no local paths. What the added lines match is only:
+
+| Where | What matches | Why it stays |
+|---|---|---|
+| `design/evidence/sofa12/pkm33-send-clear-sofa12.json` | 「我在 Orca 說的私人內容…」 | the made-up test sentence, as in 4.2–4.4 |
+| `process/DECISIONS.md`, `process/TIMELINE.md`, the dispatch | "Orca" | the owner's own words: SofaPad should update itself "like Orca" |
+| `web/test/follow.test.mjs`, `SOFA12Tests.swift` | `#pair=123456`, `192.168.1.20` | made-up example values, as in the older tests |
+| `docs/PROTOCOL.md` | `100.64.0.0/10`, `fd7a:115c:a1e0::/48` | the Tailscale ranges, described |
+
+**The update key.** SofaPad's EdDSA private key lives only in the login Keychain of the Mac that makes releases. For
+this check it was exported by Sparkle's own tool into a private temporary folder, searched for, and the folder removed:
+it is in none of the 412 tracked files, nowhere in the whole git history, not in `dist/release/` or the unpacked zip,
+and not in `design/`, `docs/` or `process/`. Only its public half is in the repository
+(`tools/sparkle-public-key.txt`), as it is meant to be. The end-to-end test signs with a throwaway key made for each
+run, kept in `dist/update-test/` (not in git).
+
+**The release zip** (`SofaPad-4.5.0-macOS.zip`, 116 files, now with Sparkle.framework inside the app), `appcast.xml`
+and `RELEASE-NOTES-4.5.0.md` were searched byte by byte: nothing real. They match only an email address in
+`Sparkle-LICENSE.txt` (a copyright line in Sparkle's licence, which has to ship with it), the example address in the
+app's help text and the Tailscale range in its menu (both as in 4.2–4.4), and the word "Orca" in a code comment. The
+release executable has none of the test switches (`SofaPadTest…`, `PKM_TEST_…`; `tools/build-app.sh` checks) and no
+local paths.

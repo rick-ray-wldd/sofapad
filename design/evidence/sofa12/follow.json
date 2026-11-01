@@ -1,12 +1,12 @@
 {
-  "when": "2026-11-01T12:38:58.909Z",
+  "when": "2026-11-01T12:41:06.077Z",
   "passed": 30,
   "total": 30,
   "results": [
     {
       "name": "same version: connected, no reload",
       "ok": true,
-      "detail": "{\"navs\":[\"http://127.0.0.1:30416/\"],\"link\":\"ready\"}"
+      "detail": "{\"navs\":[\"http://127.0.0.1:30628/\"],\"link\":\"ready\"}"
     },
     {
       "name": "same version: ⚙︎ shows the page and the Mac at 4.5.0",
@@ -26,12 +26,12 @@
     {
       "name": "Mac updated: the page reloaded by itself, once",
       "ok": true,
-      "detail": "[\"http://127.0.0.1:30416/\",\"http://127.0.0.1:30416/?follow=1%7E4.5.1%2Bdev\"]"
+      "detail": "[\"http://127.0.0.1:30628/\",\"http://127.0.0.1:30628/?follow=1%7E4.5.1%2Bdev\"]"
     },
     {
       "name": "the reload went to the address with the mark, and the mark came off",
       "ok": true,
-      "detail": "{\"navs\":[\"http://127.0.0.1:30416/\",\"http://127.0.0.1:30416/?follow=1%7E4.5.1%2Bdev\"],\"search\":\"\"}"
+      "detail": "{\"navs\":[\"http://127.0.0.1:30628/\",\"http://127.0.0.1:30628/?follow=1%7E4.5.1%2Bdev\"],\"search\":\"\"}"
     },
     {
       "name": "after the reload: connected again (same pairing), no pairing sheet",
@@ -71,7 +71,7 @@
     {
       "name": "a page that stays old: exactly two reloads, then it stops",
       "ok": true,
-      "detail": "[\"http://127.0.0.1:30416/?follow=1%7E4.5.2%2Bdev\",\"http://127.0.0.1:30416/?follow=2%7E4.5.2%2Bdev\"]"
+      "detail": "[\"http://127.0.0.1:30628/?follow=1%7E4.5.2%2Bdev\",\"http://127.0.0.1:30628/?follow=2%7E4.5.2%2Bdev\"]"
     },
     {
       "name": "it says so, plainly, and stays connected (it still works)",
@@ -96,7 +96,7 @@
     {
       "name": "no login reached the Mac",
       "ok": true,
-      "detail": "▀ ▀▀▄▀▀▄  ██▀▄▀ █▀▀▀█  ▄▄  \u001b[0m\n\u001b[30;47m  █▀▀▀▀▀█  ▄█▀▀▀ ▄▀█ ██ ▀ █▀▄█▀  \u001b[0m\n\u001b[30;47m  █ ███ █ ▀█ ▄ ▄  ▀  ▄▀▀██▀█ █▀  \u001b[0m\n\u001b[30;47m  █ ▀▀▀ █ ▀ ▀█████▀▄▀▄█▄▀  ▄ ▄▀  \u001b[0m\n\u001b[30;47m  ▀▀▀▀▀▀▀ ▀▀▀ ▀  ▀    ▀ ▀ ▀ ▀▀▀  \u001b[0m\n\u001b[30;47m                                 \u001b[0m\n\n在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。\n\n"
+      "detail": "  ▀ ▄▀█ ▀ ██▀▄▀▄█▀▀▀█  ▄▄  \u001b[0m\n\u001b[30;47m  █▀▀▀▀▀█  ██ ▄▀ ▄▀█ ▀█ ▀ █▀▄█▀  \u001b[0m\n\u001b[30;47m  █ ███ █ ▀█ ▄▄  ▄██▀▄▀▀██▀█ █▀  \u001b[0m\n\u001b[30;47m  █ ▀▀▀ █ ▀██▀▄▄█▀  █ █▄▀  ▄ ▄▀  \u001b[0m\n\u001b[30;47m  ▀▀▀▀▀▀▀ ▀ ▀▀ ▀ ▀▀▀  ▀ ▀ ▀ ▀▀▀  \u001b[0m\n\u001b[30;47m                                 \u001b[0m\n\n在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。\n\n"
     },
     {
       "name": "the message says what to do (English)",
@@ -131,17 +131,17 @@
     {
       "name": "hello carries the protocol version: v 2, vmin 1, next to the app version",
       "ok": true,
-      "detail": "{\"boot\":\"6edZRGL27IBj9Z2RspRz++Dk\",\"build\":\"dev\",\"host\":\"Mac mini\",\"nonce\":\"0it2zYJVP2QSVkErwJBjAoFm\",\"t\":\"hello\",\"v\":2,\"ver\":\"4.5.1\",\"vmin\":1}"
+      "detail": "{\"boot\":\"A2aAGNwGq1desKEmpB6H9yYZ\",\"build\":\"dev\",\"host\":\"Mac mini\",\"nonce\":\"vMeRAIWt6gFJnnB/UqQIVK4P\",\"t\":\"hello\",\"v\":2,\"ver\":\"4.5.1\",\"vmin\":1}"
     },
     {
       "name": "a client speaking version 9: auth_fail \"protocol\" (v 2, vmin 1), then close 4426",
       "ok": true,
-      "detail": "{\"got\":[{\"boot\":\"6edZRGL27IBj9Z2RspRz++Dk\",\"build\":\"dev\",\"host\":\"Mac mini\",\"nonce\":\"0it2zYJVP2QSVkErwJBjAoFm\",\"t\":\"hello\",\"v\":2,\"ver\":\"4.5.1\",\"vmin\":1},{\"reason\":\"protocol\",\"t\":\"auth_fail\",\"v\":2,\"vmin\":1}],\"code\":4426}"
+      "detail": "{\"got\":[{\"boot\":\"A2aAGNwGq1desKEmpB6H9yYZ\",\"build\":\"dev\",\"host\":\"Mac mini\",\"nonce\":\"vMeRAIWt6gFJnnB/UqQIVK4P\",\"t\":\"hello\",\"v\":2,\"ver\":\"4.5.1\",\"vmin\":1},{\"reason\":\"protocol\",\"t\":\"auth_fail\",\"v\":2,\"vmin\":1}],\"code\":4426}"
     },
     {
       "name": "the Mac logs it",
       "ok": true,
-      "detail": "  ▄▄  \u001b[0m\n\u001b[30;47m  █▀▀▀▀▀█   ▄  ▀ ▄▀█ ██ ▀ █▀▄█▀  \u001b[0m\n\u001b[30;47m  █ ███ █ ▀█▀ ▄▄ ▄▀▄▀▄▀▀██▀█ █▀  \u001b[0m\n\u001b[30;47m  █ ▀▀▀ █ ▀▀█ ▀  ▄ ▄▄▄█▄▀  ▄ ▄▀  \u001b[0m\n\u001b[30;47m  ▀▀▀▀▀▀▀ ▀ ▀▀  ▀   ▀ ▀ ▀ ▀ ▀▀▀  \u001b[0m\n\u001b[30;47m                                 \u001b[0m\n\n在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。\n\n[20:38:44] authenticated iPhone from 127.0.0.1\n[20:38:44] protocol version 9 from 127.0.0.1 not accepted (this Mac: 1–2)\n"
+      "detail": "  ▄▄  \u001b[0m\n\u001b[30;47m  █▀▀▀▀▀█  █▄▀ ▀ ▄▀▀ ▀█ ▀ █▀▄█▀  \u001b[0m\n\u001b[30;47m  █ ███ █ ▀▄▄ ▀▄  ▀▀ ▄▀▀██▀█ █▀  \u001b[0m\n\u001b[30;47m  █ ▀▀▀ █ ▀▀█ ▀█ ▄▀▀▀ █▄▀  ▄ ▄▀  \u001b[0m\n\u001b[30;47m  ▀▀▀▀▀▀▀ ▀  ▀▀  ▀▀ ▀ ▀ ▀ ▀ ▀▀▀  \u001b[0m\n\u001b[30;47m                                 \u001b[0m\n\n在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。\n\n[20:40:52] authenticated iPhone from 127.0.0.1\n[20:40:52] protocol version 9 from 127.0.0.1 not accepted (this Mac: 1–2)\n"
     },
     {
       "name": "the real 4.4.0 page (protocol 1, no v) pairs with this Mac",

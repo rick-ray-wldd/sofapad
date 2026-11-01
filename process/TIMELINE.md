@@ -321,3 +321,6 @@
 | S12-M6 | 端對端更新測試第一次跑：App 找到更新，但 Mac 進了鎖定畫面，測試卡住（I-54）；工具改成鎖定時先停 | 20:01–20:22 | process/ISSUES.md I-54 |
 | S12-M7 | 文件：docs/PROTOCOL.md、docs/RELEASING.md、README 中英（4.5、更新、為什麼多一個套件、已知限制）、INSTALL、CHANGELOG、release notes 4.5.0、DEVELOPMENT、SPEC | 20:22–20:50 | — |
 | S12-M8 | 自己審程式：跟著更新後重連又說一次「更新了」（I-56）、版本對不上的橫幅蓋住離線和配對；修好、測試加一項 | 20:45–20:55 | I-56 |
+| S12-M9 | 全部瀏覽器套件（15 個）跑 4.5：全過（sofa6-caret 這次 15/15、sofa12-follow 30/30）；4.4 的截圖和結果檔還原，新的放 design/evidence/sofa12/ | 20:30–20:55 | design/evidence/sofa12/tests.txt |
+| S12-M10 | commit 19afbef；release.sh 的「有沒有 commit」改成在測試前判斷（0bfbcc1）；`tools/release.sh 4.5.0`：測試、build、ad-hoc 簽章、打包、用鑰匙圈的金鑰簽 zip 和 appcast、用公鑰驗過，印出 gh 指令；self-test 31 PASS＋2 略過（鎖定） | 20:38–20:45 | dist/release/（不進 git）、tests.txt |
+| S12-M11 | 公開前檢查：56 個檔案、3,498 行、zip 116 個檔案逐位元組掃；私鑰在 repo、整個 git 歷史、zip、文件裡都是 0 | 20:45–20:50 | docs/PUBLIC-CHECK.md「4.5」 |
