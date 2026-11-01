@@ -324,3 +324,4 @@
 | S12-M9 | 全部瀏覽器套件（15 個）跑 4.5：全過（sofa6-caret 這次 15/15、sofa12-follow 30/30）；4.4 的截圖和結果檔還原，新的放 design/evidence/sofa12/ | 20:30–20:55 | design/evidence/sofa12/tests.txt |
 | S12-M10 | commit 19afbef；release.sh 的「有沒有 commit」改成在測試前判斷（0bfbcc1）；`tools/release.sh 4.5.0`：測試、build、ad-hoc 簽章、打包、用鑰匙圈的金鑰簽 zip 和 appcast、用公鑰驗過，印出 gh 指令；self-test 31 PASS＋2 略過（鎖定） | 20:38–20:45 | dist/release/（不進 git）、tests.txt |
 | S12-M11 | 公開前檢查：56 個檔案、3,498 行、zip 116 個檔案逐位元組掃；私鑰在 repo、整個 git 歷史、zip、文件裡都是 0 | 20:45–20:50 | docs/PUBLIC-CHECK.md「4.5」 |
+| S12-M12 | 端對端更新測試（測試簽章）：20:52 開始，20:53 前 27 項全過（找到、說明、下載驗證、換掉自己重新開啟成 4.5.1、手機跟著重載；手機連線中只放在選單；竄改的 zip 和 feed 都拒絕），之後收尾卡住；11/02 01:30 總控發現，01:32 用檢查器放開，不重跑：28/28，EXIT 0（I-57）。修好卡住的地方、每一步加時限、整個測試最多 12 分鐘；錄影改用 ffmpeg；只重跑第 1 段錄影，01:44 20/20，影片乾淨 | 20:52–01:50 | design/evidence/sofa12/update-e2e.json、update-e2e-video.json、tests.txt、I-57 |

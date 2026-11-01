@@ -11,8 +11,11 @@
 //   - a phone connected while an update is found: no window takes the keys, the update waits in the menu
 //   - a tampered zip (one file of the 4.5.1 archive changed, the signed feed untouched) is rejected, 4.5.0 stays;
 //     a feed changed after it was signed is refused
-//   node tools/sofa12-update-e2e.mjs [--video]   (--video: a screen recording of the update window and the relaunch,
-//                                                 next to the phone, in dist/sofa12/)
+//   node tools/sofa12-update-e2e.mjs [--video | --video-only]
+//     --video: a screen recording of the update window and the relaunch, next to the phone, in dist/sofa12/
+//     --video-only: the first part alone (the update and the phone following), recorded; its results go to
+//       update-e2e-video.json and its pictures to dist/sofa12/shots, so a full run's evidence stays as it is
+//   Every command and wait has a time limit, and the whole run stops after 12 minutes (exit 3, with what it had).
 import { chromium } from 'playwright-core';
 import { execFileSync, spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -23,7 +26,8 @@ import { dirname, join } from 'node:path';
 import { ROOT, IPHONE_UA, INSETS } from './test-server.mjs';
 import { startScreencast } from './screencast.mjs';
 
-const VIDEO = process.argv.includes('--video');
+const VIDEO_ONLY = process.argv.includes('--video-only');
+const VIDEO = VIDEO_ONLY || process.argv.includes('--video');
 const E2E = join(ROOT, 'dist/update-test');
 const FEED = join(E2E, 'feed');
 const INSTALLED = join(E2E, 'Applications/SofaPad.app');
@@ -32,8 +36,9 @@ const BUNDLE = 'io.github.rick-ray-wldd.sofapad.update-test';
 const LOG = join(homedir(), 'Library/Logs', BUNDLE + '.log');
 const SPARKLE = join(ROOT, 'mac/.build/artifacts/sparkle/Sparkle/bin');
 const AX = join(E2E, 'ax');
-const shotsDir = join(ROOT, 'design/screenshots/sofa12');
+const shotsDir = join(ROOT, VIDEO_ONLY ? 'dist/sofa12/shots' : 'design/screenshots/sofa12');
 const evDir = join(ROOT, 'design/evidence/sofa12');
+const evFile = join(evDir, VIDEO_ONLY ? 'update-e2e-video.json' : 'update-e2e.json');
 const videoDir = join(ROOT, 'dist/sofa12');
 const FEED_PORT = 41000 + Math.floor(Math.random() * 1000);
 const APP_PORT = 42000 + Math.floor(Math.random() * 1000);
@@ -55,7 +60,8 @@ const until = async (fn, ms = 15000, step = 200) => {
     await sleep(step);
   }
 };
-const sh = (cmd, args, opts = {}) => execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...opts });
+// a command that runs past its limit is killed and throws, so none can hold the run
+const sh = (cmd, args, opts = {}) => execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 120000, ...opts });
 const t0 = Date.now();
 const evidence = { feedPort: FEED_PORT, appPort: APP_PORT, steps: [] };
 const step = (what, extra = {}) => { const e = { t: ((Date.now() - t0) / 1000).toFixed(1), what, ...extra }; evidence.steps.push(e); console.log(`  [${e.t}s] ${what}`); };
@@ -101,7 +107,7 @@ const sign = (args) => sh(join(SPARKLE, 'sign_update'), ['--ed-key-file', '-', .
 function build(version) {
   const app = join(E2E, `build-${version}`, 'SofaPad.app');
   const out = sh(join(ROOT, 'tools/build-app.sh'), [], { env: { ...process.env, SOFAPAD_CONFIG: 'debug', SOFAPAD_APP: app,
-    SOFAPAD_BUNDLE_ID: BUNDLE, SOFAPAD_VERSION: version, SOFAPAD_ED_KEY: PUB } });
+    SOFAPAD_BUNDLE_ID: BUNDLE, SOFAPAD_VERSION: version, SOFAPAD_ED_KEY: PUB }, timeout: 600000 });
   writeFileSync(join(E2E, 'logs', `build-${version}.txt`), out);
   return app;
 }
@@ -215,29 +221,76 @@ const settingsOpen = async (open) => {
 // ---------- the recording (--video) ----------
 let stage = null;
 let recorder = null;
+let recorderExit = null;
 let cast = null;
 let castStarted = 0;
 let castList = null;
 const STAGE = { x: 940, y: 150, w: 980, h: 780 };   // where the update window shows on this display (2560×1080)
+// The Mac's screen is recorded by ffmpeg's own screen capture, stopped with q, which it answers by finishing the file.
+// (screencapture -v leaves no file when a signal stops it, and its -V time did not always end it: I-57.)
+const MAC_FPS = 30;
+const macRaw = join(videoDir, 'mac-raw.mp4');
 const caption = (line) => { if (VIDEO) writeFileSync(join(videoDir, 'caption.txt'), line); };
 async function startRecording() {
   caption(`SofaPad update test · ${OLD} → ${NEW} · feed on 127.0.0.1, test signing`);
-  stage = spawn(AX, ['stage', STAGE.x, STAGE.y, STAGE.w, STAGE.h, join(videoDir, 'caption.txt')].map(String), { stdio: 'ignore' });
+  stage = spawn(AX, ['stage', STAGE.x, STAGE.y, STAGE.w, STAGE.h, join(videoDir, 'caption.txt'), BUNDLE].map(String), { stdio: 'ignore' });
   await sleep(1200);
-  recorder = spawn('screencapture', ['-v', '-x', '-V', '150', `-R${STAGE.x},${STAGE.y},${STAGE.w},${STAGE.h}`, join(videoDir, 'mac.mov')], { stdio: 'ignore' });
-  evidence.recordingStarted = Date.now();
-  await sleep(1500);
+  rmSync(macRaw, { force: true });
+  recorder = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-nostats', '-progress', 'pipe:1', '-f', 'avfoundation', '-capture_cursor', '1',
+    '-framerate', String(MAC_FPS), '-pixel_format', 'uyvy422', '-i', 'Capture screen 0',
+    '-vf', `crop=${STAGE.w}:${STAGE.h}:${STAGE.x}:${STAGE.y},format=yuv420p`, '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '18', macRaw],
+  { stdio: ['pipe', 'pipe', 'pipe'] });
+  let errors = '';
+  recorder.stderr.on('data', (d) => { errors += d; });
+  recorderExit = new Promise((r) => recorder.once('exit', (code, signal) => r({ code, signal, errors: errors.trim().slice(-400) })));
+  // wait for the first frames (ffmpeg reports how many it has encoded, every half second) before anything happens
+  recorder.stdout.on('data', (d) => {
+    const n = Number(/frame=(\d+)/.exec(String(d))?.[1] || 0);
+    if (n > 0 && !evidence.recordingStarted) evidence.recordingStarted = Date.now() - (n * 1000) / MAC_FPS;
+  });
+  await until(() => evidence.recordingStarted, 10000);
+  evidence.recordingStarted ??= Date.now();
+  await sleep(1000);
 }
+/** Ends the recording (the phone's ends at the same moment) and waits for ffmpeg to finish the file. Once only. */
 async function stopRecording() {
   if (!recorder) return;
-  recorder.kill('SIGINT');
-  await new Promise((r) => recorder.once('exit', r));
+  const rec = recorder;
+  recorder = null;
+  evidence.recordingLength = (Date.now() - evidence.recordingStarted) / 1000;
+  evidence.recordingStopped = Date.now();
+  rec.stdin.end('q');
+  if (cast) castList = await cast.stop();
+  cast = null;
+  evidence.recorder = await Promise.race([recorderExit, sleep(15000).then(() => 'did not finish within 15 s: killed')]);
+  if (typeof evidence.recorder === 'string') rec.kill('SIGKILL');
   caption('quit');
   await sleep(500);
-  if (stage) stage.kill();
+  stage?.kill();
+  stage = null;
 }
 
-try {
+// the whole run has a limit too: past it, say where it was, write what it has and leave
+const RUN_LIMIT_MS = 12 * 60 * 1000;
+function writeEvidence(extra = {}) {
+  const passed = results.filter((r) => r.ok).length;
+  // the repository is public: the app's log names its folder, which is under the home folder
+  writeFileSync(evFile, JSON.stringify({ when: new Date().toISOString(), passed, total: results.length, ...extra, results, ...evidence,
+    requests, phoneNavigations: navs }, null, 2).replaceAll(homedir(), '~'));
+  return passed;
+}
+setTimeout(() => {
+  const at = evidence.steps.at(-1)?.what ?? 'before the first step';
+  console.log(`TIMEOUT after ${RUN_LIMIT_MS / 60000} min; the last step was: ${at}`);
+  for (const p of [recorder, stage]) p?.kill('SIGKILL');
+  const pid = appPid();
+  if (pid) try { process.kill(pid, 'SIGKILL'); } catch { /* gone */ }
+  forgetTestApp();
+  writeEvidence({ timedOut: at });
+  process.exit(3);
+}, RUN_LIMIT_MS).unref();
+
+run: try {
   // ===== 1. 4.5.0 finds 4.5.1, shows the notes, installs it and opens again as 4.5.1 =====
   install(app450);
   testDefaults();
@@ -284,7 +337,8 @@ try {
   }
   await sleep(1500);
   caption(`SofaPad ${OLD} (pid ${pid450}) · Install and Relaunch`);
-  ax('press', pid450, 'Install and Relaunch');
+  // the app quits while it answers this press, so Accessibility may report an error: what counts is what follows
+  try { ax('press', pid450, 'Install and Relaunch'); } catch { evidence.relaunchPressError = 'the app quit before answering'; }
   step('pressed Install and Relaunch');
   const gone = await until(() => { try { process.kill(pid450, 0); return false; } catch { return true; } }, 20000);
   step(`${OLD} quit`);
@@ -319,11 +373,9 @@ try {
     check('the menu bar says 4.5.1 and has 檢查更新…', /^SofaPad 4\.5\.1（建置 /.test(items[0] || '') && items.includes('檢查更新…'), JSON.stringify(items));
   }
   await sleep(2500);
-  if (VIDEO) {
-    await stopRecording();
-    if (cast) castList = await cast.stop();
-  }
+  if (VIDEO) await stopRecording();
   await quitApp();
+  if (VIDEO_ONLY) break run;
 
   // ===== 2. a phone is connected when the update is found: nothing takes the keys, it waits in the menu =====
   install(app450);
@@ -396,7 +448,7 @@ try {
   await quitApp();
   await browser.close();
   feedServer.close();
-  copyFileSync(LOG, join(E2E, 'logs', 'app.log'));
+  if (existsSync(LOG)) copyFileSync(LOG, join(E2E, 'logs', 'app.log'));
   forgetTestApp();
   rmSync(LOG, { force: true });
 }
@@ -404,23 +456,31 @@ try {
 check('no errors on the phone page', pageErrors.length === 0, pageErrors.join(' | '));
 
 // the video: the Mac's screen (the update window, the relaunch) on the right, the phone on the left, at 60 fps
-if (VIDEO && existsSync(join(videoDir, 'mac.mov')) && castList) {
-  const ff = (a) => sh('ffmpeg', ['-y', '-loglevel', 'error', ...a]);
+if (VIDEO && existsSync(macRaw) && castList) {
+  const ff = (a) => sh('ffmpeg', ['-y', '-loglevel', 'error', ...a], { timeout: 600000 });
   const mac = join(videoDir, 'sofa12-update-mac.mp4');
   const phoneMp4 = join(videoDir, 'sofa12-update-phone.mp4');
   const both = join(videoDir, 'sofa12-update.mp4');
-  ff(['-i', join(videoDir, 'mac.mov'), '-vf', 'fps=60,format=yuv420p', '-c:v', 'libx264', '-crf', '20', mac]);
-  ff(['-f', 'concat', '-safe', '0', '-i', castList, '-vf', `fps=60,scale=-2:${STAGE.h},format=yuv420p`, '-c:v', 'libx264', '-crf', '20', phoneMp4]);
-  const lead = Math.max(0, (castStarted - evidence.recordingStarted) / 1000).toFixed(2);
-  ff(['-i', mac, '-i', phoneMp4, '-filter_complex', `[1:v]tpad=start_duration=${lead}:color=0x17191f[p];[p][0:v]hstack=inputs=2[v]`,
-    '-map', '[v]', '-r', '60', '-c:v', 'libx264', '-crf', '20', '-pix_fmt', 'yuv420p', both]);
   const probe = (f) => sh('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height,r_frame_rate,nb_frames:format=duration', '-of', 'json', f]);
+  // The Mac's recording is placed by its end, when q reached ffmpeg: it began its own length before that (the frame
+  // count ffmpeg reports at the start comes after the encoder's delay, about a second late). The phone's video starts
+  // `lead` seconds into it and ends with it. Both are counted in frames; the phone's last picture has no time of its
+  // own, so it is held (tpad) and the count ends it.
+  const length = Number(JSON.parse(probe(macRaw)).format.duration);
+  const lead = Math.max(0, (castStarted - (evidence.recordingStopped - length * 1000)) / 1000).toFixed(2);
+  const frames = (s) => String(Math.round(s * 60));
+  const hold = `tpad=stop_mode=clone:stop_duration=${Math.ceil(length)}`;
+  ff(['-i', macRaw, '-vf', `fps=60,${hold},format=yuv420p`, '-frames:v', frames(length), '-c:v', 'libx264', '-crf', '20', mac]);
+  ff(['-f', 'concat', '-safe', '0', '-i', castList, '-vf', `fps=60,scale=-2:${STAGE.h},${hold},format=yuv420p`,
+    '-frames:v', frames(length - lead), '-c:v', 'libx264', '-crf', '20', phoneMp4]);
+  ff(['-i', mac, '-i', phoneMp4, '-filter_complex', `[1:v]tpad=start_duration=${lead}:color=0x17191f[p];[p][0:v]hstack=inputs=2[v]`,
+    '-map', '[v]', '-r', '60', '-frames:v', frames(length), '-c:v', 'libx264', '-crf', '20', '-pix_fmt', 'yuv420p', both]);
   evidence.video = { mac: JSON.parse(probe(mac)), phone: JSON.parse(probe(phoneMp4)), both: JSON.parse(probe(both)), phoneLead: Number(lead) };
   check('the recording was made: the Mac screen and the phone side by side', statSync(both).size > 100000, JSON.stringify(evidence.video));
+} else if (VIDEO) {
+  check('the recording was made: the Mac screen and the phone side by side', false,
+    JSON.stringify({ macRecording: existsSync(macRaw), phoneFrames: !!castList, recorder: evidence.recorder }));
 }
-evidence.requests = requests;
-evidence.phoneNavigations = navs;
-const passed = results.filter((r) => r.ok).length;
-writeFileSync(join(evDir, 'update-e2e.json'), JSON.stringify({ when: new Date().toISOString(), passed, total: results.length, results, ...evidence }, null, 2));
-console.log(`\nsofa12-update-e2e: ${passed}/${results.length} PASS`);
+const passed = writeEvidence();
+console.log(`\nsofa12-update-e2e${VIDEO_ONLY ? ' (video only)' : ''}: ${passed}/${results.length} PASS`);
 process.exit(passed === results.length ? 0 : 1);

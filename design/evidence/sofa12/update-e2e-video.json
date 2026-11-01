@@ -1,0 +1,280 @@
+{
+  "when": "2026-11-01T17:45:23.478Z",
+  "passed": 20,
+  "total": 20,
+  "results": [
+    {
+      "name": "the two test builds carry the test key and their versions",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the 4.5.1 zip and its feed are signed with the test key (checked with the public key alone)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "at launch, 4.5.0 checks the feed and offers 4.5.1 in its update window",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the window says 4.5.1 is available and that this is 4.5.0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "it shows the release notes (English on this Mac)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sparkle did not offer to install updates silently (SUAllowsAutomaticUpdates is off)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the feed was read from 127.0.0.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the phone is paired with 4.5.0: page 4.5.0 and Mac app 4.5.0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "it downloads 4.5.1 and checks it: \"Install and Relaunch\"",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the zip was downloaded from 127.0.0.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "4.5.0 quit and the app opened again by itself",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the app in its place is now 4.5.1, validly signed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the running process is the app in that place",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "its log: found 4.5.1, installed it, started as 4.5.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "4.5.1 checks at its launch too, and is up to date",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the phone page reloaded itself once and says so",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the phone shows the same version as the Mac: page 4.5.1, Mac app 4.5.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the menu bar says 4.5.1 and has 檢查更新…",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no errors on the phone page",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the recording was made: the Mac screen and the phone side by side",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "feedPort": 41304,
+  "appPort": 42521,
+  "steps": [
+    {
+      "t": "7.6",
+      "what": "built 4.5.0 (20261102014459) and 4.5.1 (20261102014503)"
+    },
+    {
+      "t": "7.9",
+      "what": "packaged 4.5.1: 1568633 bytes, feed signed"
+    },
+    {
+      "t": "12.7",
+      "what": "opened 4.5.0 (pid 96727)"
+    },
+    {
+      "t": "12.8",
+      "what": "the update window is up"
+    },
+    {
+      "t": "15.1",
+      "what": "pressed Install Update"
+    },
+    {
+      "t": "17.5",
+      "what": "pressed Install and Relaunch"
+    },
+    {
+      "t": "17.7",
+      "what": "4.5.0 quit"
+    },
+    {
+      "t": "17.8",
+      "what": "opened again (pid 96871)"
+    },
+    {
+      "t": "18.4",
+      "what": "the phone page reloaded itself"
+    }
+  ],
+  "recordingStarted": 1793555108628,
+  "updateWindow": {
+    "frame": {
+      "h": 398,
+      "w": 544,
+      "x": 1014,
+      "y": 175
+    },
+    "texts": [
+      "A new version of SofaPad is available!",
+      "SofaPad 4.5.1 is now available—you have 4.5.0. Would you like to download it now?",
+      "What's new\n•\tA test build for the update test, nothing new in it. It shows that SofaPad 4.5.0 finds this version, shows these notes, downloads it, checks its EdDSA signature, puts it in its own place and opens again as 4.5.1.\n•\tThe phone page sees the new version and reloads itself."
+    ],
+    "buttons": [
+      "Remind Me Later",
+      "Install Update",
+      "Skip This Version",
+      null,
+      null,
+      null
+    ]
+  },
+  "readyWindow": {
+    "frame": {
+      "h": 141,
+      "w": 400,
+      "x": 1086,
+      "y": 307
+    },
+    "texts": [
+      "Ready to Install",
+      "Updating SofaPad"
+    ]
+  },
+  "relaunchPressError": "the app quit before answering",
+  "menuAfter": [
+    "SofaPad 4.5.1（建置 2026-11-02 01:45）",
+    "檢查更新…",
+    "已連線：iPhone",
+    "",
+    "用 iPhone 掃描（QR code）…",
+    "拷貝網址 http://127.0.0.1:42521/",
+    "配對碼：688731",
+    "配對新手機（產生新配對碼）",
+    "忘記所有已配對手機",
+    "允許 Tailscale 裝置（100.64.0.0/10，仍要配對）",
+    "進階",
+    "",
+    "結束 SofaPad"
+  ],
+  "recordingLength": 12.726,
+  "recorder": {
+    "code": 0,
+    "signal": null,
+    "errors": "objc[96650]: class `NSKVONotifying_AVCaptureScreenInput' not linked into application\nobjc[96650]: class `NSKVONotifying_AVCaptureScreenInput' not linked into application\nobjc[96650]: class `NSKVONotifying_AVCaptureScreenInput' not linked into application"
+  },
+  "video": {
+    "mac": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 980,
+          "height": 780,
+          "r_frame_rate": "60/1",
+          "nb_frames": "820"
+        }
+      ],
+      "format": {
+        "duration": "13.666667"
+      }
+    },
+    "phone": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 360,
+          "height": 780,
+          "r_frame_rate": "60/1",
+          "nb_frames": "638"
+        }
+      ],
+      "format": {
+        "duration": "11.566992"
+      }
+    },
+    "both": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1340,
+          "height": 780,
+          "r_frame_rate": "60/1",
+          "nb_frames": "820"
+        }
+      ],
+      "format": {
+        "duration": "13.666667"
+      }
+    },
+    "phoneLead": 3.04
+  },
+  "requests": [
+    {
+      "t": "12.6",
+      "path": "/appcast.xml",
+      "ua": "SofaPad/4.5.0"
+    },
+    {
+      "t": "15.2",
+      "path": "/SofaPad-4.5.1-macOS.zip",
+      "ua": "SofaPad/4.5.0"
+    },
+    {
+      "t": "18.2",
+      "path": "/appcast.xml",
+      "ua": "SofaPad/4.5.1"
+    }
+  ],
+  "phoneNavigations": [
+    {
+      "t": "12.8",
+      "url": "http://127.0.0.1:42521/"
+    },
+    {
+      "t": "17.9",
+      "url": "http://127.0.0.1:42521/?follow=1%7E4.5.1%2B2026-11-02+01%3A45"
+    }
+  ],
+  "recordingStopped": 1793555121354,
+  "videoRecomposed": "made again from the same recording (mac-raw.mp4, the phone frames), the Mac side placed by its end; the first composition placed it by the start ffmpeg reported, about a second late"
+}

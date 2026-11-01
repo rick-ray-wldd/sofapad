@@ -173,3 +173,13 @@ and `RELEASE-NOTES-4.5.0.md` were searched byte by byte: nothing real. They matc
 app's help text and the Tailscale range in its menu (both as in 4.2–4.4), and the word "Orca" in a code comment. The
 release executable has none of the test switches (`SofaPadTest…`, `PKM_TEST_…`; `tools/build-app.sh` checks) and no
 local paths.
+
+**The end-to-end update test** (2026-11-02, before its results were committed): `update-e2e.json`,
+`update-e2e-video.json` and the eight `update-*.png` screenshots were searched the same way. One log line kept in
+`update-e2e.json` named the test app's folder, which is under the home folder; the test now writes `~` for the home
+folder in everything it saves, and that file was corrected the same way (one place). What remains is only
+`127.0.0.1`, the test app's own pairing codes (a throwaway app on 127.0.0.1, gone after the test), and the Tailscale
+range in its menu. The screenshots show only the test app's windows and menu (taken by window, nothing behind them)
+and the test page; the Mac is the model's default name ("Mac mini"). The video (`dist/sofa12/sofa12-update.mp4`, not
+in git) was checked in frames taken every 1.4 s and at its key moments: the recording's backdrop window, the test
+app's windows and the test page only.

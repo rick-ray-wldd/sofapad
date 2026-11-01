@@ -99,4 +99,6 @@ key, serves the feed on 127.0.0.1, installs 4.5.0 in `dist/update-test/` and let
 Sparkle's real windows (pressed through Accessibility). It also checks that a tampered zip and an edited feed are
 refused. It needs the Mac unlocked and the Accessibility permission for the terminal that runs it. The feed address
 it uses exists only in debug builds (`SofaPadTestFeedURL`); `tools/build-app.sh` refuses to finish a release build
-that contains any of the test switches.
+that contains any of the test switches. `--video` also records the update window and the relaunch next to the phone
+(`dist/sofa12/sofa12-update.mp4`, with ffmpeg's screen capture); `--video-only` runs just the update part, recorded,
+and leaves the full run's results alone. Every step has a time limit and the whole run stops after 12 minutes.

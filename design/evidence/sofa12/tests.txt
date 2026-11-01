@@ -27,8 +27,21 @@ Browser suites
   sofa10-i18n-theme                           51/51  [0]           51/51  [0]
   sofa12-follow (new)                         —                    30/30  [0]   (follow.json; screenshots design/screenshots/sofa12)
 
-End-to-end update (new, this Mac, test signing)
-  sofa12-update-e2e                           —                    E2E
+End-to-end update (new, this Mac, test signing: tools/sofa12-update-e2e.mjs, feed and zip on 127.0.0.1)
+  full run, 11/01 20:52 (--video)             —                    28/28  [0]   (update-e2e.json; screenshots update-*.png)
+      1. 4.5.0 finds 4.5.1 at launch and shows the notes; Install Update downloads it from 127.0.0.1 and checks it;
+         Install and Relaunch: 4.5.0 quits, 4.5.1 is in its place (validly signed) and opens by itself, checks the feed
+         again and is up to date; the phone page reloads itself once and shows 4.5.1 like the Mac; the menu shows 4.5.1
+      2. a phone connected when the update is found: no window, the keyboard focus stays where it was, the update
+         waits in the menu (⬆︎ 安裝新版本 4.5.1…), choosing it opens the window
+      3. tampered zip (one file changed, the signed feed untouched): refused ("improperly signed"), 4.5.0 stays
+      4. feed changed after signing: refused, no update offered
+      The 27 checks of parts 1-4 passed by 20:53; the run then hung in its cleanup (I-57) until 11/02 01:32, when
+      the wait was released without running anything again: it closed everything, checked the page ("no errors
+      on the phone page") and wrote its results. The Mac-side recording of that run was never saved (I-57).
+  recording, 11/02 01:44 (--video-only)       —                    20/20  [0]   (update-e2e-video.json): part 1 again, recorded:
+      dist/sofa12/sofa12-update.mp4 (not in git): 1340×780, 60 fps, 13.7 s, the Mac's screen (update window,
+      Ready to Install, relaunch) on the right and the phone (reloads itself, "now 4.5.1") on the left
 
 Release script (20:39-20:41, clean tree at 0bfbcc1)
   tools/release.sh 4.5.0                      exit 0: swift test 88/88, JS 111/111, v2-browser 41/41, sofa12-follow 30/30;

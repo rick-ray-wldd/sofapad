@@ -7,8 +7,10 @@
 //   ax menushot <pid> <png>        opens the menu, takes a picture of the menu alone, closes it
 //   ax front                       the pid of the app in front (the one that gets the keys)
 //   ax locked                      1 while the Mac shows its lock screen (then nothing here can see or press anything)
-//   ax stage <x> <y> <w> <h> <file>  a plain dark window over that part of the screen, with the line in <file> as its
-//                                  caption (redrawn when the file changes): the backdrop of the screen recording
+//   ax stage <x> <y> <w> <h> <file> [bundle id]
+//                                  a plain dark window over that part of the screen, with the line in <file> as its
+//                                  caption (redrawn when the file changes): the backdrop of the screen recording. No
+//                                  other app comes in front of it, except the one with that bundle id
 import AppKit
 import ApplicationServices
 import Foundation
@@ -60,6 +62,31 @@ func findButton(_ e: AXUIElement, _ title: String, depth: Int = 0) -> AXUIElemen
     return nil
 }
 
+/// The app's windows. Normally its AXWindows; when that holds no real window (macOS answers with the application
+/// element on a locked screen, I-54), the windows the window server shows for the app, found by hit-testing inside
+/// each one.
+func appWindows(_ pid: pid_t) -> [AXUIElement] {
+    let app = AXUIElementCreateApplication(pid)
+    let listed = ((attr(app, kAXWindowsAttribute) as? [AXUIElement]) ?? []).filter { str($0, kAXRoleAttribute) == kAXWindowRole as String }
+    if !listed.isEmpty { return listed }
+    var found: [AXUIElement] = []
+    let sys = AXUIElementCreateSystemWide()
+    for w in windowIDs(pid) where (w["layer"] as? Int ?? 0) == 0 {
+        let (x, y, wd) = (w["x"] as? Double ?? 0, w["y"] as? Double ?? 0, w["w"] as? Double ?? 0)
+        var hit: AXUIElement?
+        guard AXUIElementCopyElementAtPosition(sys, Float(x + wd / 2), Float(y + 12), &hit) == .success, let h = hit else { continue }
+        var owner: pid_t = 0
+        AXUIElementGetPid(h, &owner)
+        guard owner == pid else { continue }
+        var cur: AXUIElement? = h
+        while let c = cur, str(c, kAXRoleAttribute) != kAXWindowRole as String {
+            cur = attr(c, kAXParentAttribute).map { $0 as! AXUIElement }
+        }
+        if let win = cur, !found.contains(where: { CFEqual($0, win) }) { found.append(win) }
+    }
+    return found
+}
+
 func emit(_ obj: Any) {
     let data = try! JSONSerialization.data(withJSONObject: obj, options: [.sortedKeys])
     print(String(decoding: data, as: UTF8.self))
@@ -70,8 +97,7 @@ guard args.count >= 2 else { print("usage: ax tree|press|menu|stage …"); exit(
 switch args[1] {
 case "tree":
     let pid = pid_t(args[2])!
-    let app = AXUIElementCreateApplication(pid)
-    let windows = (attr(app, kAXWindowsAttribute) as? [AXUIElement]) ?? []
+    let windows = appWindows(pid)
     emit(["windows": windows.map { w -> [String: Any] in
         var items: [[String: Any]] = []
         walk(w, into: &items)
@@ -79,8 +105,7 @@ case "tree":
     }, "ids": windowIDs(pid)])
 case "press":
     let pid = pid_t(args[2])!
-    let app = AXUIElementCreateApplication(pid)
-    for w in (attr(app, kAXWindowsAttribute) as? [AXUIElement]) ?? [] {
+    for w in appWindows(pid) {
         if let b = findButton(w, args[3]) {
             exit(AXUIElementPerformAction(b, kAXPressAction as CFString) == .success ? 0 : 1)
         }
@@ -119,11 +144,13 @@ case "front":
 case "stage":
     let (x, y, w, h) = (Double(args[2])!, Double(args[3])!, Double(args[4])!, Double(args[5])!)
     let file = args[6]
+    let allowed = args.count > 7 ? args[7] : ""   // the app the recording is about: it may come in front of the stage
     let app = NSApplication.shared
     app.setActivationPolicy(.accessory)
     let screen = NSScreen.screens[0].frame
-    let window = NSWindow(contentRect: NSRect(x: x, y: screen.height - y - h, width: w, height: h),
-                          styleMask: [.borderless], backing: .buffered, defer: false)
+    final class StageWindow: NSWindow { override var canBecomeKey: Bool { true } }   // borderless windows cannot, by default
+    let window = StageWindow(contentRect: NSRect(x: x, y: screen.height - y - h, width: w, height: h),
+                             styleMask: [.borderless], backing: .buffered, defer: false)
     window.backgroundColor = NSColor(calibratedRed: 0.09, green: 0.1, blue: 0.13, alpha: 1)
     window.isReleasedWhenClosed = false
     let caption = NSTextField(labelWithString: "")
@@ -132,8 +159,19 @@ case "stage":
     caption.frame = NSRect(x: 24, y: h - 60, width: w - 48, height: 40)
     caption.maximumNumberOfLines = 2
     window.contentView?.addSubview(caption)
-    window.orderFrontRegardless()
-    app.activate(ignoringOtherApps: true)
+    // The stage is the active app before the recorded app is: when that one quits, macOS hands the front back to the
+    // stage, not to whatever was in front before. Any other app that still comes forward is covered again at once.
+    let takeFront = {
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
+        AXUIElementSetAttributeValue(AXUIElementCreateApplication(getpid()), kAXFrontmostAttribute as CFString, kCFBooleanTrue)
+    }
+    DispatchQueue.main.async(execute: takeFront)
+    NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { note in
+        guard let other = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
+              other.processIdentifier != getpid(), other.bundleIdentifier != allowed else { return }
+        takeFront()
+    }
     Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
         let line = (try? String(contentsOfFile: file, encoding: .utf8)) ?? ""
         if line == "quit" { exit(0) }
