@@ -6,9 +6,9 @@
 
 | Path | What |
 |---|---|
-| `mac/` | Swift package. `PKMCore`: protocol, pairing, LAN server, sessions, pacing, addresses. `pkm-server`: CGEvent injection, menu bar, self-test (built into `SofaPad.app`). `pkm-probe`: window for the older end-to-end test |
-| `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable rows (text row, key row, landscape panel; 4.2's key row converted), `shortcuts.js`, `sha256.js` login proof, `version.js`; 4.4: `i18n.js` and `lang/en.js`, `lang/zh.js` (every text, one dictionary per language), `boot.js` (run before the page is drawn: theme and language, no flash). Colours are tokens in `style.css` (light on `:root`, dark under `[data-theme="dark"]`) |
-| `tools/` | `build-app.sh` (builds `dist/SofaPad.app`, stripped, with its dSYM next to it in `dist/`), `package.sh` (`dist/release/SofaPad-<version>-macOS.zip`: the app, release notes, install guide, demo page and recording scripts; + SHA-256), browser tests (Playwright + headless Chrome, dry-run Mac), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
+| `mac/` | Swift package. `PKMCore`: protocol (and its version, 4.5), pairing, LAN server, sessions, pacing, addresses. `pkm-server`: CGEvent injection, menu bar, self-test, `Updater.swift` (Sparkle, 4.5) (built into `SofaPad.app`). `pkm-probe`: window for the older end-to-end test. The one dependency, Sparkle, is pinned in `Package.swift` (`Package.resolved` is committed); SwiftPM puts its tools (`generate_keys`, `sign_update`) in `mac/.build/artifacts/sparkle/Sparkle/bin/` |
+| `web/` | The phone page. `js/pointer.js` gestures, `caret.js` cursor pad, `textsync.js` live typing (IME, dictation, flow control), `connection.js` link (heartbeat, reconnect, nothing resent), `keyrow.js` the editable rows (text row, key row, landscape panel; 4.2's key row converted), `shortcuts.js`, `sha256.js` login proof, `version.js`, `follow.js` (4.5: reload when the Mac app's version differs, at most twice); 4.4: `i18n.js` and `lang/en.js`, `lang/zh.js` (every text, one dictionary per language), `boot.js` (run before the page is drawn: theme and language, no flash). Colours are tokens in `style.css` (light on `:root`, dark under `[data-theme="dark"]`) |
+| `tools/` | `build-app.sh` (builds `dist/SofaPad.app` with Sparkle embedded, stripped, with its dSYM next to it in `dist/`; `--identity` for a Developer ID), `package.sh` (`dist/release/SofaPad-<version>-macOS.zip`: the app, release notes, install guide, licences, demo page and recording scripts; + SHA-256), `release.sh` (4.5: one command for a release, see `docs/RELEASING.md`), `appcast.mjs` (writes and checks the update feed), `sparkle-public-key.txt`, browser tests (Playwright + headless Chrome, dry-run Mac), `sofa12-update-e2e.mjs` + `sofa12-ax.swift` (the end-to-end update test), `pkm4/` the iOS Simulator + TextEdit real-injection bench |
 | `demo/` | `playground.html`: the demo / practice page for the Mac (one stage per feature, ticks itself; English by default, `?lang=zh` Chinese; `?video=1` or `<meta name="playground-mode" content="video">` the short recording version; see `docs/DEMO-SCRIPT.md`) |
 | `design/` | `SPEC.md`, screenshots, test evidence |
 | `research/` | The research report from v1 (papers, GitHub projects, products, Apple's own features) |
@@ -30,7 +30,9 @@ swift run --package-path mac pkm-server -- --help  # all options
 
 Options: `--port 8765`, `--allow-tailscale` (this run only: also accept Tailscale devices, 100.64.0.0/10; they still pair), `--text-mode auto|type|paste`, `--forget-devices`, `--no-ui`, `--dry-run` (print events, touch nothing), `--no-post`, `--self-test`, `--state-dir DIR`, `--snapshot-scan PNG`.
 
-Run this way, the Accessibility permission belongs to Terminal (or whatever runs it), which lets everything in that terminal control the Mac. Use `SofaPad.app` for everyday use.
+Run this way, the Accessibility permission belongs to Terminal (or whatever runs it), which lets everything in that terminal control the Mac. Use `SofaPad.app` for everyday use. Run this way there are no updates: the updater starts only in `SofaPad.app`.
+
+Debug builds only (4.5, for tests; release builds have none of them, and `tools/build-app.sh` checks): `PKM_TEST_VERSION` and `PKM_TEST_PROTOCOL` make the app say another version and protocol version; the defaults keys `SofaPadTestFeedURL`, `SofaPadTestArguments` and `SofaPadTestCheckDelay` give a test app its feed, its options and a later launch check.
 
 ## Tests
 
@@ -54,6 +56,10 @@ node tools/sofa8-playground.mjs [--lang en|zh] [--mode video] [--video DIR]   # 
 node tools/sofa9-stage2.mjs                        # 4.3: demo page typing stage: English swipe typing, dictation, both languages, ?video=1
 node tools/sofa10-i18n-theme.mjs [--video DIR]     # 4.4: English / Chinese and light / dark: switching on a live connection, no Chinese
                                                    # left in English, the first frame's theme, WCAG contrast, screenshots (design/screenshots/sofa10)
+node tools/sofa12-follow.mjs                       # 4.5: the page follows a Mac app of another version, protocol versions both ways,
+                                                   # the real 4.4.0 page against this Mac, screenshots (design/screenshots/sofa12)
+node tools/sofa12-update-e2e.mjs [--video]         # 4.5: 4.5.0 updates itself to a test 4.5.1 through Sparkle's windows (needs the Mac
+                                                   # unlocked and Accessibility for the terminal), tampered zip and feed refused
 tools/e2e.sh                                       # older real-injection test into a probe window
 ```
 

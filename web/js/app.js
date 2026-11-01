@@ -7,6 +7,7 @@ import { LayoutStore, ROWS, ROW_NAMES, catalog } from './keyrow.js';
 import { VERSION, BUILD } from './version.js';
 import { BUILTIN_GROUPS, KEY_GROUPS, MODIFIERS, ShortcutStore, comboLabel, keyLabel, gestureShortcut, hotkeyHint, macStatusText } from './shortcuts.js';
 import { t, setLang, translate } from './i18n.js';
+import { macBuild, pageBuild, readMark, decide, reloadURL, cleanURL } from './follow.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -157,7 +158,10 @@ function haptic() {
 // ---------- link ----------
 const deviceName = /iPhone/.test(navigator.userAgent) ? 'iPhone' : /Android/.test(navigator.userAgent) ? 'Android' : 'phone';
 const wsURL = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
-const link = new Link({ url: wsURL, store, onState, onEvent, deviceName });
+// SOFA-12: this page reloaded itself to follow the Mac app (js/follow.js); the mark comes off the address at once
+let followMark = readMark(location.search);
+if (followMark) history.replaceState(null, '', cleanURL(location.href));
+const link = new Link({ url: wsURL, store, onState, onEvent, onHello, deviceName });
 window.pkmLink = link; // for tests and the latency page
 
 const dot = $('dot');
@@ -166,7 +170,7 @@ const rttEl = $('rtt');
 const banner = $('banner');
 const pairSheet = $('pairSheet');
 const pairMsg = $('pairMsg');
-let bannerState = { perm: true, secure: false, locked: false, offline: false, replaced: false, note: null };
+let bannerState = { perm: true, secure: false, locked: false, offline: false, replaced: false, incompatible: null, stuck: null, note: null };
 let hotkeysOff = new Set(); // macOS shortcuts the gestures need that are switched off on this Mac
 let macSpaces = null;        // Spaces on the Mac (desktops + full-screen apps); null = unknown
 let macKnown = false;        // ⚙︎ shows the Mac's version and shortcuts once it has said hello
@@ -181,10 +185,13 @@ function renderMacStatus() {
 function renderBanner() {
   let text = '';
   let bad = false;
+  const inc = bannerState.incompatible;
   if (bannerState.replaced) { text = t('banner.replaced'); bad = true; }
+  else if (inc) { text = t(inc.fit === 'mac-old' ? 'banner.incompatible.macOld' : 'banner.incompatible.pageOld', { page: inc.page, mac: inc.mac ?? '?' }); bad = true; }
   else if (bannerState.offline) text = t('banner.offline');
   else if (bannerState.locked) { text = t('banner.locked'); bad = true; }
   else if (!bannerState.perm) { text = t('banner.perm'); bad = true; }
+  else if (bannerState.stuck) { text = t('banner.stuck', bannerState.stuck); bad = true; }
   else if (bannerState.secure) text = t('banner.secure');
   else if (bannerState.note) text = bannerState.note();
   banner.hidden = !text;
@@ -200,6 +207,7 @@ function renderHost() {
   else if (state === 'need_pair') hostEl.textContent = t('host.unpaired', { host: info.host || link.host || 'Mac' });
   else if (state === 'connecting') hostEl.textContent = info.attempt ? t('host.reconnecting', { n: info.attempt }) : t('host.connecting');
   else if (state === 'offline') hostEl.textContent = t('host.offline');
+  else if (state === 'incompatible') hostEl.textContent = t('host.incompatible', { host: link.host || 'Mac' });
   else hostEl.textContent = t('host.finding');
 }
 
@@ -223,7 +231,7 @@ function onState(state, info) {
       }
       else if (info.reconnected) note(() => t('note.reconnected'), 2000);
     } else if (info.reconnected) note(() => t('note.reconnected'), 2000);
-    bannerState = { ...bannerState, offline: false, replaced: false, perm: info.perm !== false, secure: !!info.secure, locked: !!info.locked };
+    bannerState = { ...bannerState, offline: false, replaced: false, incompatible: null, perm: info.perm !== false, secure: !!info.secure, locked: !!info.locked };
     pairSheet.hidden = true;
     if (info.screen && info.screen.w && info.screen.h) root.style.setProperty('--aspect', String(info.screen.w / info.screen.h));
     hotkeysOff = new Set(info.hotkeysOff || []);
@@ -232,14 +240,49 @@ function onState(state, info) {
     renderMacStatus();
   } else if (state === 'need_pair') {
     bannerState.offline = false;
+    bannerState.incompatible = null;
     pairSheet.hidden = false;
   } else if (state === 'offline') {
     rttEl.textContent = '';
+    bannerState.incompatible = null;   // the next hello says again whether the versions fit
     if (info.reason === 'replaced') bannerState.replaced = true;
     else bannerState.offline = true;
     releaseLocalState();
+  } else if (state === 'incompatible') {
+    // SOFA-12: this page and the Mac app speak protocol versions that don't fit; the link keeps looking
+    rttEl.textContent = '';
+    bannerState.offline = false;
+    bannerState.incompatible = info;
+    pairSheet.hidden = true;
+    releaseLocalState();
   }
   renderBanner();
+}
+
+/**
+ * The Mac's hello (SOFA-12): when the Mac app is another version than this page, reload to get the Mac's page
+ * (js/follow.js), at most twice for the same version. A Batch draft is kept for the reloaded page.
+ * Returns false when the page is about to reload (the link stops here).
+ */
+function onHello(m) {
+  const mac = macBuild(m);
+  const d = decide(pageBuild(VERSION, BUILD), mac, followMark);
+  if (d.act === 'reload') {
+    inputLog.add('follow', { from: VERSION, to: m.ver, n: d.n });
+    if (settings.mode === 'buffer' && input.value) {
+      try { sessionStorage.setItem('pkm.followDraft', input.value); } catch { /* the draft can't be kept */ }
+    }
+    link.onState = () => {};   // leaving: no "connection lost" for the moment before the new page
+    link.stop();
+    location.replace(reloadURL(location.href, mac, d.n));
+    return false;
+  }
+  bannerState.stuck = d.act === 'stuck' ? { page: VERSION, mac: m.ver } : null;
+  if (followMark && d.act === 'stay' && mac) {
+    note(() => t('note.followed', { ver: VERSION }), 6000);
+    followMark = null;   // said once; a stuck page keeps its mark, so a reconnect does not start reloading again
+  } else renderBanner();
+  return true;
 }
 
 /** ⚙︎ shows this page's version and the Mac app's (PKM-4: tell an old page or an old app from the new one). */
@@ -1554,5 +1597,13 @@ document.addEventListener('gesturestart', (e) => e.preventDefault()); // iOS pin
 
 applyAll();
 relabel();
+// SOFA-12: the Batch draft that was in the box when the page reloaded to follow the Mac app
+if (followMark) {
+  try {
+    const draft = sessionStorage.getItem('pkm.followDraft');
+    sessionStorage.removeItem('pkm.followDraft');
+    if (draft && settings.mode === 'buffer' && !input.value) { input.value = draft; autosize(); }
+  } catch { /* nothing kept */ }
+}
 prefs.ready();
 link.connect();

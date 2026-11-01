@@ -24,7 +24,7 @@ test('no token: asks for pairing; code pairs and stores the token', () => {
   ws.recv({ t: 'hello', nonce: 'n1', host: 'Neo' });
   assert.equal(link.state, 'need_pair');
   link.pair('123456');
-  assert.deepEqual(ws.sent.at(-1), { t: 'auth', code: '123456', device: 'phone', sid: link.sid });
+  assert.deepEqual(ws.sent.at(-1), { t: 'auth', code: '123456', device: 'phone', sid: link.sid, v: 2 });
   ws.recv({ t: 'auth_ok', token: 'TOK', host: 'Neo', perm: true });
   assert.equal(store.get('token'), 'TOK');
   assert.equal(link.state, 'ready');

@@ -4,10 +4,14 @@ import Foundation
 /// The app bundle carries both in Info.plist (tools/build-app.sh); a build run from the source tree says "dev".
 public enum BuildInfo {
     /// Same as the VERSION file and web/js/version.js (a test checks they agree).
-    public static let sourceVersion = "4.4.0"
+    public static let sourceVersion = "4.5.0"
 
     public static var version: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? sourceVersion
+        #if DEBUG
+        // tests only: a Mac app of another version, to see the phone page follow it (tools/sofa12-follow.mjs)
+        if let v = ProcessInfo.processInfo.environment["PKM_TEST_VERSION"] { return v }
+        #endif
+        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? sourceVersion
     }
 
     /// e.g. "2026-10-28 05:12"; "dev" when not built as an app.

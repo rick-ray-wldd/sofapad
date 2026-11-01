@@ -18,7 +18,7 @@
 
 給戴 Vision Pro、在沙發上用 Mac Virtual Display 工作的人：手機放在胸口或腿上，用**手機平常的鍵盤**（注音、拼音、英文、鍵盤的聽寫都可以）打字，字直接出現在 Mac 上；手機另一半是觸控板，一隻手就能移動游標、點擊、右鍵、捲動、拖曳、三指切桌面。
 
-- **Mac 端**：選單列小程式 `SofaPad.app`（Swift，沒有任何第三方套件）。
+- **Mac 端**：選單列小程式 `SofaPad.app`（Swift；只用一個第三方套件 [Sparkle](https://sparkle-project.org)，負責更新，見[「更新」](#更新45)）。
 - **手機端**：網頁，不用裝 App。Safari 打開就能用，也可以「加入主畫面」。
 - 只走家裡的 Wi-Fi，不經過任何雲端；要先配對才能控制。
 - 4.0 以前叫 **Phone KeyMouse**；更早的 Python 版（v0.2）在 [`legacy/v0.2-python/`](legacy/v0.2-python/)，兩版的差異見 [`docs/COMPARISON.md`](docs/COMPARISON.md)。
@@ -39,13 +39,15 @@
 
 最後有總表，列出每一項和完成的時間。「錄影模式」（`?rec=1`）會把小字藏起來，適合錄影。錄短片用的「錄影精簡版」：網址加 `?video=1`，只有第 1、2、5、6、7 關，第 2 關是英文滑動輸入和聽寫。2–3 分鐘和 60 秒兩種錄影腳本：[`docs/DEMO-SCRIPT.zh-TW.md`](docs/DEMO-SCRIPT.zh-TW.md)（[English](docs/DEMO-SCRIPT.md)）。安裝包（zip）裡也有一份 `playground.html`。
 
-## 最新版：4.4.0
+## 最新版：4.5.0
 
-- **下載**：[GitHub Releases → SofaPad 4.4.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.4.0)（`SofaPad-4.4.0-macOS.zip`，macOS 13 以上，Apple 晶片）。安裝：[`docs/INSTALL.md`](docs/INSTALL.md)。
+- **下載**：[GitHub Releases → SofaPad 4.5.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.0)（`SofaPad-4.5.0-macOS.zip`，macOS 13 以上，Apple 晶片）。安裝：[`docs/INSTALL.md`](docs/INSTALL.md)。
+- **4.5 新功能**：**SofaPad 會自己更新**。打開時和每天檢查一次，顯示新版的說明，按一下就裝好新版並重新打開（選單列也有「檢查更新…」）。**手機網頁跟著 Mac 走**：Mac 更新後，開著的網頁會自己重新載入成新版。Mac 和手機會互相說明自己用的**協定版本**，對不上時清楚說明，不會默默失敗；以後也能接上 iPhone App。見[「更新」](#更新45)。
+- **已知限制**：SofaPad 還沒有 Apple Developer ID 簽章。下載的版本第一次打開會被 macOS 擋下（第 2 步），更新後「輔助使用」權限可能要再開一次（第 3 步）。之後換成 Developer ID 簽章就兩個都解決。
 - **4.4 新功能**：手機網頁有**中文和英文**（跟著手機的語言；⚙︎ →「語言」可以換），還有**淺色和深色主題**（⚙︎ →「主題」：系統、淺色、深色）。切換馬上生效，不用重新整理，手機會記住。其他都和 4.3 一樣。
 - **4.3 新功能**：輸入框半寬，旁邊是游標板和 ⏎；輸入列、按鍵列、橫拿側欄都可以自己排；橫拿有側欄和全高的觸控板；示範場。
 - **4.3 的預設**：按鍵列不放 ⏎（在游標板右邊；要的話到「✎ 編輯」加）；直拿、即時模式打字時輸入框一行，觸控板保持 290 px 以上；橫拿側欄在左邊（左手模式在右邊）。
-- 完整更新紀錄：[`CHANGELOG.md`](CHANGELOG.md)（英文）。發行說明：[`docs/release/4.4.0.md`](docs/release/4.4.0.md)（中英）。
+- 完整更新紀錄：[`CHANGELOG.md`](CHANGELOG.md)（英文）。發行說明：[`docs/release/4.5.0.md`](docs/release/4.5.0.md)（中英）。
 
 ---
 
@@ -66,9 +68,10 @@
    ./tools/build-app.sh
    ```
    - **會看到**最後一行 `Built …/dist/SofaPad.app`。
+   - 第一次建置會用 Swift Package Manager 下載 Sparkle 2.10.0（負責更新的套件，見[「更新」](#更新45)），所以那一次要連網。自己建置的 App 也會自己更新，裝的是 GitHub 上的發行版。
 3. 在 Finder 把 `dist/SofaPad.app` 拖到「應用程式」資料夾（權限設定比較穩定）。
 
-**B. 用別人建好的 `SofaPad.app`**（AirDrop、下載）：可以，但第一次打開會被擋，照第 2 步做。從發行的 zip（`SofaPad-<版本>-macOS.zip`，Apple 晶片；最新是 [4.4.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.4.0)）安裝：見 [`docs/INSTALL.md`](docs/INSTALL.md)，裡面有怎麼核對 SHA-256。
+**B. 用別人建好的 `SofaPad.app`**（AirDrop、下載）：可以，但第一次打開會被擋，照第 2 步做。從發行的 zip（`SofaPad-<版本>-macOS.zip`，Apple 晶片；最新是 [4.5.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.0)）安裝：見 [`docs/INSTALL.md`](docs/INSTALL.md)，裡面有怎麼核對 SHA-256。
 
 ### 2. 第一次打開 App（被 Gatekeeper 擋時）
 
@@ -91,7 +94,7 @@ macOS 規定：替你按鍵盤、動滑鼠的程式，要先由你允許。
    - 清單裡沒有：按下方的 **＋**，選「應用程式」裡的 `SofaPad.app`。
 3. 不用重開 App。**會看到**選單列的 ⚠️ 不見了；手機上的紅色提示也會自己消失。
 
-> 換新版或重新建置後，如果手機又說「Mac 還沒開輔助使用權限」：在同一個清單選 SofaPad → 按 **－** 移除 → 再用 **＋** 加一次。macOS 是用 App 的簽章認人，自己建置的 App 每次簽章都會變。
+> 換新版、重新建置後，以及 SofaPad 自己更新後（4.5；在換成 Developer ID 簽章以前），如果手機又說「Mac 還沒開輔助使用權限」：在同一個清單選 SofaPad → 按 **－** 移除 → 再用 **＋** 加一次。macOS 是用 App 的簽章認人，自己建置的 App 每次簽章都會變。
 
 ### 4. 防火牆和「區域網路」
 
@@ -117,9 +120,9 @@ macOS 規定：替你按鍵盤、動滑鼠的程式，要先由你允許。
 
 ### 7. 怎麼看版本
 
-- **Mac**：點選單列 `⌨︎🖱`，第一行就是版本，例如「SofaPad 4.4.0（建置 2026-10-31 16:00）」。
-- **iPhone**：右上角 ⚙︎（橫拿時在側欄最上面那排；側欄收起時是左邊那排小按鈕的 ⚙︎），最上面一行「網頁 4.4.0（建置 …）・Mac App 4.4.0（建置 …）」（英文介面是「Web page 4.4.0 (build …) · Mac app 4.4.0 (build …)」）。
-- 兩邊版本不同，或寫「舊版（沒有版本資訊）」：Mac 上換成新版 App，再重新整理網頁（主畫面 App 要從 App 切換器往上滑掉再打開）。
+- **Mac**：點選單列 `⌨︎🖱`，第一行就是版本，例如「SofaPad 4.5.0（建置 2026-11-01 16:00）」。
+- **iPhone**：右上角 ⚙︎（橫拿時在側欄最上面那排；側欄收起時是左邊那排小按鈕的 ⚙︎），最上面一行「網頁 4.5.0（建置 …）・Mac App 4.5.0（建置 …）」（英文介面是「Web page 4.5.0 (build …) · Mac app 4.5.0 (build …)」）。
+- 從 4.5 起，Mac 的 App 換了版本，網頁會自己重新載入，兩邊就一樣。還是不同，或寫「舊版（沒有版本資訊）」：把網頁關掉再打開（主畫面 App 要從 App 切換器往上滑掉再打開）。
 
 ### 8. 常見問題
 
@@ -128,10 +131,25 @@ macOS 規定：替你按鍵盤、動滑鼠的程式，要先由你允許。
 | 手機打不開網頁 | 兩台在同一個 Wi-Fi？Mac 上的 SofaPad 有開著？試選單列的 `.local` 網址。還是不行看下面「疑難排解」 |
 | 手機說「Mac 還沒開輔助使用權限」 | 第 3 步；換新版後要移除再加一次 |
 | 手機說「Mac 目前是鎖定畫面」 | 先解鎖 Mac。鎖定時為了安全，手機的輸入會暫停 |
+| 更新後手機說「Mac 還沒開輔助使用權限」 | 第 3 步：在清單移除 SofaPad 再加一次（在換成 Developer ID 簽章以前，每次更新後都要） |
+| 手機說這個頁面和 Mac 上的 SofaPad「沒辦法連線」（版本對不上） | 更新 Mac 上的 SofaPad（`⌨︎🖱` →「檢查更新…」），再把網頁關掉重開 |
 | 左上角變成黃點「重新連線中…」 | 會自己重連（最多每 2 秒試一次）。斷線時打的字**不會**在連上後補送（以免打進別的視窗），手機會說哪些沒送到 |
 | 想確認是不是新版 | 第 7 步 |
 
 ---
+
+## 更新（4.5）
+
+SofaPad 用 [Sparkle](https://sparkle-project.org) 自己更新，很多 Mac App 都用它做這件事。
+
+- **什麼時候檢查**：打開時，以及每天一次。想馬上檢查：`⌨︎🖱` →「**檢查更新…**」。
+- **會看到**：一個視窗，裡面是新版的說明（跟著 Mac 的語言，中文或英文）和「**安裝更新項目**」（英文 Mac 上是 Install Update）。它會下載、檢查簽章，再按「**安裝並重新啟動**」（Install and Relaunch），新版就會換掉舊的並重新打開。沒有按就不會安裝。
+- **手機連線中**找到新版時，不會跳出視窗（視窗會吃掉你從手機打的字）：選單列圖示多一個 ↑，選單裡有「**⬆︎ 安裝新版本 …**」。
+- **手機會跟著**：Mac 的 App 換了版本，開著的手機網頁（主畫面 App 也是）會自己重新載入成新版並說一聲，「整段」模式還沒送出的字會留在輸入框。萬一重新載入也拿不到新頁面，網頁會請你把它關掉重開。
+- **安全嗎**：每個更新都用 SofaPad 的 EdDSA 金鑰簽章，更新清單本身也簽章；和 App 內建的金鑰對不上、或清單被改過，SofaPad 一律不裝。清單從這個 repo 的 GitHub Releases 用 HTTPS 讀取；檢查時不會送出任何關於你的資料（和一般下載一樣，只有 App 名稱和版本）。
+- **已知限制**：在換成 Apple Developer ID 簽章以前，macOS 是用程式碼的雜湊認 SofaPad，每個版本都不一樣。所以更新後手機可能說「輔助使用」沒開：照第 3 步（在清單移除 SofaPad 再加回來）。下載的 zip 第一次打開也會被擋（第 2 步）。發布流程和 Developer ID 的計畫：[`docs/RELEASING.md`](docs/RELEASING.md)。
+
+**為什麼現在多了一個套件。** 到 4.4 為止，App 只用 Apple 自己的框架。要安全地更新一個 App，得下載、檢查簽章、換掉正在執行的 App、再重新打開，每一種失敗都要處理好；Sparkle 替很多 Mac App 做這件事很多年了，而且是開放原始碼（MIT）。只有這一個：固定在 2.10.0 版，由 Swift Package Manager 建置進去（`mac/Package.swift`），它的授權條款放在 App 和 zip 裡。手機網頁仍然不用任何外部的東西。
 
 ## 從 Phone KeyMouse（舊名）換成 SofaPad
 
@@ -241,6 +259,7 @@ App 改名後，macOS 會把它當成新的 App，所以輔助使用權限要重
 - 第一次要輸入 Mac 螢幕上的配對碼（或掃配對視窗的 QR code，碼 10 分鐘內有效）。之後手機用一次性的挑戰碼（HMAC）證明身分，長期密鑰不會再出現在 Wi-Fi 上。選單列「用 iPhone 掃描」的 QR code 只有網址，沒有配對碼。
 - 配對碼錯 5 次鎖 30 秒，之後時間加倍；錯太多次 Mac 會自動換碼並關閉配對。選單列可以「忘記所有已配對手機」。
 - Mac 鎖定時不打任何字；送到 Mac 的字晚到超過 3 秒（連線卡住）就不打，以免打進你已經切過去的視窗。
+- 更新（4.5）用 SofaPad 的 EdDSA 金鑰簽章；安裝前 App 會用內建的金鑰檢查更新檔和更新清單（見[「更新」](#更新45)）。
 - **限制**：連線是一般的 http／ws，沒有加密（4.0 拿掉了 v3 為語音鍵加的 https）。同一個 Wi-Fi 上如果有人主動攻擊，理論上可以看到或劫持連線。請在家裡或可信任的網路使用；公共 Wi-Fi 請改用手機熱點。
 
 ---
@@ -261,7 +280,8 @@ App 改名後，macOS 會把它當成新的 App，所以輔助使用權限要重
 | 聽寫時 Mac 上疊字（「然後然後」） | 確認是 4.0（第 7 步）。在即時模式按鍵盤的 🎤 念「然後現在需要按步驟，先按鍵盤打開來，然後鍵盤內建的錄音功能可以直接用。」，停一下，看 Mac 上是不是一字不差。不對的話把「輸入紀錄」拷貝給開發者；暫時改用整段模式 |
 | 三指滑動沒有切換桌面 | 手機會說原因：快速鍵被關掉（系統設定 → 鍵盤 → 鍵盤快速鍵… → Mission Control），或只有一個桌面（三指上滑打開 Mission Control，按最上方「＋」多開一個） |
 | 延遲數字很大（> 50 ms） | Wi-Fi 訊號差或路由器省電；靠近路由器，或改用 5 GHz |
-| 記錄檔在哪 | `~/Library/Logs/SofaPad.log`（從 Finder 打開 App 時）；每次啟動會記版本和「網路介面：…」 |
+| 更新視窗說「更新發生錯誤！」（Update Error!；… improperly signed and could not be validated） | 不要用別的方法裝那個檔案：它在路上被改過或壞了。晚點再試；一直這樣的話到 GitHub 開 issue |
+| 記錄檔在哪 | `~/Library/Logs/SofaPad.log`（從 Finder 打開 App 時）；每次啟動會記版本和「網路介面：…」，更新也會記（「有新版本」「安裝新版本」「更新中止」） |
 
 ---
 
@@ -271,7 +291,7 @@ App 改名後，macOS 會把它當成新的 App，所以輔助使用權限要重
 
 ## 開發
 
-從終端機執行、測試、檔案結構：[`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)。開發過程紀錄在 [`process/`](process/)（中文）。
+從終端機執行、測試、檔案結構：[`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)。發布：[`docs/RELEASING.md`](docs/RELEASING.md)。Mac 和手機之間的協定（給以後的 iPhone App）：[`docs/PROTOCOL.md`](docs/PROTOCOL.md)。開發過程紀錄在 [`process/`](process/)（中文）。
 
 ## 授權
 

@@ -26,6 +26,10 @@ final class StatusUI: NSObject, NSMenuDelegate {
     /// SOFA-5: accept Tailscale devices (100.64.0.0/10); off by default.
     var allowTailscale = false
     var onToggleTailscale: ((Bool) -> Void)?
+    /// SOFA-12: 檢查更新… (nil when not running as SofaPad.app: no updates then).
+    var onCheckForUpdates: (() -> Void)?
+    /// SOFA-12: a newer version found by a scheduled check, waiting to be installed.
+    var waitingUpdate: String?
 
     var onNewCode: (() -> Void)?
     var onForgetDevices: (() -> Void)?
@@ -37,7 +41,7 @@ final class StatusUI: NSObject, NSMenuDelegate {
     }
 
     func refresh() {
-        statusItem.button?.title = controller == nil ? "⌨︎🖱" : "⌨︎🖱●"
+        statusItem.button?.title = (controller == nil ? "⌨︎🖱" : "⌨︎🖱●") + (waitingUpdate == nil ? "" : "↑")
         statusItem.button?.toolTip = "SofaPad \(BuildInfo.version)"
         let menu = NSMenu()
         menu.delegate = self
@@ -55,6 +59,17 @@ final class StatusUI: NSObject, NSMenuDelegate {
         let version = NSMenuItem(title: "SofaPad \(BuildInfo.version)（\(BuildInfo.build == "dev" ? "開發版" : "建置 " + BuildInfo.build)）", action: nil, keyEquivalent: "")
         version.isEnabled = false
         menu.addItem(version)
+        // SOFA-12: updates (Sparkle). A version found by the daily check waits here while a phone is connected.
+        if onCheckForUpdates != nil {
+            if let v = waitingUpdate {
+                let install = NSMenuItem(title: "⬆︎ 安裝新版本 \(v)…", action: #selector(checkUpdatesClicked), keyEquivalent: "")
+                install.target = self
+                menu.addItem(install)
+            }
+            let check = NSMenuItem(title: "檢查更新…", action: #selector(checkUpdatesClicked), keyEquivalent: "")
+            check.target = self
+            menu.addItem(check)
+        }
         let title = NSMenuItem(title: controller.map { "已連線：\($0)" } ?? "沒有手機連線", action: nil, keyEquivalent: "")
         title.isEnabled = false
         menu.addItem(title)
@@ -119,6 +134,7 @@ final class StatusUI: NSObject, NSMenuDelegate {
     }
 
     @objc private func newCodeClicked() { onNewCode?() }
+    @objc private func checkUpdatesClicked() { onCheckForUpdates?() }
     @objc private func scanClicked() { showScanPanel() }
 
     // MARK: - "用 iPhone 掃描" (PKM-3-2)

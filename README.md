@@ -18,7 +18,7 @@
 
 This is for people who work from the sofa in Vision Pro with Mac Virtual Display. Rest the phone on your chest or lap and type with the **phone's normal keyboard** (Zhuyin, Pinyin, English, and the keyboard's dictation all work). The text shows up on the Mac. The other half of the phone is a trackpad: with one hand you can move the pointer, click, right-click, scroll, drag, and switch desktops with three fingers.
 
-- **Mac side**: a menu-bar app, `SofaPad.app` (Swift, no third-party packages).
+- **Mac side**: a menu-bar app, `SofaPad.app` (Swift; one dependency, [Sparkle](https://sparkle-project.org), for updates: see [Updates](#updates-45)).
 - **Phone side**: a web page, so there's no app to install. Open it in Safari, or add it to the Home Screen.
 - Home Wi-Fi only, nothing goes through a cloud, and you have to pair before you can control anything.
 - Before 4.0 this was called **Phone KeyMouse**. The older Python version (v0.2) is in [`legacy/v0.2-python/`](legacy/v0.2-python/). For the differences between the two, see [`docs/COMPARISON.md`](docs/COMPARISON.md).
@@ -39,13 +39,15 @@ Open [`demo/playground.html`](demo/playground.html) in a browser on the Mac (it 
 
 At the end, a summary of every check and when it was done. Recording mode (`?rec=1`) hides the small print for a video. For a short video there is a recording version, `?video=1`: stages 1, 2, 5, 6 and 7 only, with English swipe typing and dictation in stage 2. Scripts for a 2–3 minute and a 60-second video: [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) ([中文](docs/DEMO-SCRIPT.zh-TW.md)). The release zip has the page too (`playground.html`).
 
-## Latest version: 4.4.0
+## Latest version: 4.5.0
 
-- **Download**: [GitHub Releases → SofaPad 4.4.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.4.0) (`SofaPad-4.4.0-macOS.zip`, macOS 13 or later, Apple silicon). Install: [`docs/INSTALL.md`](docs/INSTALL.md).
+- **Download**: [GitHub Releases → SofaPad 4.5.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.0) (`SofaPad-4.5.0-macOS.zip`, macOS 13 or later, Apple silicon). Install: [`docs/INSTALL.md`](docs/INSTALL.md).
+- **New in 4.5**: **SofaPad updates itself.** It checks when it opens and once a day, shows what's new, and with one click installs the new version and opens again ("檢查更新…", Check for Updates, in the menu). **The phone page follows the Mac**: after an update, an open page reloads itself to the new version. The Mac and the phone now say which **protocol version** they speak, so a mismatch is explained instead of failing silently, and an iPhone app can join later. See [Updates](#updates-45).
+- **Known limit**: SofaPad isn't signed with an Apple Developer ID yet. macOS blocks the first launch of a downloaded copy (step 2), and after an update the Accessibility permission may have to be given again (step 3). A Developer ID signature, planned, fixes both.
 - **New in 4.4**: the phone page in **English or Chinese** (it follows the phone's language; switch in ⚙︎ → Language) and a **light or dark theme** (⚙︎ → Theme: System, Light or Dark). Both apply at once, without a reload, and are remembered on the phone. Nothing else changed.
 - **New in 4.3**: the text box takes half the width, with the cursor pad and ⏎ next to it; the text row, the key row and the landscape panel can be edited; landscape has a side panel and a full-height trackpad; the demo page.
 - **Defaults in 4.3**: no ⏎ on the key row (it's next to the cursor pad; add one in ✎ Edit if you want it); in portrait live mode the text box stays one line while you type, so the trackpad keeps at least 290 px; the landscape panel is on the left (on the right in left-handed mode).
-- All changes: [`CHANGELOG.md`](CHANGELOG.md). Release notes: [`docs/release/4.4.0.md`](docs/release/4.4.0.md).
+- All changes: [`CHANGELOG.md`](CHANGELOG.md). Release notes: [`docs/release/4.5.0.md`](docs/release/4.5.0.md).
 
 ---
 
@@ -66,9 +68,10 @@ Every step says what you'll see. Screen names follow macOS 15 / 26 / 27 (English
    ./tools/build-app.sh
    ```
    - **You'll see** `Built …/dist/SofaPad.app` on the last line.
+   - The first build also downloads Sparkle 2.10.0, the update framework ([Updates](#updates-45)), with Swift Package Manager, so it needs the internet that once. A self-built app updates itself too, to the release on GitHub.
 3. In Finder, drag `dist/SofaPad.app` into the Applications folder (permissions are more reliable that way).
 
-**B. Use a `SofaPad.app` someone else built** (AirDrop, download): that works, but macOS will block it the first time you open it. Follow step 2. From a release zip (`SofaPad-<version>-macOS.zip`, Apple silicon; the latest is [4.4.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.4.0)): [`docs/INSTALL.md`](docs/INSTALL.md), with how to check its SHA-256.
+**B. Use a `SofaPad.app` someone else built** (AirDrop, download): that works, but macOS will block it the first time you open it. Follow step 2. From a release zip (`SofaPad-<version>-macOS.zip`, Apple silicon; the latest is [4.5.0](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.0)): [`docs/INSTALL.md`](docs/INSTALL.md), with how to check its SHA-256.
 
 ### 2. Open the app the first time (if Gatekeeper blocks it)
 
@@ -91,7 +94,7 @@ macOS requires you to allow any program that presses keys or moves the mouse for
    - If it's not in the list, click **+** at the bottom and choose `SofaPad.app` in Applications.
 3. You don't need to restart the app. **You'll see** the ⚠️ in the menu bar go away, and the red notice on the phone disappears by itself.
 
-> After you switch to a new version or rebuild, the phone may say "The Mac hasn't turned on Accessibility permission" again. In the same list, select SofaPad, click **-** to remove it, then add it again with **+**. macOS identifies an app by its signature, and an app you build yourself gets a different signature every time.
+> After you switch to a new version or rebuild, and after SofaPad updates itself (4.5, until it's signed with a Developer ID), the phone may say "The Mac hasn't turned on Accessibility permission" again. In the same list, select SofaPad, click **-** to remove it, then add it again with **+**. macOS identifies an app by its signature, and an app you build yourself gets a different signature every time.
 
 ### 4. Firewall and Local Network
 
@@ -117,9 +120,9 @@ macOS requires you to allow any program that presses keys or moves the mouse for
 
 ### 7. Check the version
 
-- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.4.0 (build 2026-10-31 16:00)".
-- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the side panel's top row, or in the column of small buttons when the panel is closed). The top line reads "Web page 4.4.0 (build …) · Mac app 4.4.0 (build …)" (網頁 4.4.0（建置 …）・Mac App 4.4.0（建置 …） in Chinese).
-- If the two versions differ, or it says "old (no version information)": install the new app on the Mac, then reload the page. For the Home Screen app, swipe it away in the app switcher and open it again.
+- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.5.0 (build 2026-11-01 16:00)".
+- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the side panel's top row, or in the column of small buttons when the panel is closed). The top line reads "Web page 4.5.0 (build …) · Mac app 4.5.0 (build …)" (網頁 4.5.0（建置 …）・Mac App 4.5.0（建置 …） in Chinese).
+- From 4.5 the page reloads itself when the Mac app changes version, so the two match. If they still differ, or it says "old (no version information)": close the page and open it again. For the Home Screen app, swipe it away in the app switcher and open it again.
 
 ### 8. Common problems
 
@@ -128,10 +131,25 @@ macOS requires you to allow any program that presses keys or moves the mouse for
 | The phone can't open the page | Are both on the same Wi-Fi? Is SofaPad running on the Mac? Try the `.local` address in the menu bar. If it still fails, see Troubleshooting below |
 | The phone says "The Mac hasn't given SofaPad the Accessibility permission yet" | Step 3. After a new version, remove it and add it again |
 | The phone says "The Mac is on its lock screen" | Unlock the Mac first. While it's locked, the phone's input is paused for safety |
+| After an update the phone says the Mac hasn't given SofaPad the Accessibility permission | Step 3: remove SofaPad from the list and add it again (needed after each update until SofaPad has a Developer ID signature) |
+| The phone says the page and SofaPad on the Mac "can't connect" (versions don't fit) | Update SofaPad on the Mac (`⌨︎🖱` → 檢查更新…), then close the page and open it again |
 | The top left turns into a yellow dot, "Reconnecting…" | It reconnects by itself (it tries up to once every 2 seconds). Text you type while disconnected is **not** sent after it reconnects (so it can't end up in another window), and the phone tells you what wasn't sent |
 | You want to check you have the new version | Step 7 |
 
 ---
+
+## Updates (4.5)
+
+SofaPad updates itself with [Sparkle](https://sparkle-project.org), the framework many Mac apps use for this.
+
+- **When**: it checks when it opens and once a day. To check now: `⌨︎🖱` → "**檢查更新…**" (Check for Updates).
+- **What you'll see**: a window with the new version's notes (in English or Chinese, following the Mac's language) and **Install Update**. It downloads the update and checks its signature; **Install and Relaunch** then puts the new SofaPad in place of the old one and opens it. Nothing is installed until you click.
+- **While a phone is connected**, an update that is found doesn't open a window (the window would take what you type from the phone). The menu-bar icon gets a ↑, and the menu offers "**⬆︎ 安裝新版本 …**" (Install the new version).
+- **The phone follows**: when the Mac app has changed version, an open phone page, also the Home Screen app, reloads itself to the new page and says so. A Batch draft stays in the box. If reloading doesn't bring the new page, the page tells you to close it and open it again.
+- **Is it safe**: every update is signed with SofaPad's EdDSA key, and so is the list of updates; SofaPad refuses anything that doesn't match the key built into it, and refuses a list that was changed. The list is read over HTTPS from this repository's GitHub releases. The check sends nothing about you beyond what any download sends (the app's name and version).
+- **Known limit**: until SofaPad is signed with an Apple Developer ID, macOS knows it by the hash of its code, which every version changes. After an update the phone may say the Accessibility permission isn't on: step 3 (remove SofaPad from the list, add it again). A downloaded zip is also blocked at its first launch (step 2). Making releases, and the Developer ID plan: [`docs/RELEASING.md`](docs/RELEASING.md).
+
+**Why SofaPad now has a dependency.** Up to 4.4 the app used only Apple's own frameworks. Updating an app safely means downloading it, checking its signature, replacing an app that is running and opening it again, with every way that can fail handled. Sparkle has done exactly that for many Mac apps for years, and it's open source (MIT). It's the only dependency: pinned to version 2.10.0, built in by Swift Package Manager (`mac/Package.swift`), and its licence ships in the app and in the zip. The phone page uses nothing from outside this repository.
 
 ## Upgrading from Phone KeyMouse (the old name) to SofaPad
 
@@ -241,6 +259,7 @@ The version is at the top. Then **Language** (Auto, English, 中文) and **Theme
 - The first time, you enter the pairing code shown on the Mac screen (or scan the QR code in the pairing window; the code is valid for 10 minutes). After that, the phone proves its identity with a one-time challenge (HMAC), and the long-term secret never appears on the Wi-Fi again. The QR code under "Scan with iPhone (用 iPhone 掃描)" in the menu bar contains only the address, not the pairing code.
 - Five wrong pairing codes lock it for 30 seconds, and the lockout doubles after that. After too many wrong tries, the Mac changes the code automatically and closes pairing. In the menu bar you can "Forget all paired phones (忘記所有已配對手機)".
 - While the Mac is locked, it types nothing. Text that reaches the Mac more than 3 seconds late (a stalled connection) isn't typed, so it can't land in a window you've already switched to.
+- Updates (4.5) are signed with SofaPad's EdDSA key; the app checks the update and the list of updates against the key built into it before installing anything ([Updates](#updates-45)).
 - **Limitation**: the connection is plain http / ws, with no encryption (4.0 removed the https that v3 added for the voice key). If someone on the same Wi-Fi attacks actively, they could in theory see or hijack the connection. Use it at home or on a network you trust, and on public Wi-Fi use your phone's hotspot instead.
 
 ---
@@ -261,7 +280,8 @@ The version is at the top. Then **Language** (Auto, English, 中文) and **Theme
 | Doubled text on the Mac during dictation ("然後然後") | Check that you're on 4.0 (step 7). In Live mode, tap 🎤 on the keyboard and say "然後現在需要按步驟，先按鍵盤打開來，然後鍵盤內建的錄音功能可以直接用。" (a Chinese test sentence: "Then now we need to go step by step: first open the keyboard, then the keyboard's built-in dictation can be used directly."), pause, and see whether the Mac shows it word for word. If not, copy the "Input log" and send it to the developer; in the meantime switch to Batch mode |
 | Three-finger swipe doesn't switch desktops | The phone says why: the shortcuts are turned off (System Settings > Keyboard > Keyboard Shortcuts… > Mission Control), or there's only one desktop (swipe three fingers up to open Mission Control and click "+" at the top to add one) |
 | The latency number is large (> 50 ms) | Weak Wi-Fi signal or a router power-saving mode. Move closer to the router, or switch to 5 GHz |
-| Where's the log file | `~/Library/Logs/SofaPad.log` (when the app is opened from Finder). Each launch records the version and "Network interfaces: …" |
+| The update window says "Update Error!" (… improperly signed and could not be validated) | Don't install that file another way: it was changed or damaged on the way. Try again later; if it keeps happening, open an issue on GitHub |
+| Where's the log file | `~/Library/Logs/SofaPad.log` (when the app is opened from Finder). Each launch records the version and "Network interfaces: …"; updates are logged too ("有新版本", "安裝新版本", "更新中止") |
 
 ---
 
@@ -271,7 +291,7 @@ See [Try the demo page](#try-the-demo-page) at the top.
 
 ## Development
 
-To run it from Terminal, run the tests, and see the file layout: [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md). The development process is recorded in [`process/`](process/) (in Chinese).
+To run it from Terminal, run the tests, and see the file layout: [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md). Making a release: [`docs/RELEASING.md`](docs/RELEASING.md). The Mac ↔ phone protocol, for an iPhone app later: [`docs/PROTOCOL.md`](docs/PROTOCOL.md). The development process is recorded in [`process/`](process/) (in Chinese).
 
 ## License
 

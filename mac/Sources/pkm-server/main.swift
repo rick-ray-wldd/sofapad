@@ -47,6 +47,11 @@ func usage() -> Never {
 func parseOptions() -> Options {
     var o = Options()
     var args = CommandLine.arguments.dropFirst()
+    #if DEBUG
+    // SOFA-12 end-to-end update test: Sparkle relaunches the test app without arguments, so a debug build also takes
+    // them from its own defaults (tools/sofa12-update-e2e.mjs). Not in release builds.
+    args += UserDefaults.standard.stringArray(forKey: "SofaPadTestArguments") ?? []
+    #endif
     func value() -> String { guard let v = args.popFirst() else { usage() }; return v }
     while let a = args.popFirst() {
         switch a {
@@ -101,12 +106,15 @@ let options = parseOptions()
 if options.selfTest { exit(SelfTest.run() ? 0 : 1) }
 if let path = options.snapshotScan { exit(snapshotScanView(to: path, port: options.port) ? 0 : 1) }
 
-/// Started as SofaPad.app (double-click), not from a terminal.
-let isAppBundle = Bundle.main.bundleIdentifier == "io.github.rick-ray-wldd.sofapad"
+/// Started as SofaPad.app (double-click), not from a terminal. A test build of the app (SOFA-12, its own bundle id
+/// ending in .update-test) counts too, and logs to its own file.
+let appID = "io.github.rick-ray-wldd.sofapad"
+let bundleID = Bundle.main.bundleIdentifier ?? ""
+let isAppBundle = bundleID == appID || bundleID.hasPrefix(appID + ".")
 if isAppBundle && isatty(1) == 0 && getppid() == 1 {   // launched from Finder / open, not a shell
     let logs = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("Logs")
     try? FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
-    freopen(logs.appendingPathComponent("SofaPad.log").path, "a", stdout)
+    freopen(logs.appendingPathComponent(bundleID == appID ? "SofaPad.log" : "\(bundleID).log").path, "a", stdout)
     setvbuf(stdout, nil, _IOLBF, 0)
 }
 guard let webRoot = findWebRoot(options.webRoot) else {
@@ -346,6 +354,19 @@ if options.noUI {
     statusUI.scanURL = scanURL
     statusUI.scanSummary = NetInfo.scanSummary
     ui = statusUI
+    // SOFA-12: updates, only in SofaPad.app (Sparkle replaces and relaunches the app bundle)
+    var updater: Updater?
+    if isAppBundle {
+        let u = Updater(log: log)
+        u.phoneConnected = { statusUI.controller != nil }
+        u.onWaiting = { version in
+            statusUI.waitingUpdate = version
+            statusUI.refresh()
+        }
+        statusUI.onCheckForUpdates = { u.checkForUpdates() }
+        u.start()
+        updater = u
+    }
     statusUI.refresh()
     Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
         let p = options.dryRun || AXIsProcessTrusted()
@@ -355,5 +376,5 @@ if options.noUI {
             log(p ? "已取得「輔助使用」權限" : "⚠️ 「輔助使用」權限被關閉")
         }
     }
-    app.run()
+    withExtendedLifetime(updater) { app.run() }
 }

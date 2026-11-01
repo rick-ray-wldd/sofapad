@@ -224,3 +224,10 @@
 - 組字被打斷：`closeComposition(fn)` 等 0.3 秒；`comp-heal`（D-42）。流量控制：`link.oldestPendingMs > 3000` 時 canSend（D-43）。
 - 新訊息 `caret`（手機 → Mac，不 ack）：`k` ∈ left/right/up/down，`mods` ⊂ {shift, opt}，`n` 1…4，`sent`。Mac：CaretPolicy、CaretBudget（40/s）、晚到 0.5 秒不按（D-44）。
 - 新的輸入紀錄項目：commit、comp-closing、comp-force、comp-heal、stall、caret。
+
+## 4.5（SOFA-12）協定版本、網頁跟著 Mac、自動更新
+
+- 協定版本（D-56，完整的在 `docs/PROTOCOL.md`）：`hello` 多 `vmin`，`v` 是 2；`pair_request`、`auth` 多 `v`（沒帶算 1）。Mac 接受 `vmin…v`（1–2），其他回 `auth_fail` `{reason: "protocol", v, vmin}` 再 close 4426。網頁 `PROTOCOL = { speaks: 2, supports: [1, 2] }`，對不上時狀態 `incompatible`（橫幅說誰要更新，每 5 秒再試，不登入）。
+- 網頁跟著 Mac（D-57）：`hello.ver`＋`build` 和網頁不同 → `location.replace(?follow=n~ver+build)`，同一版最多 2 次，之後 `banner.stuck`；整段草稿放 sessionStorage 帶過去；網頁檔案 `Cache-Control: no-store`。
+- 自動更新（D-58、D-59）：Sparkle 2.10.0；`Updater.swift`；選單「檢查更新…」、手機連線中時「⬆︎ 安裝新版本 X…」和圖示「↑」；Info.plist：`SUFeedURL`（GitHub latest 的 appcast.xml）、`SUPublicEDKey`、`SUEnableAutomaticChecks`、`SUScheduledCheckInterval` 86400、`SUAllowsAutomaticUpdates` NO、`SUVerifyUpdateBeforeExtraction`、`SURequireSignedFeed`、`CFBundleAllowMixedLocalizations`；`CFBundleVersion` 到秒。記錄檔：「有新版本：」「檢查更新：已是最新版」「安裝新版本 …，接著重新開啟 SofaPad」「更新中止：…」。
+- 發布（D-60）：`tools/release.sh`、`tools/appcast.mjs`、`docs/RELEASING.md`。

@@ -11,6 +11,7 @@ export default {
   'host.reconnecting': 'Reconnecting… (try {n})',
   'host.connecting': 'Connecting…',
   'host.offline': 'Not connected',
+  'host.incompatible': '{host} (versions don’t fit)',
   'settings.aria': 'Settings',
 
   // trackpad
@@ -92,8 +93,12 @@ export default {
   'banner.locked': 'The Mac is on its lock screen, so input from the phone is paused for safety. Unlock the Mac first (Mac Virtual Display needs it unlocked too).',
   'banner.perm': 'The Mac hasn’t given SofaPad the Accessibility permission yet, so the pointer and typing do nothing. On the Mac, open System Settings → Privacy & Security → Accessibility → allow SofaPad (an entry with the old name Phone KeyMouse can be removed).',
   'banner.secure': 'The Mac is in a password field (Secure Input): text can’t be typed there, the mouse still works.',
+  'banner.incompatible.macOld': 'SofaPad on the Mac is too old for this page and can’t connect (the Mac speaks protocol {mac}, this page {page}). Update SofaPad on the Mac (its menu-bar menu ⌨︎🖱 has the update item), then open this page again.',
+  'banner.incompatible.pageOld': 'This page is older than SofaPad on the Mac and can’t connect (this page speaks protocol {page}, the Mac {mac}). Close this page and open it again (on the Home Screen: close the app and reopen it).',
+  'banner.stuck': 'This page is {page}, SofaPad on the Mac is {mac}, and reloading didn’t bring the new page. Close this page and open it again (on the Home Screen: close the app and reopen it).',
   'note.dropped': 'What you typed while disconnected didn’t reach the Mac (and isn’t sent now, so it can’t land in another window). The text box is empty: carry on from where the Mac is now.',
   'note.reconnected': 'Reconnected to the Mac.',
+  'note.followed': 'SofaPad on the Mac was updated: this page reloaded itself and is now {ver}.',
   'note.versions': 'The web page and the Mac app are different versions: update SofaPad on the Mac, then reload this page (close and reopen it if it’s on the Home Screen).',
   'note.refused': 'The Mac didn’t accept this command: {err}',
   'note.refused.unknown': 'unknown error',

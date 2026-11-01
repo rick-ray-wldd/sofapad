@@ -3,6 +3,21 @@
 // on the Mac (Ray's 舊文字跑到下一個視窗). The Mac says which text it did get; the rest is reported, not resent.
 import { tokenProof } from './sha256.js';
 
+/**
+ * Mac ↔ phone protocol (docs/PROTOCOL.md, SOFA-12): the version this page speaks, and the versions of the Mac app it
+ * can work with. The Mac says its version in `hello` (no `v` = 1) and accepts its own and the one before it.
+ */
+export const PROTOCOL = { speaks: 2, supports: [1, 2] };
+
+/** Can this page work with the Mac that sent `hello`? 'ok', or 'mac-old' / 'page-old' (who has to be updated). */
+export function protocolFit(hello, p = PROTOCOL) {
+  const v = typeof hello.v === 'number' ? hello.v : 1;
+  const vmin = typeof hello.vmin === 'number' ? hello.vmin : v;
+  if (p.supports.includes(v)) return 'ok';
+  if (vmin <= p.speaks && p.speaks <= v) return 'ok';   // a newer Mac that still accepts this page's version
+  return v < p.speaks ? 'mac-old' : 'page-old';
+}
+
 function randomId() {
   const b = new Uint8Array(12);
   crypto.getRandomValues(b); // available on plain http, unlike crypto.randomUUID / crypto.subtle
@@ -14,15 +29,18 @@ export class Link {
    * @param {object} o
    * @param {string} o.url        ws://host:port/ws
    * @param {object} o.store      {get(k), set(k,v), del(k)}
-   * @param {function} o.onState  (state, info) state: connecting | need_pair | ready | offline
+   * @param {function} o.onState  (state, info) state: connecting | need_pair | ready | offline | incompatible
    * @param {function} o.onEvent  (msg) server messages other than handshake (status, ack, pairing, auth_fail…)
+   * @param {function} [o.onHello] (msg) the Mac's hello; returning false stops here (the page reloads itself, SOFA-12)
    * @param {function} [o.WebSocketImpl]
    */
-  constructor({ url, store, onState, onEvent, WebSocketImpl, deviceName, pingMs = 1500, deadMs = 4500 }) {
+  constructor({ url, store, onState, onEvent, onHello, WebSocketImpl, deviceName, pingMs = 1500, deadMs = 4500,
+    incompatibleRetryMs = 5000 }) {
     this.url = url;
     this.store = store;
     this.onState = onState || (() => {});
     this.onEvent = onEvent || (() => {});
+    this.onHello = onHello || (() => true);
     this.WS = WebSocketImpl || WebSocket;
     this.deviceName = deviceName || 'phone';
     this.sid = randomId();
@@ -34,6 +52,7 @@ export class Link {
     this.attempts = 0;   // reconnect attempts since the link was last ready
     this.pingMs = pingMs;
     this.deadMs = deadMs; // nothing heard for this long while connected = the connection is dead (half-open TCP)
+    this.incompatibleRetryMs = incompatibleRetryMs; // a Mac this page can't talk to: look again this often
     this.boot = null;     // the Mac app's start id: changes when it restarts
     this.mac = null;      // {ver, build} of the Mac app
     this.rtt = null;
@@ -58,7 +77,8 @@ export class Link {
     this.stopped = false;
     if (this.ws && (this.ws.readyState === 0 || this.ws.readyState === 1)) return;
     clearTimeout(this.retryTimer);
-    this.setState('connecting', { attempt: this.attempts });
+    // still "can't talk to this Mac" until a hello says otherwise (no flicker every few seconds)
+    if (this.state !== 'incompatible') this.setState('connecting', { attempt: this.attempts });
     let ws;
     try {
       ws = new this.WS(this.url);
@@ -76,6 +96,7 @@ export class Link {
         this.setState('offline', { reason: 'replaced' });
         return; // another phone took over; don't fight it
       }
+      if (ev && ev.code === 4426) { this.incompatible({ fit: 'page-old' }); return; }   // the Mac turned this page away
       this.setState('offline', { reason: ev && ev.code });
       this.scheduleReconnect();
     };
@@ -163,12 +184,24 @@ export class Link {
 
   pair(code) {
     this.pendingCode = code;
-    if (this.state === 'need_pair' && this.ws) this.raw({ t: 'auth', code, device: this.deviceName, sid: this.sid });
+    if (this.state === 'need_pair' && this.ws) this.raw({ t: 'auth', code, device: this.deviceName, sid: this.sid, v: PROTOCOL.speaks });
     else this.connect();
   }
 
   requestPairing() {
-    this.raw({ t: 'pair_request', device: this.deviceName });
+    this.raw({ t: 'pair_request', device: this.deviceName, v: PROTOCOL.speaks });
+  }
+
+  /** The Mac and this page can't work together (SOFA-12): say so, and look again now and then — when SofaPad on the
+   *  Mac is updated, the next hello says so (and the page follows it). */
+  incompatible(info) {
+    const ws = this.ws;
+    this.ws = null;
+    clearInterval(this.pingTimer);
+    try { if (ws) ws.close(); } catch { /* already gone */ }
+    this.setState('incompatible', { page: PROTOCOL.speaks, ...info });
+    clearTimeout(this.retryTimer);
+    if (!this.stopped) this.retryTimer = setTimeout(() => this.connect(), this.incompatibleRetryMs);
   }
 
   forget() {
@@ -187,11 +220,15 @@ export class Link {
       case 'hello': {
         this.host = m.host;
         if (m.ver) this.mac = { ver: m.ver, build: m.build || '' };
+        if (this.onHello(m) === false) return;   // another Mac version: the page reloads itself (SOFA-12)
+        const fit = protocolFit(m);
+        if (fit !== 'ok') { this.incompatible({ fit, mac: typeof m.v === 'number' ? m.v : 1 }); return; }
         const token = this.token;
+        const v = PROTOCOL.speaks;
         if (this.pendingCode) {
-          this.raw({ t: 'auth', code: this.pendingCode, device: this.deviceName, sid: this.sid });
+          this.raw({ t: 'auth', code: this.pendingCode, device: this.deviceName, sid: this.sid, v });
         } else if (token) {
-          this.raw({ t: 'auth', proof: tokenProof(token, m.nonce), device: this.deviceName, sid: this.sid });
+          this.raw({ t: 'auth', proof: tokenProof(token, m.nonce), device: this.deviceName, sid: this.sid, v });
         } else {
           this.setState('need_pair', { host: m.host });
         }
@@ -220,6 +257,10 @@ export class Link {
         return;
       }
       case 'auth_fail': {
+        if (m.reason === 'protocol') {   // SOFA-12: the Mac doesn't speak this page's version
+          this.incompatible({ fit: typeof m.v === 'number' && m.v < PROTOCOL.speaks ? 'mac-old' : 'page-old', mac: m.v });
+          return;
+        }
         if (m.reason === 'bad_token') this.forget();
         this.pendingCode = null;
         this.setState('need_pair', m);

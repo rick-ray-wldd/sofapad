@@ -1,6 +1,6 @@
 .build/
 .DS_Store
 node_modules/
-tools/node_modules/
+tools/node_modules
 *.xcuserstate
 dist/

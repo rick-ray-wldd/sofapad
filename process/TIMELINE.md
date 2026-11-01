@@ -307,3 +307,17 @@
 | S11-M2 | 中英 README 頂端 hero（picture 淺／深色、標語、徽章、語言切換） | 17:58–18:00 | README.md、README.zh-TW.md |
 | S11-M3 | 用 GitHub 的 README 樣式渲染：淺／深 × 桌機／手機 × 中英 8 張，兩種 picture 都載入，連結都在 | 18:00–18:05 | design/screenshots/sofa11/、design/evidence/sofa11/readme-render.json |
 | S11-M4 | 公開前檢查 | 18:05– | docs/PUBLIC-CHECK.md「SOFA-11」 |
+
+## SOFA-12（SofaPad 4.5：協定版本、手機網頁跟著 Mac、App 內自動更新、發布腳本，2026-11-01）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S12-M0 | 收到派工（Ray：「讓 SofaPad 像 Orca 一樣可以下載後自動更新，同步手機網頁和以後的 App」；計畫經 Ray「做 4.5」核准） | 19:26 | process/dispatch/DISPATCH-SOFA-12.md |
+| S12-M1 | 讀 Sparkle 2.10.0 原始碼（驗證規則、在壓縮檔裡找 App、選單列 App 的焦點、鑰匙圈）；用 SwiftPM 加進來：`swift build` 可以、release 執行檔沒有本機路徑 → 不用另寫更新程式 | 19:30–19:40 | D-58 |
+| S12-M2 | 協定版本（Swift＋網頁），Swift 測試 88/88（新增 8）；網頁跟著 Mac（follow.js、no-store），JS 111/111（新增 7） | 19:38–19:52 | D-56、D-57 |
+| S12-M3 | Updater.swift（每次啟動＋每天、檢查更新…、手機連線中不開視窗）；build-app.sh 嵌入 Sparkle、由內到外簽章；EdDSA 金鑰用 generate_keys 產生在登入鑰匙圈（帳號 sofapad，沒有對話框） | 19:42–19:48 | D-58、D-59 |
+| S12-M4 | package.sh 可以打包已經 build 好的 App；appcast.mjs（中英說明、用公鑰驗簽章）；release.sh | 19:48–19:56 | D-60 |
+| S12-M5 | 瀏覽器套件 sofa12-follow：第一次 23/29 是測試寫錯（I-55），改完 29/29 | 19:56–19:58 | design/evidence/sofa12/follow.json |
+| S12-M6 | 端對端更新測試第一次跑：App 找到更新，但 Mac 進了鎖定畫面，測試卡住（I-54）；工具改成鎖定時先停 | 20:01–20:22 | process/ISSUES.md I-54 |
+| S12-M7 | 文件：docs/PROTOCOL.md、docs/RELEASING.md、README 中英（4.5、更新、為什麼多一個套件、已知限制）、INSTALL、CHANGELOG、release notes 4.5.0、DEVELOPMENT、SPEC | 20:22–20:50 | — |
+| S12-M8 | 自己審程式：跟著更新後重連又說一次「更新了」（I-56）、版本對不上的橫幅蓋住離線和配對；修好、測試加一項 | 20:45–20:55 | I-56 |

@@ -4,10 +4,28 @@ public enum MouseButton: String, Equatable {
     case left, right, middle
 }
 
+/// Version of the Mac ↔ phone protocol (docs/PROTOCOL.md): an integer of its own, not the app version (SOFA-12).
+/// The Mac says which version it speaks in `hello` (`v`, and `vmin`, the oldest it still accepts); a client says which
+/// one it speaks in `pair_request` and `auth` (`v`). The Mac accepts its own version and the one before it. A client
+/// that sends no `v` is a phone page from before 4.5: it speaks version 1.
+public enum ProtocolVersion {
+    /// 1: SofaPad 4.0–4.4. 2: SofaPad 4.5 (clients send `v`; `hello` has `vmin`; auth_fail reason "protocol", 4426).
+    public static let current: Int = {
+        #if DEBUG
+        // tests only: a Mac that speaks another version (tools/sofa12-follow.mjs); not in release builds
+        if let s = ProcessInfo.processInfo.environment["PKM_TEST_PROTOCOL"], let v = Int(s) { return v }
+        #endif
+        return 2
+    }()
+    public static var oldest: Int { current - 1 }
+    public static func accepts(_ v: Int) -> Bool { v >= oldest && v <= current }
+}
+
 /// Messages from the phone. JSON objects with a short "t" type field (see design/SPEC.md §4).
 public enum ClientMessage: Equatable {
-    case pairRequest(device: String)
-    case auth(code: String?, proof: String?, device: String, sid: String)
+    /// `v`: the protocol version the client speaks (1 when it sends none).
+    case pairRequest(device: String, v: Int)
+    case auth(code: String?, proof: String?, device: String, sid: String, v: Int)
     case move(dx: Double, dy: Double)
     /// Absolute jump on the mini-map: x, y in 0…1 of the display under the cursor.
     case jump(x: Double, y: Double)
@@ -57,12 +75,13 @@ public enum ClientMessage: Equatable {
 
         switch t {
         case "pair_request":
-            return .pairRequest(device: (obj["device"] as? String) ?? "")
+            return .pairRequest(device: (obj["device"] as? String) ?? "", v: obj["v"] == nil ? 1 : try int("v"))
         case "auth":
             let code = obj["code"] as? String
             let proof = obj["proof"] as? String
             guard code != nil || proof != nil else { throw DecodeError.badField("code/proof") }
-            return .auth(code: code, proof: proof, device: (obj["device"] as? String) ?? "", sid: (obj["sid"] as? String) ?? "")
+            return .auth(code: code, proof: proof, device: (obj["device"] as? String) ?? "", sid: (obj["sid"] as? String) ?? "",
+                         v: obj["v"] == nil ? 1 : try int("v"))
         case "move": return .move(dx: try num("dx"), dy: try num("dy"))
         case "jump": return .jump(x: try num("x"), y: try num("y"))
         case "scroll": return .scroll(dx: (try? num("dx")) ?? 0, dy: try num("dy"))

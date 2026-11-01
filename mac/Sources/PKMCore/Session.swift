@@ -80,6 +80,8 @@ public final class ControlSession {
         case unauthorized = 4401
         case replaced = 4409
         case idle = 4408
+        /// The client speaks a protocol version this Mac does not accept (SOFA-12).
+        case protocolVersion = 4426
     }
 
     public struct Limits {
@@ -139,7 +141,8 @@ public final class ControlSession {
 
     /// First message after the WebSocket handshake.
     public func start() {
-        reply(["t": "hello", "nonce": nonce, "host": hostName, "v": 1, "boot": boot, "ver": BuildInfo.version, "build": BuildInfo.build])
+        reply(["t": "hello", "nonce": nonce, "host": hostName, "v": ProtocolVersion.current, "vmin": ProtocolVersion.oldest,
+               "boot": boot, "ver": BuildInfo.version, "build": BuildInfo.build])
     }
 
     public func handle(_ text: String) {
@@ -290,6 +293,11 @@ public final class ControlSession {
         switch message {
         case .ping(let ts):
             reply(["t": "pong", "ts": ts, "us": 0])
+        case .pairRequest(_, let v) where !ProtocolVersion.accepts(v), .auth(_, _, _, _, let v) where !ProtocolVersion.accepts(v):
+            // SOFA-12: say which versions this Mac speaks, so the client can tell the user what to update
+            reply(["t": "auth_fail", "reason": "protocol", "v": ProtocolVersion.current, "vmin": ProtocolVersion.oldest])
+            log?("protocol version \(v) from \(peerIP) not accepted (this Mac: \(ProtocolVersion.oldest)–\(ProtocolVersion.current))")
+            close(.protocolVersion, "protocol version")
         case .pairRequest:
             switch pairing.requestPairing(ip: peerIP) {
             case .success:
@@ -298,7 +306,7 @@ public final class ControlSession {
             case .failure(let f):
                 reply(failureFields(f))
             }
-        case .auth(let code, let proof, let device, let sid):
+        case .auth(let code, let proof, let device, let sid, _):
             if let proof {
                 switch pairing.verify(proof: proof, nonce: nonce, ip: peerIP) {
                 case .success(let name):

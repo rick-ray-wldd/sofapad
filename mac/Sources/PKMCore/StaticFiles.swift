@@ -19,7 +19,9 @@ public struct StaticFiles {
         ("X-Content-Type-Options", "nosniff"),
         ("Referrer-Policy", "no-referrer"),
         ("X-Frame-Options", "DENY"),
-        ("Cache-Control", "no-cache"),
+        // SOFA-12: never kept, not even to be revalidated, so after SofaPad on the Mac is updated the phone (also a Home
+        // Screen web app) can only get the new page; the files are small and come over the local network
+        ("Cache-Control", "no-store"),
     ]
 
     public func response(for request: HTTPRequest) -> [UInt8] {

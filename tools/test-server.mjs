@@ -8,9 +8,10 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-export async function startServer({ webRoot = join(ROOT, 'web'), env = {} } = {}) {
-  const state = mkdtempSync(join(tmpdir(), 'pkm-test-'));
-  const port = 30000 + Math.floor(Math.random() * 10000);
+// SOFA-12: `port` and `state` start a Mac app again where the last one was (same address, same paired phones), e.g.
+// as another version (env PKM_TEST_VERSION / PKM_TEST_PROTOCOL; debug builds only).
+export async function startServer({ webRoot = join(ROOT, 'web'), env = {}, port = 30000 + Math.floor(Math.random() * 10000),
+  state = mkdtempSync(join(tmpdir(), 'pkm-test-')) } = {}) {
   const proc = spawn(join(ROOT, 'mac/.build/debug/pkm-server'),
     ['--dry-run', '--no-ui', '--bind', '127.0.0.1', '--port', String(port), '--state-dir', state, '--web-root', webRoot],
     { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, ...env } });

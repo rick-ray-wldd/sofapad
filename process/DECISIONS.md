@@ -579,3 +579,52 @@ A 下方工具列                     B 可收合側欄（選這個）          
 - README 頂端：置中的 `<picture>`，`prefers-color-scheme` 切換淺色／深色版本，寬 440（手機上縮到欄寬）；原本的標題字放進圖片的 alt（讀螢幕和搜尋用），所以不另外放 `<h1>`。下面一句標語接上 Logo 的概念：英文「Sofa mode on.」、中文「沙發模式 ON。」；三個徽章（最新版、macOS 13+ · Apple 晶片、MIT）都用品牌藍，不用 Apple logo，這樣 375 px 寬的手機也排得成一行；再來是原本的語言切換。README 其他內容不動。
 - 渲染檢查不送 GitHub API（還沒公開的內容不離開這台 Mac）：pandoc 的 GFM 加 GitHub 的 README 樣式（github-markdown-css），headless Chrome 模擬淺色／深色、桌機／手機。
 - social preview：品牌藍底、全白標誌（圓鈕的洞透出藍色）、標語用 Space Grotesk（OFL）。要在 GitHub 的 repo 設定上傳，Ray 自己設。
+
+## D-56 協定版本（SOFA-12，4.5.0）
+- Ray 要 SofaPad 像 Orca 一樣下載後會自動更新，也要同步手機網頁和以後可能有的 iPhone App；總控提的計畫 Ray 回「做 4.5」。協定要讓以後的原生 App 可以和網頁並存。
+- **協定版本是一個整數，和 App 版本分開**。只有「用戶端要改才能繼續用」的時候才加一。4.0–4.4 的協定算版本 1（`hello` 本來就帶 `v: 1`），4.5 是版本 2。
+- **規則**：Mac 在 `hello` 說自己講的 `v` 和最舊還接受的 `vmin`（= `v − 1`，也就是「目前這版和前一版」）。用戶端在 `pair_request`、`auth` 帶 `v`；沒帶的是 4.5 以前的網頁，算 1。範圍外的 → `auth_fail` `{reason: "protocol", v, vmin}`，再用 4426 關閉；不配對、它送的東西都不用、配對碼也不會被用掉。
+- **網頁看 `hello` 自己決定**：Mac 的 `v` 在網頁會的清單裡（`PROTOCOL.supports = [1, 2]`），或 Mac 還接受網頁的版本（`vmin ≤ 2 ≤ v`），就登入；否則不登入，說是誰要更新（Mac 的 `v` 比較小 → 更新 Mac 上的 SofaPad；比較大 → 把網頁關掉重開），每 5 秒再看一次（Mac 可能剛好更新完）。這段時間不顯示「連線中…」閃來閃去。
+- 新的狀態 `incompatible`：橫幅（紅）＋上方狀態列「（版本對不上）」，中英文都寫好，跟著網頁的語言。
+- 文件 `docs/PROTOCOL.md`（英文）：傳輸、每一種訊息、順序和晚到、連線生命週期、close code、配對和登入證明、版本規則、誰和誰能用、寫原生 App 的步驟。Swift 測試檢查文件裡有每一種訊息和每個 close code。
+- 配對和安全模型都沒改（派工限制），只多了版本欄位。
+
+## D-57 手機網頁跟著 Mac 的版本（SOFA-12）
+- Mac 提供網頁，所以 Mac 更新後，開著的網頁（Safari 分頁、加到主畫面的 App 回到前景）還是舊的。每次連線的 `hello` 都有 Mac 的 `ver` 和 `build`；和網頁自己的（`version.js`）不同就重新載入，拿 Mac 現在的網頁。版本加 build 一起比：同一版重新 build 也換。
+- **不會無限重載**：重新載入的網址帶記號 `?follow=n~版本+build`，網頁一打開就讀記號、把它從網址拿掉（`history.replaceState`）。同一個 Mac 版本最多重載 2 次；還是舊的（快取一直給舊檔），就停下來，用紅色橫幅請使用者把網頁關掉重開，連線照常可以用。用網址記號，不用 sessionStorage／localStorage：私密瀏覽、儲存被擋時一樣有效，測試也看得到。
+- 重載前「整段」模式輸入框裡還沒送出的字放進 sessionStorage，重載後放回去（只在帶記號的那次）。即時模式本來就不補送斷線時的字（D-30），不用留。重載後橫幅說「Mac 上的 SofaPad 更新了，這頁已自動重新載入，現在是 X」。
+- **快取**：網頁的每個檔案從 `Cache-Control: no-cache` 改成 `no-store`。no-cache 沒有 ETag／Last-Modified 時其實每次都重抓，但 iOS 主畫面 App 對快取的處理沒有保證；檔案小、走區網，乾脆不存。瀏覽器測試檢查重載後沒有任何檔案來自磁碟、記憶體或 service worker 的快取。
+- 原生 App 不是 Mac 提供的，不用重載；它顯示 Mac 的版本，靠協定版本規則。
+
+## D-58 用 Sparkle 做 Mac App 的自動更新（SOFA-12）
+- 派工：用 Sparkle（官方、MIT、SwiftPM），除非它和現在的 SwiftPM＋`tools/package.sh` 接不起來（那就停下來報告，不自己寫更新程式）。**接得起來**：Sparkle 的 SwiftPM 版是 binary target（xcframework），`swift build` 會把 Sparkle.framework 放在執行檔旁邊；`tools/build-app.sh` 把它複製到 `Contents/Frameworks`、加 rpath `@executable_path/../Frameworks`、拿掉指到本機 .build 的 rpath，再照 Sparkle 文件的順序由內到外簽章（Installer.xpc、Downloader.xpc、Autoupdate、Updater.app、framework、App）。
+- **版本固定 2.10.0**（`exact:`，Package.resolved 進 git）。2.10.1 出來才一週，修的是我們用不到的地方（releaseNotesLink 空白、NFC 路徑、翻譯）；2.10.0 已經七週。要升級改一行。
+- **什麼時候檢查**：每次啟動（Sparkle 自己只在離上次超過一天時才在啟動時查；所以 `Updater.checkAtLaunch` 等 Sparkle 排好時程後，這次啟動還沒查過就查一次）和每天一次（`SUScheduledCheckInterval` 86400）。不問使用者要不要自動檢查（`SUEnableAutomaticChecks` YES）。選單有「檢查更新…」：選單本來全是中文，所以用中文，英文文件寫「檢查更新… (Check for Updates)」。
+- **一定要按才裝**（`SUAllowsAutomaticUpdates` NO）：ad-hoc 簽章下每次更新「輔助使用」權限都可能失效，悄悄裝好會變成「手機突然不能用」。使用者看到說明、按「安裝更新項目」→ 下載、檢查 → 「安裝並重新啟動」。
+- **說明文字**：appcast 裡放兩個 `<description sparkle:format="markdown">`，`xml:lang="en"` 和 `zh-Hant`，內容是 `docs/release/<版本>.md` 的英文半和中文半（用 `---` 分開），去掉標題和「下載和安裝」那段。Sparkle 2.10 自己會畫 Markdown，不用轉 HTML；照 Mac 的語言挑。`CFBundleAllowMixedLocalizations` 讓 Sparkle 的視窗也跟著 Mac 的語言（中文 Mac 是中文）。
+- **檢查兩次**：`SUVerifyUpdateBeforeExtraction`（解壓前先驗 zip 的 EdDSA 簽章）、`SURequireSignedFeed`（更新清單本身也要簽章，改過一個字就不收）。代理（delegate）一律回 GitHub 的 feed 網址，所以使用者 defaults 裡的 `SUFeedURL`（Sparkle 舊功能）沒有作用。
+- **手機連線中不搶焦點**（gentle reminders）：選單列 App 剛啟動 3 秒內找到更新時，Sparkle 會把 App 叫到前面、讓「安裝」成為預設按鈕；手機這時打的字和 Return 會進那個視窗。所以手機連線中找到的更新不開視窗：選單列圖示加「↑」，選單第二行「⬆︎ 安裝新版本 X…」，按下去才開（使用者自己叫的，可以拿焦點）。沒有手機時照 Sparkle 的預設。
+- **一個 zip 兩種用途**：給人下載的 zip 也是給 Sparkle 的（Sparkle 會在解開的資料夾裡找 SofaPad.app），不用另做一個。Sparkle 的授權條款放在 App（`Resources/Sparkle-LICENSE.txt`）和 zip 裡。
+- 只有 SofaPad.app 有更新功能；終端機執行、`--no-ui`、測試用的 dry-run 伺服器都沒有。
+- 建置號（`CFBundleVersion`，Sparkle 用它比新舊）改成到秒：同一分鐘 build 兩次（測試會）也分得出新舊。
+
+## D-59 更新的簽章金鑰（SOFA-12）
+- 照派工用 Sparkle 自己的 `generate_keys` 產生 EdDSA 金鑰，存在登入鑰匙圈。用自己的帳號名稱 `--account sofapad`，不用預設的 `ed25519`：這台 Mac 上如果有別的專案的 Sparkle 金鑰，不會混在一起。產生時沒有任何鑰匙圈對話框；公鑰放 `tools/sparkle-public-key.txt`，`build-app.sh` 放進每個 App 的 `SUPublicEDKey`。
+- **私鑰怎麼交給 sign_update**：鑰匙圈項目是 generate_keys 建的，只有它讀不會跳出「允許存取」；sign_update 直接讀鑰匙圈會跳對話框（要 Ray 按）。所以 `release.sh` 用 `generate_keys -x` 把私鑰寫到一個權限 700 的暫存資料夾、由 sign_update 從標準輸入讀（`--ed-key-file -`），簽完馬上刪（結束時 trap 也會刪）。generate_keys 不能直接輸出到管線（它拒絕已存在的路徑、用原子寫入）。私鑰從不印出、不進 git、不上傳。
+- 簽完 release.sh 只用公鑰（`tools/appcast.mjs verify`，Node 的 Ed25519）再驗一次 zip 和 feed，也檢查鑰匙圈裡那把的公鑰、App 裡的 `SUPublicEDKey` 和 repo 裡的一樣。
+- **備份**：`docs/RELEASING.md`（中英）寫給 Ray：`generate_keys --account sofapad -x` 到桌面 → 存進密碼管理器或加密隨身碟 → 刪檔 → 用 `-p` 核對。掉了的話，已經裝好的 SofaPad 不能再自動更新（要等 Developer ID 簽章才能換金鑰）。
+- **端對端測試不用這把**：測試每次用 Node 產生一把丟棄式的金鑰（存在 git 忽略的 dist/），假的 4.5.1 用它簽。真的金鑰只簽真的版本：不會有一個「用正式金鑰簽過的假 4.5.1」存在。
+
+## D-60 發布腳本 `tools/release.sh`（SOFA-12）
+- 一個指令：`tools/release.sh 4.5.0 [--identity "Developer ID Application: …" [--notary-profile 名稱]] [--skip-browser-tests]`。順序：改版本（VERSION、BuildInfo.swift、version.js）→ 測試（swift test、JS 單元測試、v2-browser、sofa12-follow）→ build＋簽章 →（第二階段）公證、staple、spctl → 打包 → 用鑰匙圈的金鑰簽 zip、寫 appcast.xml 並簽章、用公鑰驗 → 寫 GitHub release 的說明 → 印出 `gh release create` 指令。
+- **絕不 push、打 tag、發布**；指令由總控審過、push 之後執行（`gh release create` 會建 tag）。`--target` 是 HEAD 的 commit：工作樹有沒 commit 的改動（例如剛改的版本號）時會說，請 commit 後再跑一次，印出來的指令才對得上 zip。
+- 沒有 `--identity` 就用 ad-hoc，並且直接說會被 Gatekeeper 擋、更新後輔助使用權限可能要重開。有 Developer ID：hardened runtime＋secure timestamp；有 notary profile 才公證（`notarytool --keychain-profile`，腳本不碰密碼，也不讀憑證）。`--notary-profile` 沒有 `--identity` 不准。
+- release notes 還沒寫時，腳本寫一份中英骨架就停下來（不會用骨架發布）；CHANGELOG 沒有這一版也停。
+- `build-app.sh` 在 release build 裡找到任何測試開關（`SofaPadTest*`、`PKM_TEST_*`）或本機路徑就讓 build 失敗。
+
+## D-61 端對端更新測試（SOFA-12）
+- 派工要在這台 Mac 上用測試簽章證明：4.5.0 找到、下載、驗證、安裝、以 4.5.1 重新打開；被竄改的 zip 被拒。
+- **測試 App 和真的分開**：debug build、bundle id `io.github.rick-ray-wldd.sofapad.update-test`（自己的 defaults、記錄檔、快取、權限），裝在 `dist/update-test/Applications/`，用 dry-run、只聽 127.0.0.1、狀態資料夾在 dist。Ray 的 SofaPad、它的設定和權限都不碰。
+- **只在 debug build 的測試開關**：feed 網址、啟動參數、延後檢查從測試 App 自己的 defaults 讀（`SofaPadTestFeedURL`、`SofaPadTestArguments`、`SofaPadTestCheckDelay`：Sparkle 重新開 App 時不帶參數，所以參數也要從 defaults 讀）；`PKM_TEST_VERSION`／`PKM_TEST_PROTOCOL` 讓瀏覽器測試的 dry-run 伺服器假裝別的版本。都包在 `#if DEBUG`；release 執行檔裡一個字串都沒有（build-app.sh 會查）。debug 版的 Info.plist 另外允許 127.0.0.1 的 http（ATS `NSAllowsLocalNetworking`）。
+- **按 Sparkle 真的視窗**：用 Accessibility（`tools/sofa12-ax.swift`）讀視窗文字、按「Install Update」「Install and Relaunch」，和人按的一樣；不按任何別的 App。截圖用 `screencapture -l <視窗>`，只有那個視窗、沒有背景。錄影時先在錄影範圍放一個深色背景視窗（同一個工具的 `stage`），範圍外的東西不會錄進去；手機那邊用 Chrome 的 screencast，兩段並排。
+- 要 Mac 沒鎖定（鎖定畫面時 macOS 不顯示 App 的視窗，Accessibility 也看不到）；測試一開始就檢查，鎖著就停下來說明。

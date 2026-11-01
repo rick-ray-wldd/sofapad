@@ -11,7 +11,7 @@
 ## English
 
 1. **Check the download** (optional): in Terminal, in the folder with the zip, run
-   `shasum -a 256 -c SofaPad-4.4.0-macOS.zip.sha256`. **You'll see** `SofaPad-4.4.0-macOS.zip: OK`.
+   `shasum -a 256 -c SofaPad-4.5.0-macOS.zip.sha256`. **You'll see** `SofaPad-4.5.0-macOS.zip: OK`.
 2. Double-click the zip. Drag `SofaPad.app` from the folder that appears into **Applications**.
 3. Double-click **SofaPad** in Applications. If you get "**"SofaPad" Not Opened** / Apple could not verify…":
    1. Click **Done** (not Move to Trash).
@@ -22,19 +22,25 @@
    - On recent macOS, right-click > Open no longer skips this check.
 4. **Accessibility**: System Settings > Privacy & Security > Accessibility. If an older SofaPad is in the list, select
    it and click **-** first; then click **+** and add `/Applications/SofaPad.app`, and turn it on. (macOS knows the app
-   by its signature, and each build has a new one.)
+   by its signature, and each build has a new one: you do this again after an update, until SofaPad is signed with a
+   Developer ID.)
 5. **Firewall** (only if it is on): when macOS asks whether SofaPad may accept incoming connections, click **Allow**.
 6. `⌨︎🖱` appears in the menu bar. Click it → **Scan with iPhone (用 iPhone 掃描)**, scan the QR code with the iPhone's
    camera, and pair with the code on the Mac's screen. Then follow README step 6.
-7. **Check the version**: the menu's first line reads "SofaPad 4.4.0 (build …)"; on the phone, ⚙︎ shows
-   "Web page 4.4.0 (build …) · Mac app 4.4.0 (build …)".
+7. **Check the version**: the menu's first line reads "SofaPad 4.5.0 (build …)"; on the phone, ⚙︎ shows
+   "Web page 4.5.0 (build …) · Mac app 4.5.0 (build …)".
 8. **Language and theme** (4.4): the phone page is in English, or in Chinese when the phone's language is Chinese.
    ⚙︎ → **Language** (Auto, English, 中文) and **Theme** (System, Light, Dark) change it at once; the phone remembers.
+9. **Updates** (4.5): SofaPad checks for a new version when it opens and once a day; `⌨︎🖱` → **檢查更新…** (Check for
+   Updates) checks now. **You'll see** a window with what's new: click **Install Update**, then **Install and
+   Relaunch**. SofaPad opens again as the new version, and the phone page reloads itself to match. If the phone then
+   says the Accessibility permission isn't on, do step 4 again. While a phone is connected, a new version waits in the
+   menu ("⬆︎ 安裝新版本 …") instead of opening a window.
 
 ## 繁體中文
 
 1. **核對下載的檔案**（可選）：在終端機切到 zip 所在的資料夾，執行
-   `shasum -a 256 -c SofaPad-4.4.0-macOS.zip.sha256`，**會看到** `SofaPad-4.4.0-macOS.zip: OK`。
+   `shasum -a 256 -c SofaPad-4.5.0-macOS.zip.sha256`，**會看到** `SofaPad-4.5.0-macOS.zip: OK`。
 2. 雙擊 zip 解壓縮，把資料夾裡的 `SofaPad.app` 拖到「**應用程式**」。
 3. 在「應用程式」雙擊 **SofaPad**。如果出現「**無法打開「SofaPad」**／Apple 無法驗證…」：
    1. 按「**完成**」（不要按「丟到垃圾桶」）。
@@ -42,8 +48,9 @@
    3. **會看到**「已阻擋「SofaPad」以保護你的 Mac」，按「**強制打開**」，再輸入密碼或用 Touch ID。
    4. 再雙擊一次 SofaPad，在跳出的視窗按「**打開**」。每個版本只要做一次。
    - 新版 macOS 用右鍵 →「打開」已經不能略過這個檢查。
-4. **輔助使用權限**：系統設定 → 隱私權與安全性 → 輔助使用。清單裡如果有舊的 SofaPad，先選它按「**－**」移除；再按「**＋**」加入 `/應用程式/SofaPad.app` 並打開開關。（macOS 用簽章認 App，每次 build 的簽章都不一樣。）
+4. **輔助使用權限**：系統設定 → 隱私權與安全性 → 輔助使用。清單裡如果有舊的 SofaPad，先選它按「**－**」移除；再按「**＋**」加入 `/應用程式/SofaPad.app` 並打開開關。（macOS 用簽章認 App，每次 build 的簽章都不一樣：在換成 Developer ID 簽章以前，每次更新後都要再做一次。）
 5. **防火牆**（有開才會問）：問 SofaPad 能不能接受連入的連線時，按「**允許**」。
 6. 選單列出現 `⌨︎🖱`：點它 →「**用 iPhone 掃描**」，用 iPhone 相機掃 QR code，輸入 Mac 螢幕上的配對碼。之後照 README 第 6 步。
-7. **確認版本**：選單第一行是「SofaPad 4.4.0（建置 …）」；手機 ⚙︎ 最上面是「網頁 4.4.0（建置 …）・Mac App 4.4.0（建置 …）」。
+7. **確認版本**：選單第一行是「SofaPad 4.5.0（建置 …）」；手機 ⚙︎ 最上面是「網頁 4.5.0（建置 …）・Mac App 4.5.0（建置 …）」。
 8. **語言和主題**（4.4）：手機的語言是中文時，網頁是中文，否則是英文。⚙︎ →「**語言**」（自動、English、中文）和「**主題**」（系統、淺色、深色）可以馬上切換，手機會記住。
+9. **更新**（4.5）：SofaPad 打開時和每天會檢查有沒有新版；`⌨︎🖱` →「**檢查更新…**」可以馬上檢查。**會看到**新版說明的視窗：按「**安裝更新項目**」，再按「**安裝並重新啟動**」。SofaPad 會以新版重新打開，手機網頁也會自己重新載入。之後手機如果說「輔助使用」沒開，再做一次第 4 步。手機連線中時，新版會放在選單裡（「⬆︎ 安裝新版本 …」），不跳出視窗。

@@ -1,0 +1,157 @@
+{
+  "when": "2026-11-01T12:38:58.909Z",
+  "passed": 30,
+  "total": 30,
+  "results": [
+    {
+      "name": "same version: connected, no reload",
+      "ok": true,
+      "detail": "{\"navs\":[\"http://127.0.0.1:30416/\"],\"link\":\"ready\"}"
+    },
+    {
+      "name": "same version: ⚙︎ shows the page and the Mac at 4.5.0",
+      "ok": true,
+      "detail": "Web page 4.5.0 (development) · Mac app 4.5.0 (development)"
+    },
+    {
+      "name": "every page file comes with Cache-Control: no-store",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "Batch mode with a draft in the box",
+      "ok": true,
+      "detail": "{\"link\":\"ready\",\"host\":\"Mac mini\",\"banner\":\"\",\"bad\":false,\"version\":\"Web page 4.5.0 (development) · Mac app 4.5.0 (development)\",\"search\":\"\",\"input\":\"draft kept\",\"mode\":\"Batch\",\"opens\":1,\"sent\":[\"auth\",\"ping\",\"ping\"]}"
+    },
+    {
+      "name": "Mac updated: the page reloaded by itself, once",
+      "ok": true,
+      "detail": "[\"http://127.0.0.1:30416/\",\"http://127.0.0.1:30416/?follow=1%7E4.5.1%2Bdev\"]"
+    },
+    {
+      "name": "the reload went to the address with the mark, and the mark came off",
+      "ok": true,
+      "detail": "{\"navs\":[\"http://127.0.0.1:30416/\",\"http://127.0.0.1:30416/?follow=1%7E4.5.1%2Bdev\"],\"search\":\"\"}"
+    },
+    {
+      "name": "after the reload: connected again (same pairing), no pairing sheet",
+      "ok": true,
+      "detail": "{\"link\":\"ready\",\"host\":\"Mac mini\",\"banner\":\"SofaPad on the Mac was updated: this page reloaded itself and is now 4.5.1.\",\"bad\":false,\"version\":\"Web page 4.5.1 (development) · Mac app 4.5.1 (development)\",\"search\":\"\",\"input\":\"draft kept\",\"mode\":\"Batch\",\"opens\":1,\"sent\":[\"auth\",\"ping\",\"ping\",\"ping\"]}"
+    },
+    {
+      "name": "the version shown on the phone matches the Mac: 4.5.1 and 4.5.1",
+      "ok": true,
+      "detail": "Web page 4.5.1 (development) · Mac app 4.5.1 (development)"
+    },
+    {
+      "name": "a note says the page followed the Mac",
+      "ok": true,
+      "detail": "SofaPad on the Mac was updated: this page reloaded itself and is now 4.5.1."
+    },
+    {
+      "name": "nothing after the reload came from a cache (disk, memory or service worker)",
+      "ok": true,
+      "detail": "{\"n\":17,\"cached\":[],\"servedFromCache\":0}"
+    },
+    {
+      "name": "the new page files are the 4.5.1 ones",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the Batch draft is still in the box",
+      "ok": true,
+      "detail": "{\"input\":\"draft kept\",\"mode\":\"Batch\"}"
+    },
+    {
+      "name": "a reconnect afterwards does not say \"updated\" again, and does not reload",
+      "ok": true,
+      "detail": "{\"banner\":\"Reconnected to the Mac.\",\"navs\":2}"
+    },
+    {
+      "name": "a page that stays old: exactly two reloads, then it stops",
+      "ok": true,
+      "detail": "[\"http://127.0.0.1:30416/?follow=1%7E4.5.2%2Bdev\",\"http://127.0.0.1:30416/?follow=2%7E4.5.2%2Bdev\"]"
+    },
+    {
+      "name": "it says so, plainly, and stays connected (it still works)",
+      "ok": true,
+      "detail": "{\"link\":\"ready\",\"host\":\"Mac mini\",\"banner\":\"This page is 4.5.1, SofaPad on the Mac is 4.5.2, and reloading didn’t bring the new page. Close this page and open it again (on the Home Screen: close the app and reopen it).\",\"bad\":true,\"version\":\"Web page 4.5.1 (development) · Mac app 4.5.2 (development)\",\"search\":\"\",\"input\":\"draft kept\",\"mode\":\"Batch\",\"opens\":1,\"sent\":[\"auth\",\"ping\",\"ping\",\"ping\",\"ping\",\"ping\"]}"
+    },
+    {
+      "name": "the same in Chinese",
+      "ok": true,
+      "detail": "這個頁面是 4.5.1，Mac 上的 SofaPad 是 4.5.2，重新載入也沒有拿到新頁面。請把這頁關掉再重新打開（主畫面 App 要關掉重開）。"
+    },
+    {
+      "name": "a Mac that no longer accepts this page: \"incompatible\", no login attempt",
+      "ok": true,
+      "detail": "{\"link\":\"incompatible\",\"sentSince\":[]}"
+    },
+    {
+      "name": "it keeps looking, slowly (every 5 s)",
+      "ok": true,
+      "detail": "2 → 3"
+    },
+    {
+      "name": "no login reached the Mac",
+      "ok": true,
+      "detail": "▀ ▀▀▄▀▀▄  ██▀▄▀ █▀▀▀█  ▄▄  \u001b[0m\n\u001b[30;47m  █▀▀▀▀▀█  ▄█▀▀▀ ▄▀█ ██ ▀ █▀▄█▀  \u001b[0m\n\u001b[30;47m  █ ███ █ ▀█ ▄ ▄  ▀  ▄▀▀██▀█ █▀  \u001b[0m\n\u001b[30;47m  █ ▀▀▀ █ ▀ ▀█████▀▄▀▄█▄▀  ▄ ▄▀  \u001b[0m\n\u001b[30;47m  ▀▀▀▀▀▀▀ ▀▀▀ ▀  ▀    ▀ ▀ ▀ ▀▀▀  \u001b[0m\n\u001b[30;47m                                 \u001b[0m\n\n在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。\n\n"
+    },
+    {
+      "name": "the message says what to do (English)",
+      "ok": true,
+      "detail": "This page is older than SofaPad on the Mac and can’t connect (this page speaks protocol 2, the Mac 4). Close this page and open it again (on the Home Screen: close the app and reopen it)."
+    },
+    {
+      "name": "the status line says so too",
+      "ok": true,
+      "detail": "Mac mini (versions don’t fit)"
+    },
+    {
+      "name": "the message in Chinese",
+      "ok": true,
+      "detail": "這個頁面比 Mac 上的 SofaPad 舊，沒辦法連線（這頁的協定是 2，Mac 是 4）。請把這頁關掉再重新打開（主畫面 App 要關掉重開）。"
+    },
+    {
+      "name": "the Mac speaks 2 again: the page connects by itself, the message goes",
+      "ok": true,
+      "detail": "{\"link\":\"ready\",\"host\":\"Mac mini\",\"banner\":\"Reconnected to the Mac.\",\"bad\":false,\"version\":\"Web page 4.5.1 (development) · Mac app 4.5.1 (development)\",\"search\":\"\",\"input\":\"draft kept\",\"mode\":\"Batch\",\"opens\":4,\"sent\":[\"auth\",\"ping\",\"ping\",\"ping\",\"ping\",\"ping\",\"ping\",\"auth\",\"ping\"]}"
+    },
+    {
+      "name": "an older Mac: \"update SofaPad on the Mac\" (English)",
+      "ok": true,
+      "detail": "SofaPad on the Mac is too old for this page and can’t connect (the Mac speaks protocol 0, this page 2). Update SofaPad on the Mac (its menu-bar menu ⌨︎🖱 has the update item), then open this page again."
+    },
+    {
+      "name": "an older Mac (Chinese)",
+      "ok": true,
+      "detail": "Mac 上的 SofaPad 太舊，這個頁面沒辦法和它連線（Mac 的協定是 0，這頁是 2）。請從 Mac 選單列 ⌨︎🖱 的「檢查更新…」更新 SofaPad，再重新打開這頁。"
+    },
+    {
+      "name": "hello carries the protocol version: v 2, vmin 1, next to the app version",
+      "ok": true,
+      "detail": "{\"boot\":\"6edZRGL27IBj9Z2RspRz++Dk\",\"build\":\"dev\",\"host\":\"Mac mini\",\"nonce\":\"0it2zYJVP2QSVkErwJBjAoFm\",\"t\":\"hello\",\"v\":2,\"ver\":\"4.5.1\",\"vmin\":1}"
+    },
+    {
+      "name": "a client speaking version 9: auth_fail \"protocol\" (v 2, vmin 1), then close 4426",
+      "ok": true,
+      "detail": "{\"got\":[{\"boot\":\"6edZRGL27IBj9Z2RspRz++Dk\",\"build\":\"dev\",\"host\":\"Mac mini\",\"nonce\":\"0it2zYJVP2QSVkErwJBjAoFm\",\"t\":\"hello\",\"v\":2,\"ver\":\"4.5.1\",\"vmin\":1},{\"reason\":\"protocol\",\"t\":\"auth_fail\",\"v\":2,\"vmin\":1}],\"code\":4426}"
+    },
+    {
+      "name": "the Mac logs it",
+      "ok": true,
+      "detail": "  ▄▄  \u001b[0m\n\u001b[30;47m  █▀▀▀▀▀█   ▄  ▀ ▄▀█ ██ ▀ █▀▄█▀  \u001b[0m\n\u001b[30;47m  █ ███ █ ▀█▀ ▄▄ ▄▀▄▀▄▀▀██▀█ █▀  \u001b[0m\n\u001b[30;47m  █ ▀▀▀ █ ▀▀█ ▀  ▄ ▄▄▄█▄▀  ▄ ▄▀  \u001b[0m\n\u001b[30;47m  ▀▀▀▀▀▀▀ ▀ ▀▀  ▀   ▀ ▀ ▀ ▀ ▀▀▀  \u001b[0m\n\u001b[30;47m                                 \u001b[0m\n\n在這裡按 Enter：產生新配對碼；輸入 q 再按 Enter：結束。\n\n[20:38:44] authenticated iPhone from 127.0.0.1\n[20:38:44] protocol version 9 from 127.0.0.1 not accepted (this Mac: 1–2)\n"
+    },
+    {
+      "name": "the real 4.4.0 page (protocol 1, no v) pairs with this Mac",
+      "ok": true,
+      "detail": "{\"paired44\":true,\"v44\":\"4.4.0\"}"
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

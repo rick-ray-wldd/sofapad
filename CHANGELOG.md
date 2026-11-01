@@ -2,6 +2,47 @@
 
 [README](README.md) · [繁體中文 README](README.zh-TW.md) · Development records (Chinese): [`process/`](process/)
 
+## 4.5.0 (2026-11-01)
+
+**SofaPad updates itself**, with Sparkle 2.10.0 (MIT, the one dependency, built in by SwiftPM and pinned in
+`mac/Package.swift`). It checks at every launch and once a day; 檢查更新… (Check for Updates) in the menu checks now.
+Sparkle's window shows the release notes (the English or Chinese half of `docs/release/<version>.md`, by the Mac's
+language), downloads, checks the update and installs it, and SofaPad opens again. The feed is `appcast.xml` on the
+latest GitHub release; the zip and the feed are both signed with SofaPad's EdDSA key, made with Sparkle's
+`generate_keys` and kept in the login Keychain (public half: `tools/sparkle-public-key.txt`), and the app verifies the
+zip before unpacking it and refuses a feed changed after signing. Updates are never installed without a click
+(`SUAllowsAutomaticUpdates` off: with ad-hoc signing a silent update would also silently drop the Accessibility
+permission). While a phone is connected, an update found by a check opens no window, which would take what the phone
+types; the menu-bar icon gets a ↑ and the menu offers ⬆︎ 安裝新版本 …. The command-line runs (tests, `--no-ui`) have no
+updater.
+
+**The phone page follows the Mac app.** On every connection the Mac's `hello` carries its version and build; when they
+differ from the page's, the page reloads itself (`web/js/follow.js`), keeping a Batch draft, and says it was updated.
+At most two reloads for the same Mac version (a mark in the address, `?follow=n~version`, so it needs no storage);
+then it stops and tells the user to close and reopen the page. The Mac now serves every page file with
+`Cache-Control: no-store`, so neither Safari nor a Home Screen web app can keep an old one.
+
+**A versioned protocol** (`docs/PROTOCOL.md`, written for a native iPhone app next to the page). Protocol version 2:
+`hello` has `v` and `vmin`, clients send `v` in `pair_request` and `auth`, and the Mac accepts its version and the
+previous one (a client without `v` speaks 1, like the 4.4 page). Any other version gets `auth_fail` "protocol" and
+close code 4426. The page shows a clear message in English or Chinese, saying whether the Mac or the page needs
+updating, logs in only when the versions fit, and looks again every 5 s. The pairing and the security model are
+unchanged.
+
+**Releases**: `tools/release.sh <version> [--identity "Developer ID Application: …" --notary-profile NAME]` bumps the
+version, runs the tests, builds, signs (ad-hoc unless an identity is given; with one: hardened runtime, notarization,
+stapling), packages, signs the zip and writes and signs `appcast.xml`, writes the release notes and prints the
+`gh release create` command. It never pushes, tags or publishes. `tools/build-app.sh` embeds and signs Sparkle, takes
+`--identity`, and refuses a release build that carries a test switch. The build number (`CFBundleVersion`) is now to
+the second. `docs/RELEASING.md`: the release steps, backing up the key, and phase 2 (Developer ID) for the owner.
+
+Tests: Swift `SOFA12Tests` (versions, refusal, no-store, the protocol document names every message); JS
+`web/test/follow.test.mjs`; `tools/sofa12-follow.mjs` (the page follows a restarted Mac of another version, nothing from
+a cache, the reload limit, both protocol mismatches in both languages, a client speaking 9 turned away, the real 4.4.0
+page pairs with 4.5); `tools/sofa12-update-e2e.mjs` (4.5.0 updates itself to a test 4.5.1 through Sparkle's windows on
+this Mac, the phone follows, a phone connected keeps the update in the menu, a tampered zip and an edited feed are
+refused).
+
 ## 4.4.0 (2026-10-31)
 
 **The phone page in English and Chinese.** Every text on the phone, from the key row to the settings, the editors,
