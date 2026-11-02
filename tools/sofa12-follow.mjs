@@ -47,6 +47,11 @@ function webAs(version) {
   return dir;
 }
 const ver = JSON.parse(execFileSync('node', ['-e', `import('${join(ROOT, 'web/js/version.js')}').then(m => console.log(JSON.stringify(m.VERSION)))`]).toString());
+// the versions the Mac is "updated" to: the next two after this source's own (so the test holds whatever VERSION says)
+const bump = (v) => v.replace(/\d+$/, (n) => String(Number(n) + 1));
+const NEXT = bump(ver);
+const NEXT2 = bump(NEXT);
+const esc = (v) => v.replaceAll('.', '\\.');
 
 /** In the page: WebSocket connections and what was sent on them (message types only). */
 const instrument = () => {
@@ -148,26 +153,26 @@ await page.evaluate((text) => {   // typed the way the iOS keyboard does it (ins
 s = await look();
 check('Batch mode with a draft in the box', s.mode === 'Batch' && s.input === 'draft kept', JSON.stringify(s));
 
-// ---- 2. the Mac app is updated to 4.5.1 while the page is open
+// ---- 2. the Mac app is updated to the next version while the page is open
 const before = responses.length;
 const servedBefore = servedFromCache;
-const web451 = webAs('4.5.1');
-await mac({ version: '4.5.1', web: web451 });
+const webNext = webAs(NEXT);
+await mac({ version: NEXT, web: webNext });
 const followed = await until(async () => (navs.length >= 2 && (await look()).link === 'ready' ? look() : null), 15000);
 await sleep(3000);   // a loop would show here
 s = await look();
 check('Mac updated: the page reloaded by itself, once', navs.length === 2, JSON.stringify(navs));
-check('the reload went to the address with the mark, and the mark came off', /[?&]follow=1~4\.5\.1\+dev$/.test(decodeURIComponent(navs[1] || '')) && s.search === '',
+check('the reload went to the address with the mark, and the mark came off', new RegExp(`[?&]follow=1~${esc(NEXT)}\\+dev$`).test(decodeURIComponent(navs[1] || '')) && s.search === '',
   JSON.stringify({ navs, search: s.search }));
 check('after the reload: connected again (same pairing), no pairing sheet', followed && s.link === 'ready', JSON.stringify(s));
-check('the version shown on the phone matches the Mac: 4.5.1 and 4.5.1',
-  s.version === 'Web page 4.5.1 (development) · Mac app 4.5.1 (development)', s.version);
-check('a note says the page followed the Mac', /SofaPad on the Mac was updated: this page reloaded itself and is now 4\.5\.1/.test(s.banner), s.banner);
+check(`the version shown on the phone matches the Mac: ${NEXT} and ${NEXT}`,
+  s.version === `Web page ${NEXT} (development) · Mac app ${NEXT} (development)`, s.version);
+check('a note says the page followed the Mac', new RegExp(`SofaPad on the Mac was updated: this page reloaded itself and is now ${esc(NEXT)}`).test(s.banner), s.banner);
 const after = responses.slice(before);
 check('nothing after the reload came from a cache (disk, memory or service worker)',
   after.length > 5 && after.every((r) => !r.disk && !r.sw) && servedFromCache === servedBefore,
   JSON.stringify({ n: after.length, cached: after.filter((r) => r.disk || r.sw).map((r) => r.url), servedFromCache }));
-check('the new page files are the 4.5.1 ones', await page.evaluate(() => import('./js/version.js').then((m) => m.VERSION)) === '4.5.1');
+check(`the new page files are the ${NEXT} ones`, await page.evaluate(() => import('./js/version.js').then((m) => m.VERSION)) === NEXT);
 check('the Batch draft is still in the box', s.input === 'draft kept' && s.mode === 'Batch', JSON.stringify({ input: s.input, mode: s.mode }));
 await shot('en-2-followed-note');
 await page.evaluate(() => window.pkmLink.dropDead('test'));   // a dropped connection after following
@@ -181,23 +186,23 @@ await settings(false);
 
 // ---- 3. a Mac whose page stays old after reloading (what a cache would do): two reloads, then stop
 const navsBefore = navs.length;
-await mac({ version: '4.5.2', web: web451 });
+await mac({ version: NEXT2, web: webNext });
 const stuck = await until(async () => ((await look()).banner.includes('reloading didn’t bring') ? look() : null), 20000);
 await sleep(6000);
 s = await look();
 check('a page that stays old: exactly two reloads, then it stops', navs.length - navsBefore === 2, JSON.stringify(navs.slice(navsBefore)));
 check('it says so, plainly, and stays connected (it still works)', stuck && s.bad && s.link === 'ready'
-  && s.banner === 'This page is 4.5.1, SofaPad on the Mac is 4.5.2, and reloading didn’t bring the new page. Close this page and open it again (on the Home Screen: close the app and reopen it).', JSON.stringify(s));
+  && s.banner === `This page is ${NEXT}, SofaPad on the Mac is ${NEXT2}, and reloading didn’t bring the new page. Close this page and open it again (on the Home Screen: close the app and reopen it).`, JSON.stringify(s));
 await shot('en-4-stuck');
 await lang('zh');
 s = await look();
-check('the same in Chinese', s.banner === '這個頁面是 4.5.1，Mac 上的 SofaPad 是 4.5.2，重新載入也沒有拿到新頁面。請把這頁關掉再重新打開（主畫面 App 要關掉重開）。', s.banner);
+check('the same in Chinese', s.banner === `這個頁面是 ${NEXT}，Mac 上的 SofaPad 是 ${NEXT2}，重新載入也沒有拿到新頁面。請把這頁關掉再重新打開（主畫面 App 要關掉重開）。`, s.banner);
 await shot('zh-4-stuck');
 await lang('en');
 
 // ---- 4. protocol: a newer Mac that no longer accepts this page (protocol 4, accepts 3–4)
 let sentBefore = (await look()).sent.length;
-await mac({ version: '4.5.1', web: web451, protocol: 4 });
+await mac({ version: NEXT, web: webNext, protocol: 4 });
 const inc = await until(async () => ((await look()).link === 'incompatible' ? look() : null), 10000);
 await sleep(6000);   // it looks again every 5 s, without trying to log in
 s = await look();
@@ -216,13 +221,13 @@ await shot('zh-5-protocol-page-old');
 await lang('en');
 
 // the Mac is updated to one that speaks 2 again: the page picks up by itself
-await mac({ version: '4.5.1', web: web451 });
+await mac({ version: NEXT, web: webNext });
 const back = await until(async () => ((await look()).link === 'ready' ? look() : null), 12000);
 check('the Mac speaks 2 again: the page connects by itself, the message goes', back && !back.bad, JSON.stringify(back));
 
 // an older Mac (protocol 0)
 sentBefore = (await look()).sent.length;
-await mac({ version: '4.5.1', web: web451, protocol: 0 });
+await mac({ version: NEXT, web: webNext, protocol: 0 });
 await until(async () => ((await look()).link === 'incompatible' ? look() : null), 10000);
 s = await look();
 check('an older Mac: "update SofaPad on the Mac" (English)', s.banner === 'SofaPad on the Mac is too old for this page and can’t connect (the Mac speaks protocol 0, this page 2). Update SofaPad on the Mac (its menu-bar menu ⌨︎🖱 has the update item), then open this page again.'
@@ -235,7 +240,7 @@ await shot('zh-6-protocol-mac-old');
 await lang('en');
 
 // ---- 5. the Mac's side: an unknown version is turned away; version 1 (the 4.4.0 page) still pairs
-await mac({ version: '4.5.1', web: web451 });
+await mac({ version: NEXT, web: webNext });
 await until(async () => ((await look()).link === 'ready' ? look() : null), 12000);
 const raw = await page.evaluate(() => new Promise((resolve) => {
   const ws = new WebSocket(`ws://${location.host}/ws`);
@@ -250,7 +255,7 @@ const raw = await page.evaluate(() => new Promise((resolve) => {
 }));
 const hello = raw.got.find((m) => m.t === 'hello') || {};
 const fail = raw.got.find((m) => m.t === 'auth_fail') || {};
-check('hello carries the protocol version: v 2, vmin 1, next to the app version', hello.v === 2 && hello.vmin === 1 && hello.ver === '4.5.1', JSON.stringify(hello));
+check('hello carries the protocol version: v 2, vmin 1, next to the app version', hello.v === 2 && hello.vmin === 1 && hello.ver === NEXT, JSON.stringify(hello));
 check('a client speaking version 9: auth_fail "protocol" (v 2, vmin 1), then close 4426',
   fail.reason === 'protocol' && fail.v === 2 && fail.vmin === 1 && raw.code === 4426, JSON.stringify(raw));
 check('the Mac logs it', /protocol version 9 from .* not accepted \(this Mac: 1–2\)/.test(server.log()), server.log().slice(-400));
