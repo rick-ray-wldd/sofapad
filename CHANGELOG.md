@@ -2,6 +2,20 @@
 
 [README](README.md) · [繁體中文 README](README.zh-TW.md) · Development records (Chinese): [`process/`](process/)
 
+## 4.5.1 (2026-11-02)
+
+**Signed with a Developer ID and notarized.** The release app is signed with the project's Developer ID Application
+certificate (team 9B5Z3H3KLW), every part from the inside out (Sparkle's XPC services, Autoupdate and Updater.app, the
+framework, then the app), with the hardened runtime and a secure timestamp. Apple's notary service accepted it and the
+ticket is stapled to the app, so Gatekeeper lets a downloaded copy open after one "Open" click, also offline. macOS's
+privacy settings now know SofaPad by its team and bundle id instead of the hash of its code: the Accessibility
+permission has to be given once more after the update from 4.5.0 or older, and later updates keep it. The EdDSA key
+and the feed are unchanged, so 4.5.0 updates itself to 4.5.1. No change to the app, the page or the protocol.
+
+Docs: the release notes, the README (both languages) and `docs/INSTALL.md` say how a notarized release opens and when
+the permission is needed again; `docs/RELEASING.md` §3 is how the release was made, including the Keychain prompt the
+first time `codesign` uses the Developer ID key.
+
 ## 4.5.0 (2026-11-01)
 
 **SofaPad updates itself**, with Sparkle 2.10.0 (MIT, the one dependency, built in by SwiftPM and pinned in

@@ -15,6 +15,10 @@
 //     --video: a screen recording of the update window and the relaunch, next to the phone, in dist/sofa12/
 //     --video-only: the first part alone (the update and the phone following), recorded; its results go to
 //       update-e2e-video.json and its pictures to dist/sofa12/shots, so a full run's evidence stays as it is
+//   node tools/sofa12-update-e2e.mjs --new-identity "Developer ID Application: … (TEAMID)"
+//     the fake 4.5.1 is signed with that identity (hardened runtime, secure timestamp) instead of ad-hoc, and only the
+//     first part runs: an ad-hoc 4.5.0, like the one released, updates itself to a Developer ID 4.5.1 (SOFA-451).
+//     Its results go to design/evidence/sofa451/update-e2e-devid.json, its pictures to dist/sofa451/shots
 //   Every command and wait has a time limit, and the whole run stops after 12 minutes (exit 3, with what it had).
 import { chromium } from 'playwright-core';
 import { execFileSync, spawn } from 'node:child_process';
@@ -28,6 +32,8 @@ import { startScreencast } from './screencast.mjs';
 
 const VIDEO_ONLY = process.argv.includes('--video-only');
 const VIDEO = VIDEO_ONLY || process.argv.includes('--video');
+const NEW_IDENTITY = process.argv.includes('--new-identity') ? process.argv[process.argv.indexOf('--new-identity') + 1] || '' : '';
+const PART1_ONLY = VIDEO_ONLY || !!NEW_IDENTITY;
 const E2E = join(ROOT, 'dist/update-test');
 const FEED = join(E2E, 'feed');
 const INSTALLED = join(E2E, 'Applications/SofaPad.app');
@@ -36,9 +42,9 @@ const BUNDLE = 'io.github.rick-ray-wldd.sofapad.update-test';
 const LOG = join(homedir(), 'Library/Logs', BUNDLE + '.log');
 const SPARKLE = join(ROOT, 'mac/.build/artifacts/sparkle/Sparkle/bin');
 const AX = join(E2E, 'ax');
-const shotsDir = join(ROOT, VIDEO_ONLY ? 'dist/sofa12/shots' : 'design/screenshots/sofa12');
-const evDir = join(ROOT, 'design/evidence/sofa12');
-const evFile = join(evDir, VIDEO_ONLY ? 'update-e2e-video.json' : 'update-e2e.json');
+const shotsDir = join(ROOT, NEW_IDENTITY ? 'dist/sofa451/shots' : VIDEO_ONLY ? 'dist/sofa12/shots' : 'design/screenshots/sofa12');
+const evDir = join(ROOT, NEW_IDENTITY ? 'design/evidence/sofa451' : 'design/evidence/sofa12');
+const evFile = join(evDir, NEW_IDENTITY ? 'update-e2e-devid.json' : VIDEO_ONLY ? 'update-e2e-video.json' : 'update-e2e.json');
 const videoDir = join(ROOT, 'dist/sofa12');
 const FEED_PORT = 41000 + Math.floor(Math.random() * 1000);
 const APP_PORT = 42000 + Math.floor(Math.random() * 1000);
@@ -104,9 +110,9 @@ const KEY = join(E2E, 'test-ed-key.txt');   // the seed, base64: sign_update's -
 writeFileSync(KEY, Buffer.from(privateKey.export({ format: 'jwk' }).d, 'base64url').toString('base64'), { mode: 0o600 });
 const sign = (args) => sh(join(SPARKLE, 'sign_update'), ['--ed-key-file', '-', ...args], { input: readFileSync(KEY), stdio: ['pipe', 'pipe', 'pipe'] }).trim();
 
-function build(version) {
+function build(version, identity = '') {
   const app = join(E2E, `build-${version}`, 'SofaPad.app');
-  const out = sh(join(ROOT, 'tools/build-app.sh'), [], { env: { ...process.env, SOFAPAD_CONFIG: 'debug', SOFAPAD_APP: app,
+  const out = sh(join(ROOT, 'tools/build-app.sh'), identity ? ['--identity', identity] : [], { env: { ...process.env, SOFAPAD_CONFIG: 'debug', SOFAPAD_APP: app,
     SOFAPAD_BUNDLE_ID: BUNDLE, SOFAPAD_VERSION: version, SOFAPAD_ED_KEY: PUB }, timeout: 600000 });
   writeFileSync(join(E2E, 'logs', `build-${version}.txt`), out);
   return app;
@@ -114,7 +120,7 @@ function build(version) {
 const plist = (app, key) => sh('/usr/libexec/PlistBuddy', ['-c', `Print :${key}`, join(app, 'Contents/Info.plist')]).trim();
 const app450 = build(OLD);
 await sleep(1100);   // the build number is to the second
-const app451 = build(NEW);
+const app451 = build(NEW, NEW_IDENTITY);
 step(`built ${OLD} (${plist(app450, 'CFBundleVersion')}) and ${NEW} (${plist(app451, 'CFBundleVersion')})`);
 check('the two test builds carry the test key and their versions', plist(app450, 'SUPublicEDKey') === PUB && plist(app451, 'CFBundleShortVersionString') === NEW
   && Number(plist(app451, 'CFBundleVersion')) > Number(plist(app450, 'CFBundleVersion')));
@@ -274,9 +280,12 @@ async function stopRecording() {
 const RUN_LIMIT_MS = 12 * 60 * 1000;
 function writeEvidence(extra = {}) {
   const passed = results.filter((r) => r.ok).length;
-  // the repository is public: the app's log names its folder, which is under the home folder
-  writeFileSync(evFile, JSON.stringify({ when: new Date().toISOString(), passed, total: results.length, ...extra, results, ...evidence,
-    requests, phoneNavigations: navs }, null, 2).replaceAll(homedir(), '~'));
+  // the repository is public: the app's log names its folder, which is under the home folder; the identity's
+  // name stays out too (the team id is enough)
+  let json = JSON.stringify({ when: new Date().toISOString(), passed, total: results.length, ...extra, results, ...evidence,
+    requests, phoneNavigations: navs }, null, 2).replaceAll(homedir(), '~');
+  if (NEW_IDENTITY) json = json.replaceAll(NEW_IDENTITY, 'the --new-identity');
+  writeFileSync(evFile, json);
   return passed;
 }
 setTimeout(() => {
@@ -293,6 +302,12 @@ setTimeout(() => {
 run: try {
   // ===== 1. 4.5.0 finds 4.5.1, shows the notes, installs it and opens again as 4.5.1 =====
   install(app450);
+  const signature = (app) => {
+    const d = sh('/bin/sh', ['-c', 'codesign -dv --verbose=2 "$0" 2>&1', app]);
+    return { signature: /^Signature=(.*)$/m.exec(d)?.[1] || (/^Authority=Developer ID Application/m.test(d) ? 'Developer ID Application' : ''),
+      team: /^TeamIdentifier=(.*)$/m.exec(d)?.[1] || '', runtime: /flags=.*\(.*runtime.*\)/.test(d), timestamp: /^Timestamp=/m.test(d) };
+  };
+  if (NEW_IDENTITY) evidence.signatureBefore = signature(INSTALLED);
   testDefaults();
   if (VIDEO) await startRecording();
   const pid450 = await launch();
@@ -351,6 +366,14 @@ run: try {
   const signedOK = (() => { try { execFileSync('codesign', ['--verify', '--deep', '--strict', INSTALLED], { stdio: 'ignore' }); return true; } catch { return false; } })();
   check('the app in its place is now 4.5.1, validly signed', installedVersion === NEW && signedOK, `${installedVersion}, signature ${signedOK}`);
   check('the running process is the app in that place', sh('ps', ['-o', 'comm=', '-p', String(pid451)]).trim() === join(INSTALLED, 'Contents/MacOS/SofaPad'));
+  if (NEW_IDENTITY) {
+    const team = /\(([A-Z0-9]{10})\)$/.exec(NEW_IDENTITY)?.[1];
+    evidence.signatureAfter = signature(INSTALLED);
+    const b = evidence.signatureBefore, a = evidence.signatureAfter;
+    check(`${OLD} was signed ad-hoc and ${NEW} in its place is signed with the Developer ID (team ${team}, hardened runtime, timestamp)`,
+      b.signature === 'adhoc' && b.team === 'not set' && a.signature === 'Developer ID Application' && a.team === team && a.runtime && a.timestamp,
+      JSON.stringify({ before: b, after: a }));
+  }
   await until(() => /版本 4\.5\.1/.test(log()), 10000);
   const L = log();
   check('its log: found 4.5.1, installed it, started as 4.5.1', /有新版本：4\.5\.1/.test(L) && /安裝新版本 4\.5\.1，接著重新開啟 SofaPad/.test(L) && /版本 4\.5\.1（建置/.test(L), L.slice(-1200));
@@ -375,7 +398,7 @@ run: try {
   await sleep(2500);
   if (VIDEO) await stopRecording();
   await quitApp();
-  if (VIDEO_ONLY) break run;
+  if (PART1_ONLY) break run;
 
   // ===== 2. a phone is connected when the update is found: nothing takes the keys, it waits in the menu =====
   install(app450);

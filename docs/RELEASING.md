@@ -67,8 +67,8 @@ themselves work: Sparkle takes the quarantine flag off what it installs.
 ## 3. Phase 2: Developer ID and notarization (owner)
 
 With a Developer ID, macOS opens SofaPad without "Open Anyway", and the Accessibility permission stays across updates
-(macOS then knows the app by its team, not its hash). The script is ready for it; these steps need the owner,
-because they involve Apple's account and certificates:
+(macOS then knows the app by its team, not its hash). Releases are made this way from 4.5.1 (team `9B5Z3H3KLW`). These
+steps need the owner, because they involve Apple's account and certificates:
 
 1. Join the Apple Developer Program (paid, yearly).
 2. Make a **Developer ID Application** certificate: Xcode → Settings → Accounts → (your team) → Manage
@@ -78,7 +78,10 @@ because they involve Apple's account and certificates:
    (appleid.apple.com → Sign-In and Security → App-Specific Passwords):
    `xcrun notarytool store-credentials sofapad-notary --apple-id <Apple ID> --team-id <TEAMID>` (it asks for the
    password and keeps it in the Keychain; the script only passes the profile name and never sees the password).
-5. Release with both:
+5. The first time `codesign` uses the Developer ID key, macOS asks: "codesign wants to access key … in your
+   keychain". Enter the Mac's login password and click **Always Allow** (with Allow it asks again for each of the six
+   signatures of a build). Until then `codesign` waits, and so does the build.
+6. Release with both:
 
    ```bash
    tools/release.sh 4.5.1 --identity "Developer ID Application: <Name> (<TEAMID>)" --notary-profile sofapad-notary
@@ -87,10 +90,14 @@ because they involve Apple's account and certificates:
    It signs every part (Sparkle's helpers first) with the hardened runtime and a secure timestamp, sends the app to
    Apple's notary service, waits, staples the ticket, checks it with `spctl`, then packages and signs the update as
    before. The EdDSA key stays the same, so apps signed ad-hoc update to the Developer ID one normally.
-6. After that first Developer ID update, people give the Accessibility permission one last time; from then on it
+7. After that first Developer ID update, people give the Accessibility permission one last time; from then on it
    stays.
 
-**第二階段（Ray 要做的事）**：(1) 加入 Apple Developer Program（付費、每年）。(2) 在 Xcode → 設定 → Accounts → Manage Certificates 按 ＋ 建立「Developer ID Application」憑證（會存進登入鑰匙圈）。(3) 用 `security find-identity -v -p codesigning` 看憑證全名。(4) 在 appleid.apple.com 建一組 App 專用密碼，執行 `xcrun notarytool store-credentials sofapad-notary --apple-id <Apple ID> --team-id <TEAMID>`，照提示輸入密碼（存在鑰匙圈，發布腳本只用設定檔名稱，看不到密碼）。(5) 之後發布改用 `tools/release.sh <版本> --identity "Developer ID Application: <名字> (<TEAMID>)" --notary-profile sofapad-notary`。做完以後，下載的 SofaPad 第一次打開不會被擋，更新後輔助使用權限也不會再跑掉（換成 Developer ID 的那一次更新後要再開一次）。
+`node tools/sofa12-update-e2e.mjs --new-identity "Developer ID Application: <Name> (<TEAMID>)"` checks the step from
+ad-hoc to Developer ID on this Mac: an ad-hoc 4.5.0 test build updates itself to a 4.5.1 test build signed with the
+identity (feed on 127.0.0.1, throwaway EdDSA key).
+
+**第二階段（Ray 要做的事）**：(1) 加入 Apple Developer Program（付費、每年）。(2) 在 Xcode → 設定 → Accounts → Manage Certificates 按 ＋ 建立「Developer ID Application」憑證（會存進登入鑰匙圈）。(3) 用 `security find-identity -v -p codesigning` 看憑證全名。(4) 在 appleid.apple.com 建一組 App 專用密碼，執行 `xcrun notarytool store-credentials sofapad-notary --apple-id <Apple ID> --team-id <TEAMID>`，照提示輸入密碼（存在鑰匙圈，發布腳本只用設定檔名稱，看不到密碼）。(5) 第一次用 Developer ID 簽章時，macOS 會問「codesign 想要取用鑰匙圈中的金鑰」：輸入這台 Mac 的登入密碼，按「永遠允許」（只按「允許」的話，每次 build 會問 6 次）。(6) 之後發布改用 `tools/release.sh <版本> --identity "Developer ID Application: <名字> (<TEAMID>)" --notary-profile sofapad-notary`。做完以後，下載的 SofaPad 第一次打開不會被擋，更新後輔助使用權限也不會再跑掉（換成 Developer ID 的那一次更新後要再開一次）。
 
 ## 4. Testing updates without publishing
 
