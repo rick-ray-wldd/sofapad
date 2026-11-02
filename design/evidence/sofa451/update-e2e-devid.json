@@ -1,0 +1,235 @@
+{
+  "when": "2026-11-02T12:24:58.868Z",
+  "passed": 20,
+  "total": 20,
+  "results": [
+    {
+      "name": "the two test builds carry the test key and their versions",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the 4.5.1 zip and its feed are signed with the test key (checked with the public key alone)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "at launch, 4.5.0 checks the feed and offers 4.5.1 in its update window",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the window says 4.5.1 is available and that this is 4.5.0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "it shows the release notes (English on this Mac)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sparkle did not offer to install updates silently (SUAllowsAutomaticUpdates is off)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the feed was read from 127.0.0.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the phone is paired with 4.5.0: page 4.5.0 and Mac app 4.5.0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "it downloads 4.5.1 and checks it: \"Install and Relaunch\"",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the zip was downloaded from 127.0.0.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "4.5.0 quit and the app opened again by itself",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the app in its place is now 4.5.1, validly signed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the running process is the app in that place",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "4.5.0 was signed ad-hoc and 4.5.1 in its place is signed with the Developer ID (team 9B5Z3H3KLW, hardened runtime, timestamp)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "its log: found 4.5.1, installed it, started as 4.5.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "4.5.1 checks at its launch too, and is up to date",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the phone page reloaded itself once and says so",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the phone shows the same version as the Mac: page 4.5.1, Mac app 4.5.1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the menu bar says 4.5.1 and has 檢查更新…",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no errors on the phone page",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "feedPort": 41425,
+  "appPort": 42743,
+  "steps": [
+    {
+      "t": "11.1",
+      "what": "built 4.5.0 (20261102202435) and 4.5.1 (20261102202438)"
+    },
+    {
+      "t": "11.4",
+      "what": "packaged 4.5.1: 1626685 bytes, feed signed"
+    },
+    {
+      "t": "12.3",
+      "what": "opened 4.5.0 (pid 37852)"
+    },
+    {
+      "t": "12.7",
+      "what": "the update window is up"
+    },
+    {
+      "t": "15.2",
+      "what": "pressed Install Update"
+    },
+    {
+      "t": "17.2",
+      "what": "pressed Install and Relaunch"
+    },
+    {
+      "t": "17.4",
+      "what": "4.5.0 quit"
+    },
+    {
+      "t": "17.5",
+      "what": "opened again (pid 38097)"
+    },
+    {
+      "t": "18.3",
+      "what": "the phone page reloaded itself"
+    }
+  ],
+  "signatureBefore": {
+    "signature": "adhoc",
+    "team": "not set",
+    "runtime": false,
+    "timestamp": false
+  },
+  "updateWindow": {
+    "frame": {
+      "h": 398,
+      "w": 544,
+      "x": 1014,
+      "y": 175
+    },
+    "texts": [
+      "A new version of SofaPad is available!",
+      "SofaPad 4.5.1 is now available—you have 4.5.0. Would you like to download it now?",
+      "What's new\n•\tA test build for the update test, nothing new in it. It shows that SofaPad 4.5.0 finds this version, shows these notes, downloads it, checks its EdDSA signature, puts it in its own place and opens again as 4.5.1.\n•\tThe phone page sees the new version and reloads itself."
+    ],
+    "buttons": [
+      "Remind Me Later",
+      "Install Update",
+      "Skip This Version",
+      null,
+      null,
+      null
+    ]
+  },
+  "readyWindow": {
+    "frame": {
+      "h": 141,
+      "w": 400,
+      "x": 1086,
+      "y": 307
+    },
+    "texts": [
+      "Ready to Install",
+      "Updating SofaPad"
+    ]
+  },
+  "relaunchPressError": "the app quit before answering",
+  "signatureAfter": {
+    "signature": "Developer ID Application",
+    "team": "9B5Z3H3KLW",
+    "runtime": true,
+    "timestamp": true
+  },
+  "menuAfter": [
+    "SofaPad 4.5.1（建置 2026-11-02 20:24）",
+    "檢查更新…",
+    "已連線：iPhone",
+    "",
+    "用 iPhone 掃描（QR code）…",
+    "拷貝網址 http://127.0.0.1:42743/",
+    "配對碼：462934",
+    "配對新手機（產生新配對碼）",
+    "忘記所有已配對手機",
+    "允許 Tailscale 裝置（100.64.0.0/10，仍要配對）",
+    "進階",
+    "",
+    "結束 SofaPad"
+  ],
+  "requests": [
+    {
+      "t": "12.4",
+      "path": "/appcast.xml",
+      "ua": "SofaPad/4.5.0"
+    },
+    {
+      "t": "15.3",
+      "path": "/SofaPad-4.5.1-macOS.zip",
+      "ua": "SofaPad/4.5.0"
+    },
+    {
+      "t": "18.2",
+      "path": "/appcast.xml",
+      "ua": "SofaPad/4.5.1"
+    }
+  ],
+  "phoneNavigations": [
+    {
+      "t": "12.9",
+      "url": "http://127.0.0.1:42743/"
+    },
+    {
+      "t": "18.0",
+      "url": "http://127.0.0.1:42743/?follow=1%7E4.5.1%2B2026-11-02+20%3A24"
+    }
+  ]
+}

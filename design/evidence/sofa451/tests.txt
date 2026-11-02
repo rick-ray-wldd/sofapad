@@ -1,0 +1,57 @@
+SOFA-451 (4.5.1: Developer ID signature and Apple notarization; no change to the app, the page or the protocol),
+2026-11-02, this Mac (macOS 27.0.1). Exit codes in brackets. Full outputs: verify.txt, release-log.txt,
+update-e2e-devid.json.
+
+Release script: tools/release.sh 4.5.1 --identity "Developer ID Application: <name> (9B5Z3H3KLW)" --notary-profile sofapad-notary
+  first run, 19:44 (1447e5d)            [1] stopped in its tests: tools/sofa12-follow.mjs had the "new" version 4.5.1
+                                            written into it, the source's own now (I-59); nothing built, signed or sent
+  second run, 19:46-20:19 (15d8986)     [0] swift test 88/88, JS 111/111, v2-browser 41/41, sofa12-follow 30/30;
+                                            built and signed inside out (Installer.xpc, Downloader.xpc, Autoupdate,
+                                            Updater.app, Sparkle.framework, SofaPad.app) with the Developer ID, hardened
+                                            runtime, secure timestamp; notarization submission
+                                            c417f719-3e88-4a19-8f02-b735df57ca56: Accepted ("Ready for distribution",
+                                            no issues); stapled, stapler validate, spctl accepted (Notarized Developer
+                                            ID); packaged; zip and appcast.xml signed with the Keychain EdDSA key and
+                                            verified with tools/sparkle-public-key.txt alone; stopped before publishing
+  dist/release/SofaPad-4.5.1-macOS.zip  1,487,317 bytes,
+                                        sha256 6dcb08b1c651e210f219200306565d4c0a1f4d13d57f50a3ffdc1589df67265f
+
+The release as shipped (the app unpacked from the zip; verify.txt)
+  same app as notarized                  cdhash ca965bb0a6215433d03198764faef497cdb44d96 in the zip and in dist/
+  codesign -dv --verbose=4, six parts    each: Authority=Developer ID Application (team 9B5Z3H3KLW), flags runtime,
+                                         Timestamp; the app: Notarization Ticket=stapled
+  codesign --verify --strict, each part  [0] valid on disk, satisfies its Designated Requirement
+  codesign --verify --deep --strict      [0]
+  entitlements                           the app none; Downloader.xpc Sparkle's own (kept, --preserve-metadata)
+  designated requirement                 identifier "io.github.rick-ray-wldd.sofapad" and anchor apple generic and
+                                         … certificate leaf[subject.OU] = "9B5Z3H3KLW" (what TCC remembers)
+  spctl -a -vv -t execute                [0] accepted, source=Notarized Developer ID
+  xcrun stapler validate                 [0] The validate action worked!
+  notarytool info / log                  Accepted, statusSummary "Ready for distribution", issues null, 24 ticket
+                                         entries (every executable, arm64 and x86_64)
+  EdDSA (appcast.mjs verify, public key) [0] ✓ feed signed with the key, archive signed with the key, length right,
+                                         notes in English and Chinese; SUPublicEDKey in the app = the repository's
+
+A fresh user (verify.txt sections 6 and 7)
+  the zip with a browser's quarantine flag (0083;…;Safari;…), unpacked with ditto -x -k (the flag on every file)
+  spctl -a -vv -t execute                [0] accepted, source=Notarized Developer ID
+  syspolicy_check distribution           [0] "App passed all pre-distribution checks and is ready for distribution."
+  xcrun stapler validate                 [0]
+  open (as a double-click)               macOS asks once: "“SofaPad” is an app downloaded from the Internet. Are you
+                                         sure you want to open it? … Apple checked it for malicious software and none
+                                         was detected." [Cancel] [Open] (design/screenshots/sofa451/
+                                         gatekeeper-first-open.png). Not "Not Opened", no Open Anyway. Cancel pressed,
+                                         so this Mac's own SofaPad settings were not touched.
+  (Archive Utility, opened from a script, did not unpack the zip within 45 s, twice, and was closed: ditto does
+  what it does with the quarantine flag.)
+
+The update from the released kind of 4.5.0 (ad-hoc) to a Developer ID 4.5.1 (update-e2e-devid.json)
+  node tools/sofa12-update-e2e.mjs --new-identity "Developer ID Application: <name> (9B5Z3H3KLW)"
+  (test builds with their own bundle id, a throwaway EdDSA key, the feed on 127.0.0.1)
+  20:23                                  19/20 [1]: everything passed; the log check read the log before the new app
+                                         had written its first line (I-60; the saved log has all three lines)
+  20:24                                  20/20 [0]: 4.5.0 (Signature=adhoc) finds 4.5.1, shows its notes, downloads
+                                         it and checks the EdDSA signature, installs it and opens again; the app in
+                                         its place is signed with the Developer ID (team 9B5Z3H3KLW, hardened
+                                         runtime, timestamp) and validly signed; it checks the feed again and is up
+                                         to date; the phone page reloads itself once and shows 4.5.1 like the Mac

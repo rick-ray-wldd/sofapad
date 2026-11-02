@@ -16,6 +16,11 @@ Docs: the release notes, the README (both languages) and `docs/INSTALL.md` say h
 the permission is needed again; `docs/RELEASING.md` §3 is how the release was made, including the Keychain prompt the
 first time `codesign` uses the Developer ID key.
 
+Tests: `tools/sofa12-update-e2e.mjs --new-identity "Developer ID Application: …"` signs the test 4.5.1 with that
+identity and runs the update part alone: an ad-hoc 4.5.0 updates itself to a Developer ID 4.5.1 (20/20), and the test
+now waits for the new app's own first log line. `tools/sofa12-follow.mjs` updates the Mac to the next two versions
+after the source's own, not to a fixed 4.5.1 and 4.5.2.
+
 ## 4.5.0 (2026-11-01)
 
 **SofaPad updates itself**, with Sparkle 2.10.0 (MIT, the one dependency, built in by SwiftPM and pinned in

@@ -374,7 +374,8 @@ run: try {
       b.signature === 'adhoc' && b.team === 'not set' && a.signature === 'Developer ID Application' && a.team === team && a.runtime && a.timestamp,
       JSON.stringify({ before: b, after: a }));
   }
-  await until(() => /版本 4\.5\.1/.test(log()), 10000);
+  // the new app's own first line ("安裝新版本 4.5.1", written by the old one, has the same words in it)
+  await until(() => /版本 4\.5\.1（建置/.test(log()), 10000);
   const L = log();
   check('its log: found 4.5.1, installed it, started as 4.5.1', /有新版本：4\.5\.1/.test(L) && /安裝新版本 4\.5\.1，接著重新開啟 SofaPad/.test(L) && /版本 4\.5\.1（建置/.test(L), L.slice(-1200));
   const upToDate = await until(() => /檢查更新：已是最新版 4\.5\.1/.test(log()), 20000);

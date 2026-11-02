@@ -325,3 +325,15 @@
 | S12-M10 | commit 19afbef；release.sh 的「有沒有 commit」改成在測試前判斷（0bfbcc1）；`tools/release.sh 4.5.0`：測試、build、ad-hoc 簽章、打包、用鑰匙圈的金鑰簽 zip 和 appcast、用公鑰驗過，印出 gh 指令；self-test 31 PASS＋2 略過（鎖定） | 20:38–20:45 | dist/release/（不進 git）、tests.txt |
 | S12-M11 | 公開前檢查：56 個檔案、3,498 行、zip 116 個檔案逐位元組掃；私鑰在 repo、整個 git 歷史、zip、文件裡都是 0 | 20:45–20:50 | docs/PUBLIC-CHECK.md「4.5」 |
 | S12-M12 | 端對端更新測試（測試簽章）：20:52 開始，20:53 前 27 項全過（找到、說明、下載驗證、換掉自己重新開啟成 4.5.1、手機跟著重載；手機連線中只放在選單；竄改的 zip 和 feed 都拒絕），之後收尾卡住；11/02 01:30 總控發現，01:32 用檢查器放開，不重跑：28/28，EXIT 0（I-57）。修好卡住的地方、每一步加時限、整個測試最多 12 分鐘；錄影改用 ffmpeg；只重跑第 1 段錄影，01:44 20/20，影片乾淨 | 20:52–01:50 | design/evidence/sofa12/update-e2e.json、update-e2e-video.json、tests.txt、I-57 |
+
+## SOFA-451（SofaPad 4.5.1：Developer ID 簽章＋Apple 公證，本機做到可以發布為止，2026-11-02）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S451-M0 | 收到派工（Ray：「讓正式發佈的時候所有人一下載就可以直接使用」；憑證和 notarytool 設定 Ray 已做好） | 19:30 | process/dispatch/DISPATCH-SOFA-451.md |
+| S451-M1 | 試簽丟棄的檔案：鑰匙圈要登入密碼（I-58），回報總控；Ray 按「永遠允許」，再簽不會再問 | 19:36–19:43 | I-58 |
+| S451-M2 | 發布說明 4.5.1（中英）、CHANGELOG、README 中英、INSTALL、RELEASING 第 3 節、版本 4.5.1；端對端測試加 `--new-identity`；commit 1447e5d | 19:38–19:44 | docs/release/4.5.1.md |
+| S451-M3 | release.sh 第一次停在測試（I-59），修好 commit 15d8986；第二次全部完成：測試全過、Developer ID 簽章、公證 Accepted（c417f719-…）、staple、spctl、打包、EdDSA；停在發布前 | 19:44–20:19 | design/evidence/sofa451/release-log.txt |
+| S451-M4 | 驗證 zip 裡的 App：codesign（6 個部分）、spctl、stapler、notarytool log、EdDSA；新使用者：quarantine＋spctl＋syspolicy_check，雙擊只問一次「打開」 | 20:19–20:22 | design/evidence/sofa451/verify.txt、design/screenshots/sofa451/ |
+| S451-M5 | 臨時簽章的 4.5.0 自己更新到 Developer ID 的 4.5.1（測試版）：19/20（I-60，測試時序），修好 20/20 | 20:23–20:25 | design/evidence/sofa451/update-e2e-devid.json |
+| S451-M6 | 公開前檢查；交件給總控 | 20:25– | docs/PUBLIC-CHECK.md「4.5.1」 |

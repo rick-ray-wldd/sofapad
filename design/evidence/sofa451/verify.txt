@@ -1,0 +1,459 @@
+SOFA-451 (SofaPad 4.5.1): what was checked on the release, and what each check printed.
+The app checked is the one in dist/release/SofaPad-4.5.1-macOS.zip, unpacked (<unzipped>); dist/SofaPad.app is the
+app the script signed, notarized and stapled, and has the same cdhash. In this copy the certificate holder's name is
+written <name> (the signature itself carries it, as every Developer ID signature does: codesign -dv shows it); the team
+id is as printed. Paths are relative to the repository. Apple's HTTP exchange in stapler's -v output is left out.
+
+SOFA-451 verification, 2026-11-02 20:19:46 CST, macOS 27.0.1 (26A434)
+
+===== 0. the package
+
+$ shasum -a 256 dist/release/SofaPad-4.5.1-macOS.zip
+6dcb08b1c651e210f219200306565d4c0a1f4d13d57f50a3ffdc1589df67265f  dist/release/SofaPad-4.5.1-macOS.zip
+[exit 0]
+
+$ shasum -a 256 -c SofaPad-4.5.1-macOS.zip.sha256
+SofaPad-4.5.1-macOS.zip: OK
+[exit 0]
+
+$ /usr/libexec/PlistBuddy -c Print :CFBundleShortVersionString <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Info.plist
+4.5.1
+[exit 0]
+
+$ /usr/libexec/PlistBuddy -c Print :CFBundleIdentifier <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Info.plist
+io.github.rick-ray-wldd.sofapad
+[exit 0]
+
+the app in the zip is the app that was notarized and stapled (same cdhash as dist/SofaPad.app):
+  zip: CDHash=ca965bb0a6215433d03198764faef497cdb44d96
+  dist: CDHash=ca965bb0a6215433d03198764faef497cdb44d96
+  same
+
+===== 1. codesign: the app and every Sparkle part, inside out
+
+----- SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc
+
+$ codesign -dv --verbose=4 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer
+Identifier=org.sparkle-project.InstallerLauncher
+Format=bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20500 size=433 flags=0x10000(runtime) hashes=6+3 location=embedded
+VersionPlatform=1
+VersionMin=786432
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=0d6e6643c8e5de23c011f7e459c8ec277145bf34
+CandidateCDHashFull sha256=0d6e6643c8e5de23c011f7e459c8ec277145bf340f3f58620b18ddbc06f3b711
+Hash choices=sha256
+CMSDigest=0d6e6643c8e5de23c011f7e459c8ec277145bf340f3f58620b18ddbc06f3b711
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=49152
+Executable Segment flags=0x1
+Page size=16384
+CDHash=0d6e6643c8e5de23c011f7e459c8ec277145bf34
+Signature size=8979
+Authority=Developer ID Application: <name> (9B5Z3H3KLW)
+Authority=Developer ID Certification Authority
+Authority=Apple Root CA
+Timestamp=Nov 2, 2026 at 7:48:07 PM
+Info.plist entries=22
+TeamIdentifier=9B5Z3H3KLW
+Runtime Version=26.5.0
+Sealed Resources version=2 rules=13 files=0
+Internal requirements count=1 size=200
+Total signatures=1
+Chosen signature=1
+[exit 0]
+
+$ codesign --verify --strict --verbose=2 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc: valid on disk
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc: satisfies its Designated Requirement
+[exit 0]
+
+----- SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc
+
+$ codesign -dv --verbose=4 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader
+Identifier=org.sparkle-project.DownloaderService
+Format=bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20500 size=529 flags=0x10000(runtime) hashes=5+7 location=embedded
+VersionPlatform=1
+VersionMin=786432
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=8b2d2dbd697e3e2380f28899ed06b97d126f9d75
+CandidateCDHashFull sha256=8b2d2dbd697e3e2380f28899ed06b97d126f9d75e6323cea963ed95922ef1e23
+Hash choices=sha256
+CMSDigest=8b2d2dbd697e3e2380f28899ed06b97d126f9d75e6323cea963ed95922ef1e23
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=32768
+Executable Segment flags=0x1
+Page size=16384
+CDHash=8b2d2dbd697e3e2380f28899ed06b97d126f9d75
+Signature size=8978
+Authority=Developer ID Application: <name> (9B5Z3H3KLW)
+Authority=Developer ID Certification Authority
+Authority=Apple Root CA
+Timestamp=Nov 2, 2026 at 7:48:08 PM
+Info.plist entries=23
+TeamIdentifier=9B5Z3H3KLW
+Runtime Version=26.5.0
+Sealed Resources version=2 rules=13 files=0
+Internal requirements count=1 size=200
+Total signatures=1
+Chosen signature=1
+[exit 0]
+
+$ codesign --verify --strict --verbose=2 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc: valid on disk
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc: satisfies its Designated Requirement
+[exit 0]
+
+----- SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate
+
+$ codesign -dv --verbose=4 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate
+Identifier=Autoupdate
+Format=Mach-O universal (x86_64 arm64)
+CodeDirectory v=20500 size=822 flags=0x10000(runtime) hashes=20+2 location=embedded
+VersionPlatform=1
+VersionMin=786432
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=7ee0f0efbd275a0d962449abc13909b3d462ac7d
+CandidateCDHashFull sha256=7ee0f0efbd275a0d962449abc13909b3d462ac7db136fd17422c30073e877561
+Hash choices=sha256
+CMSDigest=7ee0f0efbd275a0d962449abc13909b3d462ac7db136fd17422c30073e877561
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=229376
+Executable Segment flags=0x1
+Page size=16384
+CDHash=7ee0f0efbd275a0d962449abc13909b3d462ac7d
+Signature size=8978
+Authority=Developer ID Application: <name> (9B5Z3H3KLW)
+Authority=Developer ID Certification Authority
+Authority=Apple Root CA
+Timestamp=Nov 2, 2026 at 7:48:09 PM
+Info.plist=not bound
+TeamIdentifier=9B5Z3H3KLW
+Runtime Version=26.5.0
+Sealed Resources=none
+Internal requirements count=1 size=172
+Total signatures=1
+Chosen signature=1
+[exit 0]
+
+$ codesign --verify --strict --verbose=2 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate: valid on disk
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate: satisfies its Designated Requirement
+[exit 0]
+
+----- SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app
+
+$ codesign -dv --verbose=4 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater
+Identifier=org.sparkle-project.Sparkle.Updater
+Format=app bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20500 size=527 flags=0x10000(runtime) hashes=9+3 location=embedded
+VersionPlatform=1
+VersionMin=786432
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=dcf962e25253efea811defa103d4be6ceaa4f05f
+CandidateCDHashFull sha256=dcf962e25253efea811defa103d4be6ceaa4f05f3ad878f4304e9929debdd310
+Hash choices=sha256
+CMSDigest=dcf962e25253efea811defa103d4be6ceaa4f05f3ad878f4304e9929debdd310
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=81920
+Executable Segment flags=0x1
+Page size=16384
+CDHash=dcf962e25253efea811defa103d4be6ceaa4f05f
+Signature size=8978
+Authority=Developer ID Application: <name> (9B5Z3H3KLW)
+Authority=Developer ID Certification Authority
+Authority=Apple Root CA
+Timestamp=Nov 2, 2026 at 7:48:10 PM
+Info.plist entries=24
+TeamIdentifier=9B5Z3H3KLW
+Runtime Version=26.5.0
+Sealed Resources version=2 rules=13 files=0
+Internal requirements count=1 size=196
+Total signatures=1
+Chosen signature=1
+[exit 0]
+
+$ codesign --verify --strict --verbose=2 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app: valid on disk
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app: satisfies its Designated Requirement
+[exit 0]
+
+----- SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework
+
+$ codesign -dv --verbose=4 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Sparkle
+Identifier=org.sparkle-project.Sparkle
+Format=bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20500 size=1127 flags=0x10000(runtime) hashes=28+3 location=embedded
+VersionPlatform=1
+VersionMin=786432
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=76a5a095be84e2c3e975f278145ea14904f05d22
+CandidateCDHashFull sha256=76a5a095be84e2c3e975f278145ea14904f05d228ff5aa7b239d5a8baf128738
+Hash choices=sha256
+CMSDigest=76a5a095be84e2c3e975f278145ea14904f05d228ff5aa7b239d5a8baf128738
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=344064
+Executable Segment flags=0x0
+Page size=16384
+CDHash=76a5a095be84e2c3e975f278145ea14904f05d22
+Signature size=8979
+Authority=Developer ID Application: <name> (9B5Z3H3KLW)
+Authority=Developer ID Certification Authority
+Authority=Apple Root CA
+Timestamp=Nov 2, 2026 at 7:48:10 PM
+Info.plist entries=20
+TeamIdentifier=9B5Z3H3KLW
+Runtime Version=26.5.0
+Sealed Resources version=2 rules=13 files=76
+Internal requirements count=1 size=188
+Total signatures=1
+Chosen signature=1
+[exit 0]
+
+$ codesign --verify --strict --verbose=2 <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework: valid on disk
+<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework: satisfies its Designated Requirement
+[exit 0]
+
+----- SofaPad-4.5.1/SofaPad.app
+
+$ codesign -dv --verbose=4 <unzipped>/SofaPad-4.5.1/SofaPad.app
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/MacOS/SofaPad
+Identifier=io.github.rick-ray-wldd.sofapad
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20500 size=1483 flags=0x10000(runtime) hashes=39+3 location=embedded
+VersionPlatform=1
+VersionMin=851968
+VersionSDK=851968
+Hash type=sha256 size=32
+CandidateCDHash sha256=ca965bb0a6215433d03198764faef497cdb44d96
+CandidateCDHashFull sha256=ca965bb0a6215433d03198764faef497cdb44d9620b6597941e3907ee75e2277
+Hash choices=sha256
+CMSDigest=ca965bb0a6215433d03198764faef497cdb44d9620b6597941e3907ee75e2277
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=442368
+Executable Segment flags=0x1
+Page size=16384
+CDHash=ca965bb0a6215433d03198764faef497cdb44d96
+Signature size=8978
+Authority=Developer ID Application: <name> (9B5Z3H3KLW)
+Authority=Developer ID Certification Authority
+Authority=Apple Root CA
+Timestamp=Nov 2, 2026 at 7:48:11 PM
+Notarization Ticket=stapled
+Info.plist entries=20
+TeamIdentifier=9B5Z3H3KLW
+Runtime Version=13.0.0
+Sealed Resources version=2 rules=13 files=21
+Internal requirements count=1 size=192
+Total signatures=1
+Chosen signature=1
+[exit 0]
+
+$ codesign --verify --strict --verbose=2 <unzipped>/SofaPad-4.5.1/SofaPad.app
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+<unzipped>/SofaPad-4.5.1/SofaPad.app: valid on disk
+<unzipped>/SofaPad-4.5.1/SofaPad.app: satisfies its Designated Requirement
+[exit 0]
+
+----- the whole app, nested code included
+
+$ codesign --verify --deep --strict --verbose=2 <unzipped>/SofaPad-4.5.1/SofaPad.app
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--prepared:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+<unzipped>/SofaPad-4.5.1/SofaPad.app: valid on disk
+<unzipped>/SofaPad-4.5.1/SofaPad.app: satisfies its Designated Requirement
+[exit 0]
+
+----- entitlements (the app has none; Downloader.xpc keeps Sparkle's own)
+
+$ codesign -d --entitlements - <unzipped>/SofaPad-4.5.1/SofaPad.app
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/MacOS/SofaPad
+[exit 0]
+
+$ codesign -d --entitlements - <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader
+[Dict]
+[exit 0]
+
+----- the designated requirement (what macOS's privacy settings remember the app by)
+
+$ codesign -d -r- <unzipped>/SofaPad-4.5.1/SofaPad.app
+Executable=<unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/MacOS/SofaPad
+designated => identifier "io.github.rick-ray-wldd.sofapad" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "9B5Z3H3KLW"
+[exit 0]
+
+===== 2. Gatekeeper (spctl)
+
+$ spctl -a -vv -t execute <unzipped>/SofaPad-4.5.1/SofaPad.app
+<unzipped>/SofaPad-4.5.1/SofaPad.app: accepted
+source=Notarized Developer ID
+origin=Developer ID Application: <name> (9B5Z3H3KLW)
+[exit 0]
+
+$ spctl -a -vv -t execute dist/SofaPad.app
+dist/SofaPad.app: accepted
+source=Notarized Developer ID
+origin=Developer ID Application: <name> (9B5Z3H3KLW)
+[exit 0]
+
+===== 3. the stapled ticket
+
+$ xcrun stapler validate -v <unzipped>/SofaPad-4.5.1/SofaPad.app
+Processing: <unzipped>/SofaPad-4.5.1/SofaPad.app
+Properties are {
+    NSURLIsDirectoryKey = 1;
+    NSURLIsPackageKey = 1;
+    NSURLIsSymbolicLinkKey = 0;
+    NSURLLocalizedTypeDescriptionKey = Application;
+    NSURLTypeIdentifierKey = "com.apple.application-bundle";
+    "_NSURLIsApplicationKey" = 1;
+}
+Props are {
+    cdhash = {length = 20, bytes = 0xca965bb0a6215433d03198764faef497cdb44d96};
+    digestAlgorithm = 2;
+    flags = 65536;
+    secureTimestamp = "2026-11-02 11:48:11 +0000";
+    signingId = "io.github.rick-ray-wldd.sofapad";
+    teamId = 9B5Z3H3KLW;
+}
+(Apple\'s ticket lookup over HTTPS: status 200, the ticket for this cdhash downloaded; the exchange itself is left out)
+The validate action worked!
+[exit 0]
+
+$ xcrun stapler validate dist/SofaPad.app
+Processing: dist/SofaPad.app
+The validate action worked!
+[exit 0]
+
+===== 4. the notarization (Apple's record)
+
+$ xcrun notarytool info c417f719-3e88-4a19-8f02-b735df57ca56 --keychain-profile sofapad-notary
+Successfully received submission info
+  createdDate: 2026-11-02T11:48:13.135Z
+  id: c417f719-3e88-4a19-8f02-b735df57ca56
+  name: SofaPad-4.5.1.zip
+  status: Accepted
+[exit 0]
+
+$ xcrun notarytool log c417f719-3e88-4a19-8f02-b735df57ca56 --keychain-profile sofapad-notary  (status, issues, files with their cdhash)
+{
+ "jobId": "c417f719-3e88-4a19-8f02-b735df57ca56",
+ "status": "Accepted",
+ "statusSummary": "Ready for distribution",
+ "statusCode": 0,
+ "archiveFilename": "SofaPad-4.5.1.zip",
+ "uploadDate": "2026-11-02T11:48:15.156Z",
+ "sha256": "4e7ace381f621caaf7320ea61d17651fb131d7df8c4680949cfbdfe7d5f3e87a",
+ "issues": null
+}
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app SHA-256 b2d66348f95d18d00bb629a6f56834b0ceb0efec x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app SHA-256 dcf962e25253efea811defa103d4be6ceaa4f05f arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater SHA-256 b2d66348f95d18d00bb629a6f56834b0ceb0efec x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater SHA-256 dcf962e25253efea811defa103d4be6ceaa4f05f arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app SHA-256 b2d66348f95d18d00bb629a6f56834b0ceb0efec x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app SHA-256 dcf962e25253efea811defa103d4be6ceaa4f05f arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app SHA-256 ca965bb0a6215433d03198764faef497cdb44d96 arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc SHA-256 1b12cd3e0d263dedcb472c7d985c279f1522efd0 x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc SHA-256 8b2d2dbd697e3e2380f28899ed06b97d126f9d75 arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc SHA-256 f7fe8c40a432f3cff8f97b4e7dcc26e581866ed3 x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc SHA-256 0d6e6643c8e5de23c011f7e459c8ec277145bf34 arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate SHA-256 0f831696083acacdf1bfd4e48b54e6b68fc442e4 x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate SHA-256 7ee0f0efbd275a0d962449abc13909b3d462ac7d arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current SHA-256 05ede72151a9d1f08b57cc5389dff8b2b266b5ac x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/Current SHA-256 76a5a095be84e2c3e975f278145ea14904f05d22 arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/MacOS/SofaPad SHA-256 ca965bb0a6215433d03198764faef497cdb44d96 arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate SHA-256 0f831696083acacdf1bfd4e48b54e6b68fc442e4 x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate SHA-256 7ee0f0efbd275a0d962449abc13909b3d462ac7d arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle SHA-256 05ede72151a9d1f08b57cc5389dff8b2b266b5ac x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle SHA-256 76a5a095be84e2c3e975f278145ea14904f05d22 arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader SHA-256 1b12cd3e0d263dedcb472c7d985c279f1522efd0 x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader SHA-256 8b2d2dbd697e3e2380f28899ed06b97d126f9d75 arm64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer SHA-256 f7fe8c40a432f3cff8f97b4e7dcc26e581866ed3 x86_64
+  ticket: SofaPad-4.5.1.zip/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer SHA-256 0d6e6643c8e5de23c011f7e459c8ec277145bf34 arm64
+
+===== 5. EdDSA: the zip and the update feed, with the public key in the repository alone
+
+$ node tools/appcast.mjs verify --feed dist/release/appcast.xml --zip dist/release/SofaPad-4.5.1-macOS.zip --key JbhqDdv6ZkMwN6GPzgB8UjOczMwbcHEZcWzD6ZmyRoM=
+✓ feed signed with the key, archive signed with the key, length right, notes in English and Chinese
+[exit 0]
+
+$ /usr/libexec/PlistBuddy -c Print :SUPublicEDKey <unzipped>/SofaPad-4.5.1/SofaPad.app/Contents/Info.plist
+JbhqDdv6ZkMwN6GPzgB8UjOczMwbcHEZcWzD6ZmyRoM=
+[exit 0]
+tools/sparkle-public-key.txt: JbhqDdv6ZkMwN6GPzgB8UjOczMwbcHEZcWzD6ZmyRoM=
+  appcast: <sparkle:minimumSystemVersion>13.0
+  appcast: length="1487317"
+  appcast: sparkle:edSignature="cVqtj1cXueRFFPu89Gn7Y+POCJFKiGPPrE1yjB+Qj23IvbuodKT0In62HnUMjgN3YtuAvfK8Br0+S2wgAR3kDA=="
+
+===== 6. a fresh user: the zip as a browser leaves it (quarantined: com.apple.quarantine 0083;…;Safari;…), unpacked with ditto -x -k (it carries the zip's quarantine onto every file it unpacks, as Archive Utility does)
+
+$ xattr -p com.apple.quarantine dist/sofa451/fresh/SofaPad-4.5.1-macOS.zip
+0083;6ae8803f;Safari;DD7B0195-0E62-4376-A6CC-83EA839724F1
+[exit 0]
+
+$ xattr -p com.apple.quarantine dist/sofa451/fresh/SofaPad-4.5.1/SofaPad.app
+0083;6ae8803f;Safari;DD7B0195-0E62-4376-A6CC-83EA839724F1
+[exit 0]
+
+$ spctl -a -vv -t execute dist/sofa451/fresh/SofaPad-4.5.1/SofaPad.app
+dist/sofa451/fresh/SofaPad-4.5.1/SofaPad.app: accepted
+source=Notarized Developer ID
+origin=Developer ID Application: <name> (9B5Z3H3KLW)
+[exit 0]
+
+$ syspolicy_check distribution dist/sofa451/fresh/SofaPad-4.5.1/SofaPad.app
+Only one signature found in dist/sofa451/fresh/SofaPad-4.5.1/SofaPad.app -- file://, skipping dual signature check
+App passed all pre-distribution checks and is ready for distribution.
+[exit 0]
+
+$ xcrun stapler validate dist/sofa451/fresh/SofaPad-4.5.1/SofaPad.app
+Processing: dist/sofa451/fresh/SofaPad-4.5.1/SofaPad.app
+The validate action worked!
+[exit 0]
+
+===== 7. the double-click: `open` on that quarantined, unpacked app (2026-11-02 20:22)
+
+macOS answered with this window (CoreServicesUIAgent; its text read through Accessibility, its picture:
+design/screenshots/sofa451/gatekeeper-first-open.png):
+  "“SofaPad” is an app downloaded from the Internet. Are you sure you want to open it?"
+  "Safari downloaded this file today at 8:21 PM. Apple checked it for malicious software and none was detected."
+  buttons: Help, Cancel, Open
+That is the one question for a notarized app: not ""SofaPad" Not Opened / Apple could not verify…", and nothing to do in
+System Settings. The check pressed Cancel, so that this Mac's own SofaPad settings were not touched: macOS had held
+the app's process (run translocated, as for any app opened where it was unpacked) until the answer; after Cancel it was
+gone, and SofaPad had written nothing (no log, no settings). The quarantine flag stays on that copy.

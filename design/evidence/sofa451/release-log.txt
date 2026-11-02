@@ -1,0 +1,100 @@
+SOFA-451: tools/release.sh 4.5.1 --identity "Developer ID Application: <name> (9B5Z3H3KLW)" --notary-profile sofapad-notary
+The certificate holder's name is written <name> here; paths are relative to the repository.
+
+---- first run, 2026-11-02 19:44 (at 1447e5d): stopped in the tests, before anything was built, signed or sent (I-59)
+
+start 19:44:26
+
+== 1/7 version 4.5.1
+
+== 2/7 tests
+swift test: Executed 88 tests, with 0 failures (0 unexpected) in 0.621 (0.630) seconds
+node --test: ℹ tests 111 ℹ fail 0 
+v2-browser: 41/41 PASS
+PASS Batch mode with a draft in the box
+FAIL Mac updated: the page reloaded by itself, once  → ["http://127.0.0.1:33418/"]
+FAIL the reload went to the address with the mark, and the mark came off  → {"navs":["http://127.0.0.1:33418/"],"search":""}
+FAIL after the reload: connected again (same pairing), no pairing sheet  → {"link":"ready","host":"Mac mini","banner":"","bad":false,"version":"Web page 4.5.1 (development) · Mac app 4.5.1 (development)","search":"","input":"draft kept","mode":"Batch","opens":2,"sent":["auth","ping","ping","auth","ping","ping","ping","ping","ping","ping","ping","ping","ping","ping","ping","ping"]}
+PASS the version shown on the phone matches the Mac: 4.5.1 and 4.5.1
+FAIL a note says the page followed the Mac  → 
+FAIL nothing after the reload came from a cache (disk, memory or service worker)  → {"n":0,"cached":[],"servedFromCache":0}
+PASS the new page files are the 4.5.1 ones
+PASS the Batch draft is still in the box
+FAIL a reconnect afterwards does not say "updated" again, and does not reload  → {"banner":"Reconnected to the Mac.","navs":1}
+file://tools/sofa12-follow.mjs:100
+  if (!c) throw new Error('not visible: ' + sel);
+                ^
+
+Error: not visible: #settingsBtn
+    at tap (file://tools/sofa12-follow.mjs:100:17)
+    at async settings (file://tools/sofa12-follow.mjs:117:24)
+    at async file://tools/sofa12-follow.mjs:178:1
+
+Node.js v26.5.0
+release: tools/sofa12-follow.mjs failed
+EXIT 1 19:45:07
+
+---- second run, 19:46-20:19 (at 15d8986, the follow test fixed): complete
+
+start 19:46:56
+
+== 1/7 version 4.5.1
+
+== 2/7 tests
+swift test: Executed 88 tests, with 0 failures (0 unexpected) in 0.642 (0.652) seconds
+node --test: ℹ tests 111 ℹ fail 0 
+v2-browser: 41/41 PASS
+sofa12-follow: 30/30 PASS
+
+== 3/7 build and sign
+Building for production...
+[2 / 9]
+[3 / 10] PKMCore
+[5 / 11] PKMCore
+[10 / 12] pkm-server-product
+[12 / 13] pkm-server-product
+[14 / 16] pkm-server-product
+[15 / 16] pkm-server-product
+Build complete! (6.58 sec)
+dist/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc: replacing existing signature
+dist/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc: replacing existing signature
+dist/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate: replacing existing signature
+dist/SofaPad.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app: replacing existing signature
+dist/SofaPad.app/Contents/Frameworks/Sparkle.framework: replacing existing signature
+dist/SofaPad.app: replacing existing signature
+dist/SofaPad.app: valid on disk
+dist/SofaPad.app: satisfies its Designated Requirement
+Built dist/SofaPad.app (4.5.1, build 20261102194758, signed: Developer ID Application: <name> (9B5Z3H3KLW))
+
+== 4/7 notarize
+{"id":"c417f719-3e88-4a19-8f02-b735df57ca56","status":"Accepted","message":"Processing complete"}
+Processing: dist/SofaPad.app
+Processing: dist/SofaPad.app
+The staple and validate action worked!
+Processing: dist/SofaPad.app
+The validate action worked!
+dist/SofaPad.app: accepted
+source=Notarized Developer ID
+
+== 5/7 package
+architectures: arm64
+Identifier=io.github.rick-ray-wldd.sofapad
+Signature size=8978
+TeamIdentifier=9B5Z3H3KLW
+Packaged dist/release/SofaPad-4.5.1-macOS.zip
+6dcb08b1c651e210f219200306565d4c0a1f4d13d57f50a3ffdc1589df67265f  SofaPad-4.5.1-macOS.zip
+
+== 6/7 update feed (EdDSA)
+wrote dist/release/appcast.xml
+<!-- Updated signature inside appcast.xml and added warning for making further modifications. -->
+✓ feed signed with the key, archive signed with the key, length right, notes in English and Chinese
+
+== 7/7 release notes
+dist/release/RELEASE-NOTES-4.5.1.md
+
+Ready: dist/release/SofaPad-4.5.1-macOS.zip (+ .sha256), dist/release/appcast.xml. Nothing was pushed, tagged or published.
+(the browser suites refreshed their screenshots and results; git checkout them if you keep the old ones)
+To publish (coordinator, from the repository folder, after pushing 15d89860611019491dd6357c081468d91e5a530d):
+
+gh release create v4.5.1 --repo rick-ray-wldd/sofapad --target 15d89860611019491dd6357c081468d91e5a530d --title "SofaPad 4.5.1" --notes-file dist/release/RELEASE-NOTES-4.5.1.md dist/release/SofaPad-4.5.1-macOS.zip dist/release/SofaPad-4.5.1-macOS.zip.sha256 dist/release/appcast.xml
+EXIT 0 20:19:36

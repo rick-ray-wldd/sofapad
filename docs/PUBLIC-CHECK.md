@@ -183,3 +183,31 @@ range in its menu. The screenshots show only the test app's windows and menu (ta
 and the test page; the Mac is the model's default name ("Mac mini"). The video (`dist/sofa12/sofa12-update.mp4`, not
 in git) was checked in frames taken every 1.4 s and at its key moments: the recording's backdrop window, the test
 app's windows and the test page only.
+
+## 4.5.1 (2026-11-02)
+
+Before the 4.5.1 commits were handed over, all 20 files they add or change since 4.5.0 (255 added lines in tracked
+files, this section included, and the new evidence, screenshot and dispatch) were read as raw bytes with the same list as 4.5, plus two
+things new in this release: the name of the Developer ID certificate's holder, and anything shaped like an Apple
+app-specific password. None of this computer's or the owner's real values, no local paths, no internal addresses, no
+pairing codes in the added lines, and none of the two new things. The repository names the team id (`9B5Z3H3KLW`),
+which every signed copy carries anyway, and writes the holder's name as `<name>` where an output printed it. What
+the new files match is only what 4.5 already had: the update test's throwaway pairing code on 127.0.0.1 and the
+Tailscale range in its menu (`update-e2e-devid.json`), and "100.64/10" as words in the dispatch.
+
+**Signing secrets.** The Developer ID private key and the notarization password never left the login Keychain:
+`codesign` used the key in place (after the owner allowed it, I-58), and `notarytool` was given only the Keychain
+profile's name. The EdDSA key was exported once for this check into a private temporary folder, searched for and the
+folder removed: it is in none of the 424 tracked files, none of the new files, nowhere in the git history, not in
+`dist/release/` or the unpacked zip, not in `design/`, `docs/` or `process/`.
+
+**The release zip** (`SofaPad-4.5.1-macOS.zip`, 117 files), `appcast.xml` and `RELEASE-NOTES-4.5.1.md`, byte by byte:
+the same matches as 4.5.0 (the email address in Sparkle's licence, the example address in the app's help text, the
+Tailscale range in its menu, "Orca" in a code comment), and the certificate holder's name inside the code signatures
+of the executables: a Developer ID signature carries its certificate, and `codesign -dv` shows the name to anyone.
+That is how signing works, and it stays.
+
+**Screenshots and outputs.** `design/screenshots/sofa451/gatekeeper-first-open.png` is macOS's own question, taken by
+window: the app's name, "Safari downloaded this file today at 8:21 PM", nothing behind it. In `verify.txt` and
+`release-log.txt` the paths are relative to the repository and the holder's name is `<name>`; Apple's HTTP exchange
+from `stapler validate -v` (request ids, record names, the ticket's bytes) is left out.
