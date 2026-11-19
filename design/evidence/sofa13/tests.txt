@@ -1,0 +1,29 @@
+SOFA-13 (4.5.2): test results, 2026-11-19, Mac mini (macOS 27), Xcode 27.1, Node 26.5, Google Chrome (playwright-core)
+
+Unit tests
+  swift test --package-path mac                     Executed 88 tests, with 0 failures
+  (cd web && node --test test/*.test.mjs)           tests 114, pass 114, fail 0
+  web/test/viewport.test.mjs against the 4.5.1 tree (2f82f6d, this test file copied in): fail (no js/viewport.js;
+                                                    the meta says resizes-content)
+
+New browser test: node tools/sofa13-typing.mjs (keyboard replayed the way the browser handles the page's own meta)
+  --label before --web <git archive 2f82f6d>/web   FAIL 8/13: upright + keyboard → landscape layout (layout 390×363),
+                                                    pad 114 px wide on the right, hint wraps (box 126 px), no #app.kbd
+  --label after                                     PASS 13/13 (design/evidence/sofa13-typing-{before,after}.json)
+
+Existing browser suites (this tree, dry-run Mac on 127.0.0.1)
+  v2-browser 41/41 · sofa12-follow 30/30 (also again after the 4.5.2 bump) · sofa8-layout 46/46 · sofa10-i18n-theme 51/51
+  pkm4-browser 10/10 · pkm31-keyrow 14/14 · sofa6-caret 15/15 · touch-area and pkm23-layout (measurements, no pass/fail)
+  Same suites on 4.5.1 (git archive 2f82f6d) and compared: 56 screenshots, 47 identical (fuzz 2 %), the rest differ in
+  under 0.2 % of pixels (swipe momentum, animation frames); touch-area numbers identical; v2-browser results identical;
+  pkm23 scrollLeft 314–319 and sofa10 first-frame counts 18–20 vary run to run. The refreshed files of these suites
+  were not committed.
+
+iOS Simulator (iOS 27.0, 24A434; Safari; real iOS keyboard through tools/pkm4/SimDriver; dark appearance)
+  The simulator does not implement interactive-widget: 4.5.1 is drawn correctly there, so Ray's screen could not be
+  reproduced on it (Ray's iPhone runs an iOS 27 developer beta; WebKit bug 259770 says iOS 27.3 beta honors the meta).
+  iPhone 17e, Zhuyin, keyboard up:  innerHeight 699 → 363, visualViewport 363 (offsetTop 336), clientHeight 699,
+                                    orientation portrait in both; #app: 4.5.1 "typing", 4.5.2 "typing kbd"
+  iPad Air 11-inch (M4), keyboard up: innerHeight 1048 → 711, clientHeight 1048, portrait; 4.5.1 "typing",
+                                    4.5.2 "typing kbd"; same layout otherwise
+  Screenshots: design/screenshots/sofa13/sim-*.png

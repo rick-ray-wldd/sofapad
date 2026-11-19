@@ -337,3 +337,14 @@
 | S451-M4 | 驗證 zip 裡的 App：codesign（6 個部分）、spctl、stapler、notarytool log、EdDSA；新使用者：quarantine＋spctl＋syspolicy_check，雙擊只問一次「打開」 | 20:19–20:22 | design/evidence/sofa451/verify.txt、design/screenshots/sofa451/ |
 | S451-M5 | 臨時簽章的 4.5.0 自己更新到 Developer ID 的 4.5.1（測試版）：19/20（I-60，測試時序），修好 20/20 | 20:23–20:25 | design/evidence/sofa451/update-e2e-devid.json |
 | S451-M6 | 公開前檢查；交件給總控 | 20:25– | docs/PUBLIC-CHECK.md「4.5.1」 |
+
+## SOFA-13（SofaPad 4.5.2：iPhone 直拿打字時頁面被擠壓，2026-11-19）
+
+| 里程碑 | 內容 | 時間 | 證據 |
+|---|---|---|---|
+| S13-M0 | 收到工作單（Ray：「為什麼現在打字的時候會長這樣有點被擠壓縮然後有一些空間請幫我修正」；附 iPhone 截圖，iOS 27 developer beta） | 16:34 | I-61 |
+| S13-M1 | 看截圖：直拿卻是橫拿版面（側欄＋窄觸控板）→ orientation 媒體查詢在鍵盤打開時變成 landscape | 16:35 | I-61 |
+| S13-M2 | iOS 27.0 模擬器（iPhone 17e、注音、深色）點輸入框：4.5.1 版面正常，重現不了；量到 innerHeight 跟著 visual viewport 變小、clientHeight 不變（I-62） | 16:36–16:47 | S-147 |
+| S13-M3 | WebKit bug 259770／321543：interactive-widget 已實作，iOS 27.3 beta 照做 → 原因是 meta 的 resizes-content | 16:41 | S-146 |
+| S13-M4 | 修正（D-62）：meta 改 resizes-visual、鍵盤判斷改用 clientHeight（web/js/viewport.js）；單元測試、tools/sofa13-typing.mjs（4.5.1 8/13 → 13/13）；模擬器修正後正常、看得到 kbd | 16:42–16:47 | design/evidence/sofa13-typing-*.json、design/screenshots/sofa13/ |
+| S13-M5 | 既有測試、版本 4.5.2、發布說明、CHANGELOG、README、INSTALL；交件 | 16:47– | design/evidence/sofa13/tests.txt |

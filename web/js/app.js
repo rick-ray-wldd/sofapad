@@ -8,6 +8,7 @@ import { VERSION, BUILD } from './version.js';
 import { BUILTIN_GROUPS, KEY_GROUPS, MODIFIERS, ShortcutStore, comboLabel, keyLabel, gestureShortcut, hotkeyHint, macStatusText } from './shortcuts.js';
 import { t, setLang, translate } from './i18n.js';
 import { macBuild, pageBuild, readMark, decide, reloadURL, cleanURL } from './follow.js';
+import { keyboardUp } from './viewport.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -129,14 +130,14 @@ function fitViewport() {
 /**
  * Layout mode (D-14): `typing` while the text box has focus (portrait: bar, mouse buttons and mini-map step
  * aside; landscape: the text row appears under the full-screen pad); `kbd` when the on-screen keyboard is
- * really up (focus + visual viewport clearly shorter than the layout viewport; iOS can leave a ~24 px
- * difference after the keyboard closes, S-105), so the bottom safe area it covers is dropped.
+ * really up (js/viewport.js: focus + visual viewport clearly shorter than the layout viewport), so the bottom
+ * safe area it covers is dropped.
  */
 function updateLayout() {
   const input = document.getElementById('input');
   const typing = !!input && document.activeElement === input;
   const vv = window.visualViewport;
-  const kbd = typing && !!vv && vv.height < window.innerHeight - 120;
+  const kbd = keyboardUp({ typing, visualHeight: vv?.height, layoutHeight: root.clientHeight });
   appEl.classList.toggle('typing', typing);
   appEl.classList.toggle('kbd', kbd);
 }

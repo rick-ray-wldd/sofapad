@@ -1,0 +1,379 @@
+{
+ "label": "after",
+ "meta": "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-visual",
+ "resizesContent": false,
+ "results": [
+  {
+   "name": "直拿、鍵盤收起：直式版面（上方狀態列、觸控板在上、控制區在下）",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：還是直式版面，不是橫式側欄（orientation portrait、沒有側欄標頭）",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：觸控板全寬、在控制區上面",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：頁面高度＝鍵盤上方可見的高度",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：控制區貼齊鍵盤上緣（最下排按鍵和鍵盤之間 ≤ 12 px）",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：最下排按鍵完整（不被切、不在鍵盤後面）",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：「Tap here to type」一行放得下，沒有換行",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：觸控板高度至少 230 px（控制區只佔一排文字框＋一排按鍵）",
+   "ok": true
+  },
+  {
+   "name": "直拿打字：看得出鍵盤開著（#app.kbd，下方安全區域不留白）",
+   "ok": true
+  },
+  {
+   "name": "直拿、鍵盤收起剩 24 px 差（S-105）：不算鍵盤開著",
+   "ok": true
+  },
+  {
+   "name": "收起鍵盤後回到一開始的直式版面",
+   "ok": true
+  },
+  {
+   "name": "橫拿、鍵盤收起：橫式版面（側欄＋觸控板）",
+   "ok": true
+  },
+  {
+   "name": "橫拿打字：還是橫式版面，高度＝鍵盤上方可見的高度",
+   "ok": true
+  }
+ ],
+ "scenes": [
+  {
+   "name": "portrait-keyboard-down",
+   "layout": {
+    "w": 390,
+    "h": 699
+   },
+   "innerHeight": 699,
+   "visualH": 699,
+   "landscape": false,
+   "appClass": "",
+   "app": {
+    "x": 0,
+    "y": 0,
+    "w": 390,
+    "h": 699,
+    "bottom": 699
+   },
+   "pad": {
+    "x": 10,
+    "y": 48,
+    "w": 370,
+    "h": 471,
+    "bottom": 519
+   },
+   "controls": {
+    "x": 10,
+    "y": 527,
+    "w": 370,
+    "h": 164,
+    "bottom": 691
+   },
+   "input": {
+    "x": 10,
+    "y": 593,
+    "w": 181,
+    "h": 46,
+    "bottom": 639
+   },
+   "keys": {
+    "x": 10,
+    "y": 647,
+    "w": 370,
+    "h": 44,
+    "bottom": 691
+   },
+   "bar": {
+    "x": 0,
+    "y": 0,
+    "w": 390,
+    "h": 48,
+    "bottom": 48
+   },
+   "sideHead": null,
+   "inputWraps": false
+  },
+  {
+   "name": "portrait-keyboard-up",
+   "layout": {
+    "w": 390,
+    "h": 699
+   },
+   "innerHeight": 363,
+   "visualH": 363,
+   "landscape": false,
+   "appClass": "typing kbd",
+   "app": {
+    "x": 0,
+    "y": 0,
+    "w": 390,
+    "h": 363,
+    "bottom": 363
+   },
+   "pad": {
+    "x": 10,
+    "y": 0,
+    "w": 370,
+    "h": 253,
+    "bottom": 253
+   },
+   "controls": {
+    "x": 10,
+    "y": 261,
+    "w": 370,
+    "h": 96,
+    "bottom": 357
+   },
+   "input": {
+    "x": 10,
+    "y": 261,
+    "w": 181,
+    "h": 44,
+    "bottom": 305
+   },
+   "keys": {
+    "x": 10,
+    "y": 313,
+    "w": 370,
+    "h": 44,
+    "bottom": 357
+   },
+   "bar": null,
+   "sideHead": null,
+   "inputWraps": false
+  },
+  {
+   "name": "portrait-keyboard-closing",
+   "layout": {
+    "w": 390,
+    "h": 699
+   },
+   "innerHeight": 675,
+   "visualH": 675,
+   "landscape": false,
+   "appClass": "typing",
+   "app": {
+    "x": 0,
+    "y": 0,
+    "w": 390,
+    "h": 675,
+    "bottom": 675
+   },
+   "pad": {
+    "x": 10,
+    "y": 0,
+    "w": 370,
+    "h": 563,
+    "bottom": 563
+   },
+   "controls": {
+    "x": 10,
+    "y": 571,
+    "w": 370,
+    "h": 96,
+    "bottom": 667
+   },
+   "input": {
+    "x": 10,
+    "y": 571,
+    "w": 181,
+    "h": 44,
+    "bottom": 615
+   },
+   "keys": {
+    "x": 10,
+    "y": 623,
+    "w": 370,
+    "h": 44,
+    "bottom": 667
+   },
+   "bar": null,
+   "sideHead": null,
+   "inputWraps": false
+  },
+  {
+   "name": "portrait-after",
+   "layout": {
+    "w": 390,
+    "h": 699
+   },
+   "innerHeight": 699,
+   "visualH": 699,
+   "landscape": false,
+   "appClass": "",
+   "app": {
+    "x": 0,
+    "y": 0,
+    "w": 390,
+    "h": 699,
+    "bottom": 699
+   },
+   "pad": {
+    "x": 10,
+    "y": 48,
+    "w": 370,
+    "h": 471,
+    "bottom": 519
+   },
+   "controls": {
+    "x": 10,
+    "y": 527,
+    "w": 370,
+    "h": 164,
+    "bottom": 691
+   },
+   "input": {
+    "x": 10,
+    "y": 593,
+    "w": 181,
+    "h": 46,
+    "bottom": 639
+   },
+   "keys": {
+    "x": 10,
+    "y": 647,
+    "w": 370,
+    "h": 44,
+    "bottom": 691
+   },
+   "bar": {
+    "x": 0,
+    "y": 0,
+    "w": 390,
+    "h": 48,
+    "bottom": 48
+   },
+   "sideHead": null,
+   "inputWraps": false
+  },
+  {
+   "name": "landscape-keyboard-down",
+   "layout": {
+    "w": 844,
+    "h": 390
+   },
+   "innerHeight": 390,
+   "visualH": 390,
+   "landscape": true,
+   "appClass": "",
+   "app": {
+    "x": 0,
+    "y": 0,
+    "w": 844,
+    "h": 390,
+    "bottom": 390
+   },
+   "pad": {
+    "x": 316,
+    "y": 0,
+    "w": 528,
+    "h": 390,
+    "bottom": 390
+   },
+   "controls": {
+    "x": 0,
+    "y": 0,
+    "w": 316,
+    "h": 390,
+    "bottom": 390
+   },
+   "input": {
+    "x": 8,
+    "y": 48,
+    "w": 146,
+    "h": 44,
+    "bottom": 92
+   },
+   "keys": {
+    "x": 8,
+    "y": 98,
+    "w": 299,
+    "h": 178,
+    "bottom": 276
+   },
+   "bar": null,
+   "sideHead": {
+    "x": 8,
+    "y": 6,
+    "w": 299,
+    "h": 36,
+    "bottom": 42
+   },
+   "inputWraps": false
+  },
+  {
+   "name": "landscape-keyboard-up",
+   "layout": {
+    "w": 844,
+    "h": 390
+   },
+   "innerHeight": 170,
+   "visualH": 170,
+   "landscape": true,
+   "appClass": "typing kbd",
+   "app": {
+    "x": 0,
+    "y": 0,
+    "w": 844,
+    "h": 170,
+    "bottom": 170
+   },
+   "pad": {
+    "x": 316,
+    "y": 0,
+    "w": 528,
+    "h": 170,
+    "bottom": 170
+   },
+   "controls": {
+    "x": 0,
+    "y": 0,
+    "w": 316,
+    "h": 170,
+    "bottom": 170
+   },
+   "input": {
+    "x": 8,
+    "y": 48,
+    "w": 146,
+    "h": 44,
+    "bottom": 92
+   },
+   "keys": {
+    "x": 8,
+    "y": 98,
+    "w": 299,
+    "h": 178,
+    "bottom": 276
+   },
+   "bar": null,
+   "sideHead": {
+    "x": 8,
+    "y": 6,
+    "w": 299,
+    "h": 36,
+    "bottom": 42
+   },
+   "inputWraps": false
+  }
+ ]
+}

@@ -628,3 +628,11 @@ A 下方工具列                     B 可收合側欄（選這個）          
 - **只在 debug build 的測試開關**：feed 網址、啟動參數、延後檢查從測試 App 自己的 defaults 讀（`SofaPadTestFeedURL`、`SofaPadTestArguments`、`SofaPadTestCheckDelay`：Sparkle 重新開 App 時不帶參數，所以參數也要從 defaults 讀）；`PKM_TEST_VERSION`／`PKM_TEST_PROTOCOL` 讓瀏覽器測試的 dry-run 伺服器假裝別的版本。都包在 `#if DEBUG`；release 執行檔裡一個字串都沒有（build-app.sh 會查）。debug 版的 Info.plist 另外允許 127.0.0.1 的 http（ATS `NSAllowsLocalNetworking`）。
 - **按 Sparkle 真的視窗**：用 Accessibility（`tools/sofa12-ax.swift`）讀視窗文字、按「Install Update」「Install and Relaunch」，和人按的一樣；不按任何別的 App。截圖用 `screencapture -l <視窗>`，只有那個視窗、沒有背景。錄影時先在錄影範圍放一個深色背景視窗（同一個工具的 `stage`），範圍外的東西不會錄進去；手機那邊用 Chrome 的 screencast，兩段並排。
 - 要 Mac 沒鎖定（鎖定畫面時 macOS 不顯示 App 的視窗，Accessibility 也看不到）；測試一開始就檢查，鎖著就停下來說明。
+
+## D-62 鍵盤只縮 visual viewport：`interactive-widget=resizes-visual`（SOFA-13，解 I-61、I-62）
+- 問題：iOS 27.3 beta 開始照 `interactive-widget=resizes-content` 做，鍵盤連 layout viewport 一起縮，直拿的頁面比寬還矮，CSS 的 orientation 變成 landscape（I-61）。
+- 選項：A 拿掉 interactive-widget（用瀏覽器預設，現在兩邊都是 resizes-visual）；B 明寫 `resizes-visual`；C 留著 resizes-content，改用 JS 判斷直拿／橫拿（螢幕方向、或記住鍵盤收起時的高度），四段 `@media (orientation)` 全部改成 class。
+- 選 B：頁面從 v1 起就是照「只縮 visual viewport」設計的（fitViewport 跟著 visualViewport，D-14），iOS 以前的行為就是這樣；明寫出來，預設以後變了也不受影響，也寫清楚是刻意的。bug 259770 的留言說 resizes-visual 在 27.3 beta 照預期運作。C 要改 CSS 的串接順序（橫拿區塊後面有同樣權重的規則），而且 iPad 分割畫面裡「螢幕橫的、視窗直的」會判錯，風險比問題大；B 之後如果 Ray 的 iPhone 還是不對再考慮。
+- Android：Chrome 一直照 meta 做，之前鍵盤會縮 layout viewport；現在和 iOS 一樣只縮 visual viewport，頁面高度照樣跟著 visualViewport，不變。
+- 一起修 I-62：鍵盤判斷改和 layout viewport（`documentElement.clientHeight`）比，不和 `innerHeight` 比（web/js/viewport.js）。
+- 來源：I-61、I-62、S-146、S-147。

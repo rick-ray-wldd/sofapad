@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-visual">
+<!-- interactive-widget=resizes-visual (SOFA-13): the keyboard shrinks only the visual viewport, which js/app.js follows.
+     Up to 4.5.1 this said resizes-content, which iOS ignored; WebKit now implements it (bug 259770, iOS 27.3 beta).
+     Then the keyboard also shrinks the layout viewport, the page is wider than tall, and the landscape layout is
+     drawn on an upright phone. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

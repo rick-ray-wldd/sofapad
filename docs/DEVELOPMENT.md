@@ -58,6 +58,8 @@ node tools/sofa10-i18n-theme.mjs [--video DIR]     # 4.4: English / Chinese and 
                                                    # left in English, the first frame's theme, WCAG contrast, screenshots (design/screenshots/sofa10)
 node tools/sofa12-follow.mjs                       # 4.5: the page follows a Mac app of another version, protocol versions both ways,
                                                    # the real 4.4.0 page against this Mac, screenshots (design/screenshots/sofa12)
+node tools/sofa13-typing.mjs [--label after|before] [--web DIR]   # 4.5.2: typing on an upright iPhone, the keyboard replayed the way the
+                                                   # browser handles the page's interactive-widget (iOS 27.3 beta), screenshots (design/screenshots/sofa13)
 node tools/sofa12-update-e2e.mjs [--video]         # 4.5: 4.5.0 updates itself to a test 4.5.1 through Sparkle's windows (needs the Mac
                                                    # unlocked and Accessibility for the terminal), tampered zip and feed refused;
                                                    # --video-only: the update part alone, recorded (dist/sofa12/sofa12-update.mp4)
