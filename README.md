@@ -39,15 +39,16 @@ Open [`demo/playground.html`](demo/playground.html) in a browser on the Mac (it 
 
 At the end, a summary of every check and when it was done. Recording mode (`?rec=1`) hides the small print for a video. For a short video there is a recording version, `?video=1`: stages 1, 2, 5, 6 and 7 only, with English swipe typing and dictation in stage 2. Scripts for a 2–3 minute and a 60-second video: [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) ([中文](docs/DEMO-SCRIPT.zh-TW.md)). The release zip has the page too (`playground.html`).
 
-## Latest version: 4.5.1
+## Latest version: 4.5.2
 
-- **Download**: [GitHub Releases → SofaPad 4.5.1](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.1) (`SofaPad-4.5.1-macOS.zip`, macOS 13 or later, Apple silicon). Install: [`docs/INSTALL.md`](docs/INSTALL.md).
+- **Download**: [GitHub Releases → SofaPad 4.5.2](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.2) (`SofaPad-4.5.2-macOS.zip`, macOS 13 or later, Apple silicon). Install: [`docs/INSTALL.md`](docs/INSTALL.md).
+- **New in 4.5.2**: **typing on an upright iPhone works again on the iOS 27 beta.** Tapping the text box squeezed the page into the landscape layout at the top of the screen, with an empty band above the keyboard; the page asked the browser to resize the whole page for the keyboard, which the iOS 27 beta started doing. Now only the visible part shrinks, as designed. Nothing else changed.
 - **New in 4.5.1**: **signed with an Apple Developer ID and notarized by Apple.** A downloaded copy opens with a double-click (click **Open** once), with no trip to System Settings. macOS now knows SofaPad by its developer, so the Accessibility permission stays across updates; after the update from 4.5.0, give it once more (step 3). Nothing else changed.
 - **New in 4.5**: **SofaPad updates itself.** It checks when it opens and once a day, shows what's new, and with one click installs the new version and opens again ("檢查更新…", Check for Updates, in the menu). **The phone page follows the Mac**: after an update, an open page reloads itself to the new version. The Mac and the phone now say which **protocol version** they speak, so a mismatch is explained instead of failing silently, and an iPhone app can join later. See [Updates](#updates-45).
 - **New in 4.4**: the phone page in **English or Chinese** (it follows the phone's language; switch in ⚙︎ → Language) and a **light or dark theme** (⚙︎ → Theme: System, Light or Dark). Both apply at once, without a reload, and are remembered on the phone. Nothing else changed.
 - **New in 4.3**: the text box takes half the width, with the cursor pad and ⏎ next to it; the text row, the key row and the landscape panel can be edited; landscape has a side panel and a full-height trackpad; the demo page.
 - **Defaults in 4.3**: no ⏎ on the key row (it's next to the cursor pad; add one in ✎ Edit if you want it); in portrait live mode the text box stays one line while you type, so the trackpad keeps at least 290 px; the landscape panel is on the left (on the right in left-handed mode).
-- All changes: [`CHANGELOG.md`](CHANGELOG.md). Release notes: [`docs/release/4.5.1.md`](docs/release/4.5.1.md).
+- All changes: [`CHANGELOG.md`](CHANGELOG.md). Release notes: [`docs/release/4.5.2.md`](docs/release/4.5.2.md).
 
 ---
 
@@ -71,7 +72,7 @@ Every step says what you'll see. Screen names follow macOS 15 / 26 / 27 (English
    - The first build also downloads Sparkle 2.10.0, the update framework ([Updates](#updates-45)), with Swift Package Manager, so it needs the internet that once. A self-built app updates itself too, to the release on GitHub.
 3. In Finder, drag `dist/SofaPad.app` into the Applications folder (permissions are more reliable that way).
 
-**B. Download the release** (`SofaPad-<version>-macOS.zip`, Apple silicon; the latest is [4.5.1](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.1)): from 4.5.1 it is signed with an Apple Developer ID and notarized, so it opens with a double-click. Steps, and how to check its SHA-256: [`docs/INSTALL.md`](docs/INSTALL.md). A `SofaPad.app` someone else built (AirDrop) works too, but macOS blocks it the first time: step 2.
+**B. Download the release** (`SofaPad-<version>-macOS.zip`, Apple silicon; the latest is [4.5.2](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.2)): from 4.5.1 it is signed with an Apple Developer ID and notarized, so it opens with a double-click. Steps, and how to check its SHA-256: [`docs/INSTALL.md`](docs/INSTALL.md). A `SofaPad.app` someone else built (AirDrop) works too, but macOS blocks it the first time: step 2.
 
 ### 2. Open the app the first time
 
@@ -121,8 +122,8 @@ macOS requires you to allow any program that presses keys or moves the mouse for
 
 ### 7. Check the version
 
-- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.5.1 (build 2026-11-02 21:00)".
-- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the side panel's top row, or in the column of small buttons when the panel is closed). The top line reads "Web page 4.5.1 (build …) · Mac app 4.5.1 (build …)" (網頁 4.5.1（建置 …）・Mac App 4.5.1（建置 …） in Chinese).
+- **Mac**: click `⌨︎🖱` in the menu bar. The first line is the version, for example "SofaPad 4.5.2 (build 2026-11-19 21:00)".
+- **iPhone**: tap ⚙︎ at the top right (in landscape it's in the side panel's top row, or in the column of small buttons when the panel is closed). The top line reads "Web page 4.5.2 (build …) · Mac app 4.5.2 (build …)" (網頁 4.5.2（建置 …）・Mac App 4.5.2（建置 …） in Chinese).
 - From 4.5 the page reloads itself when the Mac app changes version, so the two match. If they still differ, or it says "old (no version information)": close the page and open it again. For the Home Screen app, swipe it away in the app switcher and open it again.
 
 ### 8. Common problems

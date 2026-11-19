@@ -211,3 +211,14 @@ That is how signing works, and it stays.
 window: the app's name, "Safari downloaded this file today at 8:21 PM", nothing behind it. In `verify.txt` and
 `release-log.txt` the paths are relative to the repository and the holder's name is `<name>`; Apple's HTTP exchange
 from `stapler validate -v` (request ids, record names, the ticket's bytes) is left out.
+
+## 4.5.2 (2026-11-19)
+
+Before the 4.5.2 commits were handed over, all files they add or change since 4.5.1 (about 1,200 added lines: the page
+fix, the tests and their results, the screenshots, the release notes and docs, the process records) were searched
+with the same list as 4.5.1: none of this computer's or the owner's real values (account, computer and host names, git
+user name, email address, the LAN and Tailscale addresses read from its interfaces), no local paths, no addresses in
+192.168/16, 10/8 or 100.64/10, and nothing from the owner's private assistant files. The screenshots were searched as
+bytes too. They show only what the page shows on 127.0.0.1 (the iOS Simulator's Safari pill reads "127.0.0.1"). The
+owner's own screenshot, which shows the phone's LAN address, is not in the repository; the problem is described in
+words (process/ISSUES.md I-61).

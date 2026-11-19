@@ -39,15 +39,16 @@
 
 最後有總表，列出每一項和完成的時間。「錄影模式」（`?rec=1`）會把小字藏起來，適合錄影。錄短片用的「錄影精簡版」：網址加 `?video=1`，只有第 1、2、5、6、7 關，第 2 關是英文滑動輸入和聽寫。2–3 分鐘和 60 秒兩種錄影腳本：[`docs/DEMO-SCRIPT.zh-TW.md`](docs/DEMO-SCRIPT.zh-TW.md)（[English](docs/DEMO-SCRIPT.md)）。安裝包（zip）裡也有一份 `playground.html`。
 
-## 最新版：4.5.1
+## 最新版：4.5.2
 
-- **下載**：[GitHub Releases → SofaPad 4.5.1](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.1)（`SofaPad-4.5.1-macOS.zip`，macOS 13 以上，Apple 晶片）。安裝：[`docs/INSTALL.md`](docs/INSTALL.md)。
+- **下載**：[GitHub Releases → SofaPad 4.5.2](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.2)（`SofaPad-4.5.2-macOS.zip`，macOS 13 以上，Apple 晶片）。安裝：[`docs/INSTALL.md`](docs/INSTALL.md)。
+- **4.5.2**：**iOS 27 beta 直拿打字恢復正常。**之前點輸入框後，畫面會被擠到上方、變成橫拿的版面，鍵盤上面還空出一大塊。原因是手機網頁要求瀏覽器「鍵盤出現時把整個頁面縮小」，iOS 27 beta 開始照做。現在改成只縮小看得到的範圍，回到原本的設計。其他都沒有變。
 - **4.5.1**：**第一次用 Apple Developer ID 簽章，並經過 Apple 公證。**下載後雙擊就能打開（按一次「打開」），不用再到系統設定。macOS 改用開發者認 SofaPad，所以更新後「輔助使用」權限會保留；從 4.5.0 更新上來後要再開一次（第 3 步）。其他都沒有變。
 - **4.5 新功能**：**SofaPad 會自己更新**。打開時和每天檢查一次，顯示新版的說明，按一下就裝好新版並重新打開（選單列也有「檢查更新…」）。**手機網頁跟著 Mac 走**：Mac 更新後，開著的網頁會自己重新載入成新版。Mac 和手機會互相說明自己用的**協定版本**，對不上時清楚說明，不會默默失敗；以後也能接上 iPhone App。見[「更新」](#更新45)。
 - **4.4 新功能**：手機網頁有**中文和英文**（跟著手機的語言；⚙︎ →「語言」可以換），還有**淺色和深色主題**（⚙︎ →「主題」：系統、淺色、深色）。切換馬上生效，不用重新整理，手機會記住。其他都和 4.3 一樣。
 - **4.3 新功能**：輸入框半寬，旁邊是游標板和 ⏎；輸入列、按鍵列、橫拿側欄都可以自己排；橫拿有側欄和全高的觸控板；示範場。
 - **4.3 的預設**：按鍵列不放 ⏎（在游標板右邊；要的話到「✎ 編輯」加）；直拿、即時模式打字時輸入框一行，觸控板保持 290 px 以上；橫拿側欄在左邊（左手模式在右邊）。
-- 完整更新紀錄：[`CHANGELOG.md`](CHANGELOG.md)（英文）。發行說明：[`docs/release/4.5.1.md`](docs/release/4.5.1.md)（中英）。
+- 完整更新紀錄：[`CHANGELOG.md`](CHANGELOG.md)（英文）。發行說明：[`docs/release/4.5.2.md`](docs/release/4.5.2.md)（中英）。
 
 ---
 
@@ -71,7 +72,7 @@
    - 第一次建置會用 Swift Package Manager 下載 Sparkle 2.10.0（負責更新的套件，見[「更新」](#更新45)），所以那一次要連網。自己建置的 App 也會自己更新，裝的是 GitHub 上的發行版。
 3. 在 Finder 把 `dist/SofaPad.app` 拖到「應用程式」資料夾（權限設定比較穩定）。
 
-**B. 下載發行版**（`SofaPad-<版本>-macOS.zip`，Apple 晶片；最新是 [4.5.1](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.1)）：從 4.5.1 起有 Apple Developer ID 簽章，也經過 Apple 公證，雙擊就能打開。步驟和怎麼核對 SHA-256：[`docs/INSTALL.md`](docs/INSTALL.md)。別人建好的 `SofaPad.app`（AirDrop）也可以用，但第一次打開會被擋，照第 2 步做。
+**B. 下載發行版**（`SofaPad-<版本>-macOS.zip`，Apple 晶片；最新是 [4.5.2](https://github.com/rick-ray-wldd/sofapad/releases/tag/v4.5.2)）：從 4.5.1 起有 Apple Developer ID 簽章，也經過 Apple 公證，雙擊就能打開。步驟和怎麼核對 SHA-256：[`docs/INSTALL.md`](docs/INSTALL.md)。別人建好的 `SofaPad.app`（AirDrop）也可以用，但第一次打開會被擋，照第 2 步做。
 
 ### 2. 第一次打開 App
 
@@ -121,8 +122,8 @@ macOS 規定：替你按鍵盤、動滑鼠的程式，要先由你允許。
 
 ### 7. 怎麼看版本
 
-- **Mac**：點選單列 `⌨︎🖱`，第一行就是版本，例如「SofaPad 4.5.1（建置 2026-11-02 21:00）」。
-- **iPhone**：右上角 ⚙︎（橫拿時在側欄最上面那排；側欄收起時是左邊那排小按鈕的 ⚙︎），最上面一行「網頁 4.5.1（建置 …）・Mac App 4.5.1（建置 …）」（英文介面是「Web page 4.5.1 (build …) · Mac app 4.5.1 (build …)」）。
+- **Mac**：點選單列 `⌨︎🖱`，第一行就是版本，例如「SofaPad 4.5.2（建置 2026-11-19 21:00）」。
+- **iPhone**：右上角 ⚙︎（橫拿時在側欄最上面那排；側欄收起時是左邊那排小按鈕的 ⚙︎），最上面一行「網頁 4.5.2（建置 …）・Mac App 4.5.2（建置 …）」（英文介面是「Web page 4.5.2 (build …) · Mac app 4.5.2 (build …)」）。
 - 從 4.5 起，Mac 的 App 換了版本，網頁會自己重新載入，兩邊就一樣。還是不同，或寫「舊版（沒有版本資訊）」：把網頁關掉再打開（主畫面 App 要從 App 切換器往上滑掉再打開）。
 
 ### 8. 常見問題
