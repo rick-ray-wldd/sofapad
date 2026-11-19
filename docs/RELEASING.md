@@ -48,7 +48,7 @@ mac/.build/artifacts/sparkle/Sparkle/bin/generate_keys --account sofapad -x ~/De
    ```
 
    It: (1) sets the version in `VERSION`, `BuildInfo.swift` and `web/js/version.js`; (2) runs `swift test`, the JS
-   unit tests and two browser suites (`tools/v2-browser.mjs`, `tools/sofa12-follow.mjs`; they need
+   unit tests and three browser suites (`tools/v2-browser.mjs`, `tools/sofa12-follow.mjs`, `tools/sofa13-typing.mjs`; they need
    `(cd tools && npm ci)` once); (3) builds and signs `dist/SofaPad.app`; (4) notarizes it (phase 2 only);
    (5) packages `dist/release/SofaPad-<version>-macOS.zip` and its `.sha256`; (6) signs the zip with the Keychain key,
    writes `dist/release/appcast.xml` with the release notes in both languages, signs it, and checks both signatures

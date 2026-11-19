@@ -630,9 +630,9 @@ A 下方工具列                     B 可收合側欄（選這個）          
 - 要 Mac 沒鎖定（鎖定畫面時 macOS 不顯示 App 的視窗，Accessibility 也看不到）；測試一開始就檢查，鎖著就停下來說明。
 
 ## D-62 鍵盤只縮 visual viewport：`interactive-widget=resizes-visual`（SOFA-13，解 I-61、I-62）
-- 問題：iOS 27.3 beta 開始照 `interactive-widget=resizes-content` 做，鍵盤連 layout viewport 一起縮，直拿的頁面比寬還矮，CSS 的 orientation 變成 landscape（I-61）。
+- 問題（推定，還沒在回報的 iPhone 上證實）：如果瀏覽器照 `interactive-widget=resizes-content` 做（WebKit 已實作，維護者說在 iOS 27.3 beta），鍵盤會連 layout viewport 一起縮，直拿的頁面比寬還矮，CSS 的 orientation 變成 landscape；這和 Ray 的截圖相符（I-61）。
 - 選項：A 拿掉 interactive-widget（用瀏覽器預設，現在兩邊都是 resizes-visual）；B 明寫 `resizes-visual`；C 留著 resizes-content，改用 JS 判斷直拿／橫拿（螢幕方向、或記住鍵盤收起時的高度），四段 `@media (orientation)` 全部改成 class。
-- 選 B：頁面從 v1 起就是照「只縮 visual viewport」設計的（fitViewport 跟著 visualViewport，D-14），iOS 以前的行為就是這樣；明寫出來，預設以後變了也不受影響，也寫清楚是刻意的。bug 259770 的留言說 resizes-visual 在 27.3 beta 照預期運作。C 要改 CSS 的串接順序（橫拿區塊後面有同樣權重的規則），而且 iPad 分割畫面裡「螢幕橫的、視窗直的」會判錯，風險比問題大；B 之後如果 Ray 的 iPhone 還是不對再考慮。
-- Android：Chrome 一直照 meta 做，之前鍵盤會縮 layout viewport；現在和 iOS 一樣只縮 visual viewport，頁面高度照樣跟著 visualViewport，不變。
+- 選 B：頁面從 v1 起就是照「只縮 visual viewport」設計的（fitViewport 跟著 visualViewport，D-14），iOS 以前的行為就是這樣；明寫出來，預設以後變了也不受影響，也寫清楚是刻意的。bug 259770 有回報者留言說 resizes-visual 在 27.3 beta 照預期運作（不是本案的真機驗證）。C 要改 CSS 的串接順序（橫拿區塊後面有同樣權重的規則），而且 iPad 分割畫面裡「螢幕橫的、視窗直的」會判錯，風險比問題大；B 之後如果 Ray 的 iPhone 還是不對再考慮。
+- Android：Chrome 108 起支援這個設定（WebView 不在內），之前鍵盤會縮 layout viewport；現在和 iOS 一樣只縮 visual viewport，頁面高度照樣跟著 visualViewport。只有模擬，沒有真機測試。
 - 一起修 I-62：鍵盤判斷改和 layout viewport（`documentElement.clientHeight`）比，不和 `innerHeight` 比（web/js/viewport.js）。
 - 來源：I-61、I-62、S-146、S-147。

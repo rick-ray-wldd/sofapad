@@ -4,14 +4,17 @@
 
 ## 4.5.2 (2026-11-19)
 
-**Typing on an upright iPhone no longer squeezes the page.** On an iPhone with the iOS 27 beta, tapping the text box
-drew the landscape layout in the top third of the screen: the side panel and a narrow trackpad strip, "Tap here to
-type" broken onto a cut-off second line, the last key row cut in half, and an empty band above the keyboard. The page
-asked for `interactive-widget=resizes-content` in its viewport meta since 4.0. iOS ignored it until WebKit implemented
-it (bug 259770; honored in the iOS 27.3 beta): the keyboard then shrinks the layout viewport too, an upright phone's
-page becomes wider than tall (390×363), and `@media (orientation: landscape)` matches. The page now asks for
-`resizes-visual`, the behaviour it was built for: the keyboard shrinks only the visual viewport, which the page
-follows (D-14). Chrome on Android, which has honored the meta all along, gets the same.
+**A compatibility fix for the squeezed page when typing on an upright iPhone.** On an iPhone with an iOS 27 developer
+beta (exact version unknown), tapping the text box showed the landscape layout in the top third of the screen: the
+side panel and a narrow trackpad strip, "Tap here to type" broken onto a cut-off second line, the last key row cut in
+half, and an empty band above the keyboard. Since 4.0 the viewport meta asked for `interactive-widget=resizes-content`,
+which iOS used to ignore. WebKit has implemented the property (bug 259770; a maintainer's comment places it in the iOS
+27.3 beta). If a browser honors `resizes-content`, the keyboard shrinks the layout viewport too, an upright phone's page
+can become wider than tall (390×363 in the replay), and `@media (orientation: landscape)` matches. That matches the
+screenshot, but it was not confirmed on the reported iPhone, and the empty band (about 98 pt more than the visible
+area) is unexplained and not known to be gone. The page now asks for `resizes-visual`, the behaviour it was built
+for: the keyboard shrinks only the visual viewport, which the page follows (D-14). Chrome on Android supports the
+property from Chrome 108; there it now behaves the same way.
 
 The keyboard check (`#app.kbd`, which drops the bottom safe area while the keyboard is up) compared the visual viewport
 with `innerHeight`; iOS 27 Safari shrinks `innerHeight` with the visual viewport (iOS 27.0 simulator: 699 → 363), so it

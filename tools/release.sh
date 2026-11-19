@@ -105,7 +105,7 @@ echo "node --test: $(grep -E '^ℹ (tests|fail)' dist/release-node-test.log | tr
 if [ "$BROWSER" = 1 ]; then
   [ -d tools/node_modules/playwright-core ] || die "browser tests need (cd tools && npm ci); or --skip-browser-tests"
   (cd mac && swift build >/dev/null)
-  for t in v2-browser sofa12-follow; do
+  for t in v2-browser sofa12-follow sofa13-typing; do
     node "tools/$t.mjs" > "dist/release-$t.log" 2>&1 || { tail -20 "dist/release-$t.log"; die "tools/$t.mjs failed"; }
     echo "$t: $(grep -E 'PASS|FAIL' "dist/release-$t.log" | tail -1)"
   done
