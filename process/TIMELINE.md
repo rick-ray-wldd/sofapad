@@ -346,5 +346,6 @@
 | S13-M1 | 看截圖：直拿卻是橫拿版面（側欄＋窄觸控板）→ orientation 媒體查詢在鍵盤打開時變成 landscape | 16:35 | I-61 |
 | S13-M2 | iOS 27.0 模擬器（iPhone 17e、注音、深色）點輸入框：4.5.1 版面正常，重現不了；量到 innerHeight 跟著 visual viewport 變小、clientHeight 不變（I-62） | 16:36–16:47 | S-147 |
 | S13-M3 | WebKit bug 259770／321543：interactive-widget 已實作，iOS 27.3 beta 照做 → 原因是 meta 的 resizes-content | 16:41 | S-146 |
-| S13-M4 | 修正（D-62）：meta 改 resizes-visual、鍵盤判斷改用 clientHeight（web/js/viewport.js）；單元測試、tools/sofa13-typing.mjs（4.5.1 8/13 → 13/13）；模擬器修正後正常、看得到 kbd | 16:42–16:47 | design/evidence/sofa13-typing-*.json、design/screenshots/sofa13/ |
-| S13-M5 | 既有測試、版本 4.5.2、發布說明、CHANGELOG、README、INSTALL；交件 | 16:47– | design/evidence/sofa13/tests.txt |
+| S13-M4 | 修正（D-62）：meta 改 resizes-visual、鍵盤判斷改用 clientHeight（web/js/viewport.js）；單元測試、tools/sofa13-typing.mjs（4.5.1 9/14 → 14/14）；模擬器修正後正常、看得到 kbd | 16:42–16:47 | design/evidence/sofa13-typing-*.json、design/screenshots/sofa13/ |
+| S13-M5 | 既有測試、版本 4.5.2、發布說明、CHANGELOG、README、INSTALL；commit 89bec93、d2c71f5 | 16:47–17:02 | design/evidence/sofa13/tests.txt |
+| S13-M6 | 唯讀子代理審 diff：沒有正確性問題；照建議補橫拿文字框檢查、修 regex、舊頁跑 before 時 Mac 報同版本（不然 4.5.1 頁面會跟著 4.5.2 重新載入）；4.5.1 9/14、4.5.2 14/14；交件 | 17:02– | design/evidence/sofa13-typing-*.json |

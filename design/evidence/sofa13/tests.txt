@@ -7,9 +7,9 @@ Unit tests
                                                     the meta says resizes-content)
 
 New browser test: node tools/sofa13-typing.mjs (keyboard replayed the way the browser handles the page's own meta)
-  --label before --web <git archive 2f82f6d>/web   FAIL 8/13: upright + keyboard → landscape layout (layout 390×363),
+  --label before --web <git archive 2f82f6d>/web   FAIL 9/14: upright + keyboard → landscape layout (layout 390×363),
                                                     pad 114 px wide on the right, hint wraps (box 126 px), no #app.kbd
-  --label after                                     PASS 13/13 (design/evidence/sofa13-typing-{before,after}.json)
+  --label after                                     PASS 14/14 (design/evidence/sofa13-typing-{before,after}.json)
 
 Existing browser suites (this tree, dry-run Mac on 127.0.0.1)
   v2-browser 41/41 · sofa12-follow 30/30 (also again after the 4.5.2 bump) · sofa8-layout 46/46 · sofa10-i18n-theme 51/51

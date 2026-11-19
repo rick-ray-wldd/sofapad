@@ -19,8 +19,8 @@ never saw the keyboard. It now compares with the layout viewport, `documentEleme
 (`web/js/viewport.js`). No change to the Mac app or the protocol.
 
 Tests: `web/test/viewport.test.mjs` (the meta, the keyboard check with iOS 27 sizes); `tools/sofa13-typing.mjs` replays
-the keyboard the way the browser handles the page's own meta, upright and in landscape (4.5.1: 8/13, the squeezed
-landscape layout; 4.5.2: 13/13). The iOS 27.0 simulator (iPhone 17e, Zhuyin keyboard) does not implement
+the keyboard the way the browser handles the page's own meta, upright and in landscape (4.5.1: 9/14, the squeezed
+landscape layout; 4.5.2: 14/14). The iOS 27.0 simulator (iPhone 17e, Zhuyin keyboard) does not implement
 `interactive-widget` and drew 4.5.1 correctly; it shows 4.5.2 the same, with the keyboard now detected.
 
 ## 4.5.1 (2026-11-02)

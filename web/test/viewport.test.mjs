@@ -33,6 +33,6 @@ test('keyboard down: equal heights, the ~24 px iOS leaves after closing (S-105),
   assert.equal(keyboardUp({ typing: true, visualHeight: 675, layoutHeight: 699 }), false);
   assert.equal(keyboardUp({ typing: true, visualHeight: 699 - KEYBOARD_MIN, layoutHeight: 699 }), false);
   assert.equal(keyboardUp({ typing: true, visualHeight: undefined, layoutHeight: 699 }), false);
-  // landscape, keyboard up (844×390 → about 190 visible)
-  assert.equal(keyboardUp({ typing: true, visualHeight: 190, layoutHeight: 390 }), true);
+  // landscape, keyboard up (844×390 → about 170 visible, tools/sofa13-typing.mjs)
+  assert.equal(keyboardUp({ typing: true, visualHeight: 170, layoutHeight: 390 }), true);
 });

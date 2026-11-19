@@ -96,7 +96,9 @@ const measure = () => {
   };
 };
 
-const server = await startServer({ webRoot });
+// the Mac says the page's own version, so an older page (--web) does not reload itself to follow it (SOFA-12)
+const pageVersion = /VERSION = '([^']*)'/.exec(readFileSync(join(webRoot, 'js/version.js'), 'utf8'))[1];
+const server = await startServer({ webRoot, env: { PKM_TEST_VERSION: pageVersion } });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const scenes = [];
 try {
@@ -158,7 +160,7 @@ try {
   await page.evaluate(() => document.activeElement.blur());
   await keyboard(upright, null);
   m = await scene('portrait-after');
-  check('收起鍵盤後回到一開始的直式版面', !m.landscape && m.bar && !/\btyping|kbd\b/.test(m.appClass) && m.pad.h === scenes[0].pad.h, `class="${m.appClass}" pad=${JSON.stringify(m.pad)} before=${JSON.stringify(scenes[0].pad)}`);
+  check('收起鍵盤後回到一開始的直式版面', !m.landscape && m.bar && !/\b(typing|kbd)\b/.test(m.appClass) && m.pad.h === scenes[0].pad.h, `class="${m.appClass}" pad=${JSON.stringify(m.pad)} before=${JSON.stringify(scenes[0].pad)}`);
 
   // 4. landscape, keyboard up: the landscape layout stays (side panel + pad)
   const side = { width: LAND.w, height: LAND.h };
@@ -169,6 +171,7 @@ try {
   await keyboard(side, LAND.visible);
   m = await scene('landscape-keyboard-up');
   check('橫拿打字：還是橫式版面，高度＝鍵盤上方可見的高度', m.landscape && m.sideHead && Math.abs(m.app.h - m.visualH) <= 1, `landscape=${m.landscape} app=${JSON.stringify(m.app)} visible=${m.visualH}`);
+  check('橫拿打字：文字框在鍵盤上方看得到（按鍵格可以上下捲）', m.input && m.input.y >= 0 && m.input.bottom <= m.visualH, `input=${JSON.stringify(m.input)} visible=${m.visualH}`);
   await page.evaluate(() => document.activeElement.blur());
   await keyboard(upright, null);
   await ctx.close();

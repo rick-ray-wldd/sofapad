@@ -1,6 +1,6 @@
 // Reproduces "the touch area gets tiny while typing" (PKM-2 §2-3) and measures it.
 // Emulates what iOS does when the keyboard opens: the layout viewport stays 390×844, only the visual
-// viewport shrinks (iOS ignores interactive-widget), and the safe-area insets stay (top 47, bottom 34).
+// viewport shrinks (as iOS does with interactive-widget=resizes-visual, the page's setting since 4.5.2), and the safe-area insets stay (top 47, bottom 34).
 // Starts its own pkm-server --dry-run on 127.0.0.1 (nothing is posted to the Mac) and stops it at the end.
 //   node tools/touch-area.mjs --label before|after
 import { chromium } from 'playwright-core';
